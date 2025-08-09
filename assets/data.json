@@ -1,0 +1,72 @@
+{
+  "status": true,
+  "data": {
+    "pageIndex": 1,
+    "pageSize": 10,
+    "total": 147,
+    "items": [
+      {
+        "name": "Tổng phân tích tế bào máu ngoại vi (bằng máy đếm tổng trở)",
+        "departmentName": "Nhà A3- Khoa Cận Lâm Sàng- Phòng 102-Xét nghiệm Huyết học",
+        "time": "2022-02-24T09:00:23",
+        "status": 1
+      },
+      {
+        "name": "Điều trị bằng parafin",
+        "departmentName": "P. Thủ thuật K.Ngoại",
+        "time": "2022-02-24T09:00:26",
+        "status": 1
+      },
+      {
+        "name": "Điện châm",
+        "departmentName": "P. Thủ thuật K.Ngoại",
+        "time": "2022-02-26T07:00:03",
+        "status": 1
+      },
+      {
+        "name": "Điện châm",
+        "departmentName": "P. Thủ thuật K.Ngoại",
+        "time": "2022-02-28T07:00:03",
+        "status": 1
+      },
+      {
+        "name": "Xoa bóp bấm huyệt điều trị viêm quanh khớp vai",
+        "departmentName": "P. Thủ thuật K.Ngoại",
+        "time": "2022-02-28T07:00:03",
+        "status": 1
+      },
+      {
+        "name": "Điều trị bằng các dòng điện xung",
+        "departmentName": "P. Thủ thuật K.Ngoại",
+        "time": "2022-03-04T07:00:19",
+        "status": 1
+      },
+      {
+        "name": "Tập vận động có trợ giúp",
+        "departmentName": "P. Thủ thuật K.Ngoại",
+        "time": "2022-03-04T07:00:19",
+        "status": 1
+      },
+      {
+        "name": "Điều trị bằng parafin",
+        "departmentName": "P. Thủ thuật K.Ngoại",
+        "time": "2022-03-04T07:00:19",
+        "status": 1
+      },
+      {
+        "name": "Điều trị bằng siêu âm",
+        "departmentName": "P. Thủ thuật K.Ngoại",
+        "time": "2022-03-04T07:00:19",
+        "status": 1
+      },
+      {
+        "name": "Điện châm",
+        "departmentName": "P. Thủ thuật K.Ngoại",
+        "time": "2022-03-04T07:00:04",
+        "status": 1
+      }
+    ],
+    "countOfPage": 10
+  },
+  "errors": null
+}

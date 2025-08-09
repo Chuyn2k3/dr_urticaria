@@ -1,0 +1,14 @@
+{
+  "message": {
+    "token": "c0Mo1intQWmm_cW30G18u9:APA91bHXCeCUccXnLhHHnk09wk1Q_3whed3TvY6eGKqOQK7n-AJaaCvBlOkExS5YWmhgc5ZDu2QCpRAi8r79mYSKI5UM-5RCFc7jm472qTPeKthsjRLz884XK7RAbKTN53E9OEn-tc_N",
+    "notification":{
+      "title":"Tài liệu",
+      "body":"Bạn có tài liệu mới"
+    },
+    "data" : {
+      "type" : "signature",
+      "rolecode" : "BAC_SI",
+      "userName": "sys.admin"
+    }
+  }
+}
