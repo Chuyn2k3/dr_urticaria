@@ -1,3 +1,6 @@
+import 'package:dr_urticaria/medical_record_v2/screens/acute_urticaria_form_screen.dart';
+import 'package:dr_urticaria/medical_record_v2/screens/chronic_urticaria_followup_form_screen.dart';
+import 'package:dr_urticaria/medical_record_v2/screens/chronic_urticaria_initial_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -479,84 +482,84 @@ class _CreateMedicalRecordScreenState extends State<CreateMedicalRecordScreen> {
         const SizedBox(height: 24),
 
         // Patient Information
-        _buildSection(
-          'Thông tin bệnh nhân',
-          [
-            _buildTextField(
-              controller: _patientNameController,
-              label: 'Họ và tên',
-              icon: Icons.person,
-              required: true,
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _patientPhoneController,
-              label: 'Số điện thoại',
-              icon: Icons.phone,
-              keyboardType: TextInputType.phone,
-              required: true,
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _patientAddressController,
-              label: 'Địa chỉ',
-              icon: Icons.location_on,
-              required: true,
-            ),
-          ],
-        ),
+        // _buildSection(
+        //   'Thông tin bệnh nhân',
+        //   [
+        //     _buildTextField(
+        //       controller: _patientNameController,
+        //       label: 'Họ và tên',
+        //       icon: Icons.person,
+        //       required: true,
+        //     ),
+        //     const SizedBox(height: 16),
+        //     _buildTextField(
+        //       controller: _patientPhoneController,
+        //       label: 'Số điện thoại',
+        //       icon: Icons.phone,
+        //       keyboardType: TextInputType.phone,
+        //       required: true,
+        //     ),
+        //     const SizedBox(height: 16),
+        //     _buildTextField(
+        //       controller: _patientAddressController,
+        //       label: 'Địa chỉ',
+        //       icon: Icons.location_on,
+        //       required: true,
+        //     ),
+        //   ],
+        // ),
 
-        const SizedBox(height: 24),
+        //const SizedBox(height: 24),
 
         // Symptoms
-        _buildSection(
-          'Triệu chứng và tiền sử',
-          [
-            _buildTextField(
-              controller: _symptomsController,
-              label: 'Triệu chứng',
-              icon: Icons.sick,
-              maxLines: 3,
-              hintText: 'Mô tả triệu chứng của bệnh nhân...',
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: CheckboxListTile(
-                    title: const Text('Có tiền sử mề đay'),
-                    value: _hasUrticariaHistory,
-                    onChanged: (value) {
-                      setState(() {
-                        _hasUrticariaHistory = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                ),
-                Expanded(
-                  child: CheckboxListTile(
-                    title: const Text('Có ảnh minh chứng'),
-                    value: _hasPhotos,
-                    onChanged: (value) {
-                      setState(() {
-                        _hasPhotos = value ?? false;
-                        if (!_hasPhotos) {
-                          _selectedImages.clear();
-                        }
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                ),
-              ],
-            ),
-            if (_hasPhotos) ...[
-              const SizedBox(height: 16),
-              _buildPhotoUploadSection(),
-            ],
-          ],
-        ),
+        // _buildSection(
+        //   'Triệu chứng và tiền sử',
+        //   [
+        //     _buildTextField(
+        //       controller: _symptomsController,
+        //       label: 'Triệu chứng',
+        //       icon: Icons.sick,
+        //       maxLines: 3,
+        //       hintText: 'Mô tả triệu chứng của bệnh nhân...',
+        //     ),
+        //     const SizedBox(height: 16),
+        //     Row(
+        //       children: [
+        //         Expanded(
+        //           child: CheckboxListTile(
+        //             title: const Text('Có tiền sử mề đay'),
+        //             value: _hasUrticariaHistory,
+        //             onChanged: (value) {
+        //               setState(() {
+        //                 _hasUrticariaHistory = value ?? false;
+        //               });
+        //             },
+        //             controlAffinity: ListTileControlAffinity.leading,
+        //           ),
+        //         ),
+        //         Expanded(
+        //           child: CheckboxListTile(
+        //             title: const Text('Có ảnh minh chứng'),
+        //             value: _hasPhotos,
+        //             onChanged: (value) {
+        //               setState(() {
+        //                 _hasPhotos = value ?? false;
+        //                 if (!_hasPhotos) {
+        //                   _selectedImages.clear();
+        //                 }
+        //               });
+        //             },
+        //             controlAffinity: ListTileControlAffinity.leading,
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //     if (_hasPhotos) ...[
+        //       const SizedBox(height: 16),
+        //       _buildPhotoUploadSection(),
+        //     ],
+        //   ],
+        // ),
       ],
     );
   }
@@ -1027,15 +1030,35 @@ class _CreateMedicalRecordScreenState extends State<CreateMedicalRecordScreen> {
           : null,
     );
 
-    context.read<MedicalRecordCubit>().addRecord(newRecord);
+    // context.read<MedicalRecordCubit>().addRecord(newRecord);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Đã tạo bệnh án $recordNumber'),
-        backgroundColor: Colors.green,
-      ),
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text('Đã tạo bệnh án $recordNumber'),
+    //     backgroundColor: Colors.green,
+    //   ),
+    // );
+
+    // Navigator.pop(context);
+    Widget targetScreen;
+
+    switch (_selectedType) {
+      case MedicalRecordType.acute:
+        targetScreen = const AcuteUrticariaFormScreen();
+        break;
+      case MedicalRecordType.chronicFirst:
+        targetScreen = const ChronicUrticariaInitialFormScreen();
+        break;
+      case MedicalRecordType.chronicReexam:
+        targetScreen = const ChronicUrticariaFollowupFormScreen();
+        break;
+      default:
+        return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => targetScreen),
     );
-
-    Navigator.pop(context);
   }
 }

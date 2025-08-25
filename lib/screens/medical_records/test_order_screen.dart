@@ -69,10 +69,15 @@ class _TestOrderScreenState extends State<TestOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = ['Tất cả', ..._availableTests.map((t) => t.category).toSet()];
+    final categories = [
+      'Tất cả',
+      ..._availableTests.map((t) => t.category).toSet()
+    ];
     final filteredTests = _selectedCategory == 'Tất cả'
         ? _availableTests
-        : _availableTests.where((t) => t.category == _selectedCategory).toList();
+        : _availableTests
+            .where((t) => t.category == _selectedCategory)
+            .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -149,7 +154,7 @@ class _TestOrderScreenState extends State<TestOrderScreen> {
               itemBuilder: (context, index) {
                 final category = categories[index];
                 final isSelected = _selectedCategory == category;
-                
+
                 return Container(
                   margin: const EdgeInsets.only(right: 8),
                   child: FilterChip(
@@ -163,8 +168,11 @@ class _TestOrderScreenState extends State<TestOrderScreen> {
                     selectedColor: AppTheme.primaryColor.withOpacity(0.2),
                     checkmarkColor: AppTheme.primaryColor,
                     labelStyle: TextStyle(
-                      color: isSelected ? AppTheme.primaryColor : AppTheme.textSecondaryColor,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected
+                          ? AppTheme.primaryColor
+                          : AppTheme.textSecondaryColor,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 );
@@ -189,22 +197,24 @@ class _TestOrderScreenState extends State<TestOrderScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: isSelected 
-                          ? AppTheme.primaryColor 
+                      color: isSelected
+                          ? AppTheme.primaryColor
                           : Colors.transparent,
                       width: 2,
                     ),
                   ),
                   child: InkWell(
-                    onTap: isAlreadyOrdered ? null : () {
-                      setState(() {
-                        if (isSelected) {
-                          _selectedTests.remove(test.id);
-                        } else {
-                          _selectedTests.add(test.id);
-                        }
-                      });
-                    },
+                    onTap: isAlreadyOrdered
+                        ? null
+                        : () {
+                            setState(() {
+                              if (isSelected) {
+                                _selectedTests.remove(test.id);
+                              } else {
+                                _selectedTests.add(test.id);
+                              }
+                            });
+                          },
                     borderRadius: BorderRadius.circular(12),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -231,9 +241,9 @@ class _TestOrderScreenState extends State<TestOrderScreen> {
                               size: 24,
                             ),
                           ),
-                          
+
                           const SizedBox(width: 16),
-                          
+
                           // Test info
                           Expanded(
                             child: Column(
@@ -284,7 +294,7 @@ class _TestOrderScreenState extends State<TestOrderScreen> {
                               ],
                             ),
                           ),
-                          
+
                           // Status indicator
                           if (isAlreadyOrdered)
                             Container(
@@ -381,20 +391,22 @@ class _TestOrderScreenState extends State<TestOrderScreen> {
     }).toList();
 
     // Update record with new test orders
-    context.read<MedicalRecordCubit>().orderTests(widget.record.id, newTestOrders);
+    context
+        .read<MedicalRecordCubit>()
+        .orderTests(widget.record.id, newTestOrders);
 
     // Send notification to patient
     final testNames = selectedTestOptions.map((t) => t.name).join(', ');
     context.read<NotificationCubit>().addNotification(
-      NotificationModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: widget.record.patientId,
-        title: 'Chỉ định xét nghiệm mới',
-        message: 'Bạn cần thực hiện các xét nghiệm: $testNames',
-        type: NotificationType.testOrder,
-        createdAt: DateTime.now(),
-      ),
-    );
+          NotificationModel(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            userId: widget.record.patientId,
+            title: 'Chỉ định xét nghiệm mới',
+            message: 'Bạn cần thực hiện các xét nghiệm: $testNames',
+            type: NotificationType.testOrder,
+            createdAt: DateTime.now(),
+          ),
+        );
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

@@ -1,3 +1,5 @@
+import 'package:dr_urticaria/models/user_model.dart';
+import 'package:dr_urticaria/screens/medical_records/medical_records_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../cubits/auth_cubit.dart';
@@ -22,7 +24,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.read<AuthCubit>().state.user!;
+    final user = UserModel(
+        email: "chuyenp32@gmail.com",
+        id: '1',
+        name: "chuyen",
+        phone: "0342702590",
+        role: UserRole.doctor);
 
     return Scaffold(
       appBar: AppBar(
@@ -82,7 +89,8 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             doctorId: user.id,
             roomNumber: user.roomNumber ?? 'P101',
           ),
-          MedicalRecordListScreen(doctorId: user.id),
+          MedicalRecordsListScreen(),
+          //MedicalRecordListScreen(doctorId: user.id),
           const ProfileScreen(),
         ],
       ),

@@ -1,3 +1,7 @@
+import 'package:dr_urticaria/di/locator.dart';
+import 'package:dr_urticaria/medical_record_v2/cubits/acute_urticaria/acute_urticaria_cubit.dart';
+import 'package:dr_urticaria/medical_record_v2/cubits/chronic_followup/chronic_followup_cubit.dart';
+import 'package:dr_urticaria/medical_record_v2/cubits/chronic_initital/chronic_initial_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'cubits/auth_cubit.dart';
@@ -10,7 +14,9 @@ import 'screens/dashboard/doctor_dashboard.dart';
 import 'screens/dashboard/nurse_dashboard.dart';
 import 'utils/app_theme.dart';
 
-void main() {
+void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  await setupLocator();
   runApp(const MyApp());
 }
 
@@ -25,6 +31,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => MedicalRecordCubit()),
         BlocProvider(create: (context) => AppointmentCubit()),
         BlocProvider(create: (context) => NotificationCubit()),
+        BlocProvider(create: (context) => AcuteUrticariaCubit()),
+        BlocProvider(create: (context) => ChronicInitialCubit()),
+        BlocProvider(create: (context) => ChronicFollowupCubit()),
       ],
       child: MaterialApp(
         title: 'Urticaria Management',

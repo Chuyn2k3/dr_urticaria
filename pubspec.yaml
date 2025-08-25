@@ -31,7 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-
+  design_system_sl:
+    path: library/design_system_sl
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -40,7 +41,6 @@ dependencies:
   carousel_slider: ^5.0.0
   intl: ^0.18.1
   webview_flutter: ^4.8.0
-  json_serializable: ^6.1.5
   freezed: ^2.2.0
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.3.10
@@ -48,11 +48,28 @@ dependencies:
   flutter_bloc: ^9.1.1
   url_launcher: ^6.2.1
   mask_text_input_formatter: ^2.9.0
-  image_picker: ^1.1.2
+  image_picker: ^1.0.4
+  dio: ^4.0.6
+  connectivity_plus: ^6.0.3
+  get_it: ^8.2.0
+  shared_preferences: ^2.2.3
+  json_annotation: ^4.8.1
+  logger: ^2.5.0
+  equatable: ^2.0.5
+  toastification: ^2.3.0
+  pretty_dio_logger: ^1.2.0-beta-1
+  retrofit: ^3.3.1
+  go_router: ^6.0.9
+  another_flushbar: ^1.12.30
+  permission_handler: ^11.3.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.0.4
+  freezed:
+  flutter_gen_runner: ^5.5.0+1
+  build_runner: ^2.4.9
+  json_serializable: ^6.7.1
+  retrofit_generator: ^4.2.0
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -62,14 +79,15 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
+dependency_overrides:
+  flutter_gen_core: 5.8.0
 # The following section is specific to Flutter packages.
 flutter:
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
-  generate: true
+
   uses-material-design: true
   assets:
     - assets/images/
