@@ -1,12 +1,5 @@
+import 'package:dr_urticaria/utils/enum/appointment_enum.dart';
 import 'package:flutter/material.dart';
-
-enum AppointmentStatus {
-  scheduled,
-  waiting,
-  inProgress,
-  completed,
-  cancelled,
-}
 
 class AppointmentModel {
   final String id;
@@ -39,15 +32,15 @@ class AppointmentModel {
     this.isWalkIn = false,
     required this.createdAt,
     this.updatedAt, // Thêm parameter này
-  }) : appointmentDate = appointmentDate ?? DateTime(appointmentTime.year, appointmentTime.month, appointmentTime.day);
+  }) : appointmentDate = appointmentDate ??
+            DateTime(appointmentTime.year, appointmentTime.month,
+                appointmentTime.day);
 
   String get statusDisplayName {
     switch (status) {
-      case AppointmentStatus.scheduled:
-        return 'Đã đặt lịch';
-      case AppointmentStatus.waiting:
+      case AppointmentStatus.pending:
         return 'Chờ khám';
-      case AppointmentStatus.inProgress:
+      case AppointmentStatus.confirmed:
         return 'Đang khám';
       case AppointmentStatus.completed:
         return 'Hoàn thành';
@@ -58,11 +51,9 @@ class AppointmentModel {
 
   Color get statusColor {
     switch (status) {
-      case AppointmentStatus.scheduled:
-        return Colors.blue;
-      case AppointmentStatus.waiting:
+      case AppointmentStatus.pending:
         return Colors.orange;
-      case AppointmentStatus.inProgress:
+      case AppointmentStatus.confirmed:
         return Colors.purple;
       case AppointmentStatus.completed:
         return Colors.green;

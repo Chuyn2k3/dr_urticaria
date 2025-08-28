@@ -42,7 +42,8 @@ class _UrticariaFormSelectorScreenState
         targetScreen = const ChronicUrticariaInitialFormScreen();
         break;
       case 'chronic_followup':
-        targetScreen = const ChronicUrticariaFollowupFormScreen();
+        targetScreen = const ChronicUrticariaInitialFormScreen();
+        //ChronicUrticariaFollowupFormScreen();
         break;
       default:
         return;

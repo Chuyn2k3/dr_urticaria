@@ -29,11 +29,11 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => MedicalRecordCubit()),
-        BlocProvider(create: (context) => AppointmentCubit()),
+        //  BlocProvider(create: (context) => AppointmentCubit()),
         BlocProvider(create: (context) => NotificationCubit()),
         BlocProvider(create: (context) => AcuteUrticariaCubit()),
         BlocProvider(create: (context) => ChronicInitialCubit()),
-        BlocProvider(create: (context) => ChronicFollowupCubit()),
+        //  BlocProvider(create: (context) => ChronicFollowupCubit()),
       ],
       child: MaterialApp(
         title: 'Urticaria Management',
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => const LoginScreen(),
           '/doctor-dashboard': (context) => const DoctorDashboard(),
-          '/nurse-dashboard': (context) => const NurseDashboard(),
+          '/nurse-dashboard': (context) => const DoctorDashboard(),
         },
       ),
     );

@@ -45,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
         dashboard = const DoctorDashboard();
         break;
       case UserRole.nurse:
-        dashboard = const NurseDashboard();
+        dashboard = const DoctorDashboard();
         break;
     }
 

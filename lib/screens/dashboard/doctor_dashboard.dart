@@ -1,3 +1,4 @@
+import 'package:dr_urticaria/medical_record_v2/screens/appointment_list_screen.dart';
 import 'package:dr_urticaria/models/user_model.dart';
 import 'package:dr_urticaria/screens/medical_records/medical_records_list_screen.dart';
 import 'package:flutter/material.dart';
@@ -85,11 +86,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         index: _currentIndex,
         children: [
           _buildHomeTab(user),
-          PatientQueueScreen(
-            doctorId: user.id,
-            roomNumber: user.roomNumber ?? 'P101',
-          ),
-          MedicalRecordsListScreen(),
+          AppointmentsListScreen(),
+          // PatientQueueScreen(
+          //   doctorId: user.id,
+          //   roomNumber: user.roomNumber ?? 'P101',
+          // ),
+          const MedicalRecordsListScreen(),
           //MedicalRecordListScreen(doctorId: user.id),
           const ProfileScreen(),
         ],
@@ -124,12 +126,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => CreateMedicalRecordScreen(
-                      createdBy: 'doctor',
-                      doctorId: user.id,
-                      doctorName: user.name,
-                      roomNumber: user.roomNumber ?? 'P101',
-                    ),
+                    builder: (_) => const AppointmentsListScreen(),
                   ),
                 );
               },
@@ -199,7 +196,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                           backgroundColor: Colors.white,
                           child: Text(
                             user.name.split(' ').last[0],
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: AppTheme.doctorColor,
                               fontSize: 24,
                               fontWeight: FontWeight.bold,

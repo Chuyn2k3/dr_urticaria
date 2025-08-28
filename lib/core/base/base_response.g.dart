@@ -38,31 +38,6 @@ Object? _$nullableGenericToJson<T>(
 ) =>
     input == null ? null : toJson(input);
 
-BaseListResponse<T> _$BaseListResponseFromJson<T>(
-  Map<String, dynamic> json,
-  T Function(Object? json) fromJsonT,
-) =>
-    BaseListResponse<T>(
-      json['data'] == null
-          ? null
-          : DataResponse<T>.fromJson(json['data'] as Map<String, dynamic>,
-              (value) => fromJsonT(value)),
-      (json['code'] as num?)?.toInt(),
-      json['message'] as String?,
-    );
-
-Map<String, dynamic> _$BaseListResponseToJson<T>(
-  BaseListResponse<T> instance,
-  Object? Function(T value) toJsonT,
-) =>
-    <String, dynamic>{
-      'data': instance.data?.toJson(
-        (value) => toJsonT(value),
-      ),
-      'code': instance.code,
-      'message': instance.message,
-    };
-
 DataResponse<T> _$DataResponseFromJson<T>(
   Map<String, dynamic> json,
   T Function(Object? json) fromJsonT,
@@ -77,4 +52,26 @@ Map<String, dynamic> _$DataResponseToJson<T>(
 ) =>
     <String, dynamic>{
       'content': instance.content?.map(toJsonT).toList(),
+    };
+
+BaseListResponse<T> _$BaseListResponseFromJson<T>(
+  Map<String, dynamic> json,
+  T Function(Object? json) fromJsonT,
+) =>
+    BaseListResponse<T>(
+      data: (json['data'] as List<dynamic>).map(fromJsonT).toList(),
+      total: (json['total'] as num).toInt(),
+      page: (json['page'] as num).toInt(),
+      limit: (json['limit'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$BaseListResponseToJson<T>(
+  BaseListResponse<T> instance,
+  Object? Function(T value) toJsonT,
+) =>
+    <String, dynamic>{
+      'data': instance.data.map(toJsonT).toList(),
+      'total': instance.total,
+      'page': instance.page,
+      'limit': instance.limit,
     };

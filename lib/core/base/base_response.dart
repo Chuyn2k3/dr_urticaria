@@ -16,31 +16,35 @@ class BaseResponse<T> {
     this.message,
   );
 
-  factory BaseResponse.fromJson(Map<String, dynamic> json,  T Function(Object? json) fromJsonT,) =>
+  factory BaseResponse.fromJson(
+    Map<String, dynamic> json,
+    T Function(Object? json) fromJsonT,
+  ) =>
       _$BaseResponseFromJson(json, fromJsonT);
 
-  Map<String, dynamic> toJson(Object? Function(T value) toJsonT) => _$BaseResponseToJson(this, toJsonT);
+  Map<String, dynamic> toJson(Object? Function(T value) toJsonT) =>
+      _$BaseResponseToJson(this, toJsonT);
 }
 
-@JsonSerializable(
-  genericArgumentFactories: true,
-)
-class BaseListResponse<T> {
-  final DataResponse<T>? data;
-  final int? code;
-  final String? message;
+// @JsonSerializable(
+//   genericArgumentFactories: true,
+// )
+// class BaseListResponse<T> {
+//   final DataResponse<T>? data;
+//   final int? code;
+//   final String? message;
 
-  BaseListResponse(
-    this.data,
-    this.code,
-    this.message,
-  );
+//   BaseListResponse(
+//     this.data,
+//     this.code,
+//     this.message,
+//   );
 
-  factory BaseListResponse.fromJson(Map<String, dynamic> json,  T Function(Object? json) fromJsonT,) =>
-      _$BaseListResponseFromJson(json, fromJsonT);
+//   factory BaseListResponse.fromJson(Map<String, dynamic> json,  T Function(Object? json) fromJsonT,) =>
+//       _$BaseListResponseFromJson(json, fromJsonT);
 
-  Map<String, dynamic> toJson(Object? Function(T value) toJsonT) => _$BaseListResponseToJson(this, toJsonT);
-}
+//   Map<String, dynamic> toJson(Object? Function(T value) toJsonT) => _$BaseListResponseToJson(this, toJsonT);
+// }
 @JsonSerializable(
   genericArgumentFactories: true,
 )
@@ -57,4 +61,30 @@ class DataResponse<T> {
 
   Map<String, dynamic> toJson(Object? Function(T value) toJsonT) =>
       _$DataResponseToJson(this, toJsonT);
+}
+
+@JsonSerializable(genericArgumentFactories: true)
+class BaseListResponse<T> {
+  final List<T> data;
+  final int total;
+  final int page;
+  final int limit;
+
+  BaseListResponse({
+    required this.data,
+    required this.total,
+    required this.page,
+    required this.limit,
+  });
+
+  factory BaseListResponse.fromJson(
+    Map<String, dynamic> json,
+    T Function(Object? json) fromJsonT,
+  ) =>
+      _$BaseListResponseFromJson(json, fromJsonT);
+
+  Map<String, dynamic> toJson(
+    Object? Function(T value) toJsonT,
+  ) =>
+      _$BaseListResponseToJson(this, toJsonT);
 }

@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:dr_urticaria/core/repositories/appointments_repository.dart';
 import 'package:dr_urticaria/core/repositories/user_repository.dart';
+import 'package:dr_urticaria/core/services/appointments_service.dart';
 import 'package:dr_urticaria/core/services/user_service.dart';
 import 'package:dr_urticaria/cubits/login/login_cubit.dart';
 import 'package:dr_urticaria/utils/http_services.dart';
@@ -30,6 +32,12 @@ Future<void> setupLocator() async {
   // );
 
   // Cubits
+  serviceLocator.registerLazySingleton<AppointmentsService>(
+      () => AppointmentsService(dio));
+
+// Repositories
+  serviceLocator.registerLazySingleton<AppointmentsRepository>(
+      () => AppointmentsRepositoryImpl(serviceLocator<AppointmentsService>()));
 
   serviceLocator.registerFactory<UserRepository>(
       () => UserRepositoryImpl(userServices: serviceLocator<UserServices>()));

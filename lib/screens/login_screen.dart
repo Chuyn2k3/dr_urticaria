@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
         dashboard = const DoctorDashboard();
         break;
       case UserRole.nurse:
-        dashboard = const NurseDashboard();
+        dashboard = const DoctorDashboard();
         break;
     }
 

@@ -1050,7 +1050,9 @@ class _CreateMedicalRecordScreenState extends State<CreateMedicalRecordScreen> {
         targetScreen = const ChronicUrticariaInitialFormScreen();
         break;
       case MedicalRecordType.chronicReexam:
-        targetScreen = const ChronicUrticariaFollowupFormScreen();
+        targetScreen = const ChronicUrticariaInitialFormScreen();
+
+        //ChronicUrticariaFollowupFormScreen();
         break;
       default:
         return;
