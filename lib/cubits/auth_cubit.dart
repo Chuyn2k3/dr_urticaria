@@ -1,74 +1,61 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/user_model.dart';
+import 'package:get_it/get_it.dart';
+import '../../constant/config.dart';
+import '../../utils/shared_preferences_manager.dart';
 
-class AuthState {
-  final UserModel? user;
-  final bool isLoading;
-  final String? error;
+part 'auth_state.dart';
 
-  AuthState({
-    this.user,
-    this.isLoading = false,
-    this.error,
-  });
-
-  AuthState copyWith({
-    UserModel? user,
-    bool? isLoading,
-    String? error,
-  }) {
-    return AuthState(
-      user: user ?? this.user,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-    );
-  }
-}
+GetIt sl = GetIt.instance;
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthState());
 
-  // Demo users
-  final List<UserModel> _demoUsers = [
-    UserModel(
-      id: 'doctor1',
-      name: 'Nguyễn Văn A',
-      email: 'doctor@hospital.com',
-      phone: '0123456789',
-      role: UserRole.doctor,
-      specialization: 'Da liễu',
-      roomNumber: 'P101',
-      department: 'Khoa Da liễu',
-    ),
-    UserModel(
-      id: 'nurse1',
-      name: 'Trần Thị B',
-      email: 'nurse@hospital.com',
-      phone: '0987654321',
-      role: UserRole.nurse,
-      department: 'Khoa Da liễu',
-    ),
-  ];
+  void login({
+    String? username,
+    String? password,
+  }) async {
+    final spManager = GetIt.instance.get<SharedPreferencesManager>();
+    await spManager.putString(AppConfig.SL_USERNAME, username ?? "");
+    await spManager.putString(AppConfig.SL_PASSWORD, password ?? "");
+    emit(AuthState(isLogin: true));
+  }
 
-  Future<void> login(String email, String password) async {
-    emit(state.copyWith(isLoading: true, error: null));
+  Future<void> logout() async {
+    final spManager = GetIt.instance.get<SharedPreferencesManager>();
 
-    try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+    spManager.remove(AppConfig.accessTokenKey);
+    spManager.remove(AppConfig.idTokenKey);
+    await spManager.remove(AppConfig.SL_USERNAME);
+    await spManager.remove(AppConfig.SL_PASSWORD);
+    emit(AuthState(isLogin: false));
+  }
 
-      final user = _demoUsers.firstWhere(
-        (u) => u.email == email,
-        orElse: () => throw Exception('Invalid credentials'),
-      );
-
-      emit(state.copyWith(user: user, isLoading: false));
-    } catch (e) {
-      emit(state.copyWith(error: e.toString(), isLoading: false));
+  void checkLogin() async {
+    final isExpired = await isTokenExpired();
+    if (isExpired) {
+      logout();
+    } else {
+      login();
     }
   }
 
-  void logout() {
-    emit(AuthState());
+  Future<bool> isTokenExpired() async {
+    final spManager = GetIt.instance.get<SharedPreferencesManager>();
+
+    final username = spManager.getString(AppConfig.SL_USERNAME);
+    final password = spManager.getString(AppConfig.SL_PASSWORD);
+    final accessToken = spManager.getString(AppConfig.accessTokenKey) ?? "";
+    // if (accessToken.isEmpty) {
+    //   return true;
+    // }
+    if (username != null && password != null) {
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> deleteAccount() async {
+    // await sl.get<UserRepository>().deleteAccount();
+    // logout();
   }
 }

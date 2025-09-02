@@ -28,6 +28,7 @@ class MedicalRecordsListScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('Danh sách bệnh án'),
       ),
       body: ListView.builder(

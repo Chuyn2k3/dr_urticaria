@@ -1,5 +1,5 @@
 import 'package:dr_urticaria/core/repositories/vital_record_repository.dart';
-import 'package:dr_urticaria/cubits/login/appointment/appointment_update_status_cubit.dart';
+import 'package:dr_urticaria/cubits/appointment/appointment_update_status_cubit.dart';
 import 'package:dr_urticaria/cubits/vital_record_detail_cubit.dart';
 import 'package:dr_urticaria/cubits/vital_record_detail_state.dart';
 import 'package:dr_urticaria/medical_record_v2/widgets/vital_field_editor.dart';
@@ -10,12 +10,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class VitalRecordDetailPage extends StatelessWidget {
   final int medicalRecordId;
- 
 
   const VitalRecordDetailPage({
     super.key,
     required this.medicalRecordId,
-
   });
 
   @override
@@ -27,13 +25,10 @@ class VitalRecordDetailPage extends StatelessWidget {
               VitalRecordDetailCubit(medicalRecordId: medicalRecordId)..load(),
         ),
         BlocProvider(
-          create: (ctx) => AppointmentUpdateStatusCubit(
-          
-          ),
+          create: (ctx) => AppointmentUpdateStatusCubit(),
         ),
       ],
-      child: _VitalRecordDetailView(appointmentId: medicalRecordId
-      ),
+      child: _VitalRecordDetailView(appointmentId: medicalRecordId),
     );
   }
 }
@@ -60,12 +55,14 @@ class _VitalRecordDetailView extends StatelessWidget {
             }
           },
         ),
-        BlocListener<AppointmentUpdateStatusCubit, AppointmentUpdateStatusState>(
+        BlocListener<AppointmentUpdateStatusCubit,
+            AppointmentUpdateStatusState>(
           listener: (context, state) {
             if (state is AppointmentUpdateStatusSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Trạng thái đổi thành: ${state.appointment.status}'),
+                  content:
+                      Text('Trạng thái đổi thành: ${state.appointment.status}'),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -153,8 +150,8 @@ class _VitalRecordDetailView extends StatelessWidget {
                                     ),
                                     if (item.indicator.unit != null)
                                       Text(item.indicator.unit!,
-                                          style:
-                                              TextStyle(color: Colors.grey[600])),
+                                          style: TextStyle(
+                                              color: Colors.grey[600])),
                                   ],
                                 ),
                                 const SizedBox(height: 8),
@@ -176,7 +173,8 @@ class _VitalRecordDetailView extends StatelessWidget {
                                     prefixIcon:
                                         const Icon(Icons.note_alt_outlined),
                                     border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12)),
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
                                   ),
                                   controller: TextEditingController(
                                       text: state.editedNotes[vitalId] ??

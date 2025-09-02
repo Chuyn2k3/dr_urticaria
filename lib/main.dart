@@ -1,3 +1,4 @@
+import 'package:dr_urticaria/cubits/profile/profile_cubit.dart';
 import 'package:dr_urticaria/di/locator.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/acute_urticaria/acute_urticaria_cubit.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/chronic_followup/chronic_followup_cubit.dart';
@@ -27,13 +28,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider(create: (context) => AuthCubit()..checkLogin()),
         BlocProvider(create: (context) => MedicalRecordCubit()),
         //  BlocProvider(create: (context) => AppointmentCubit()),
         BlocProvider(create: (context) => NotificationCubit()),
         BlocProvider(create: (context) => AcuteUrticariaCubit()),
         BlocProvider(create: (context) => ChronicInitialCubit()),
         //  BlocProvider(create: (context) => ChronicFollowupCubit()),
+        BlocProvider(
+          create: (_) => serviceLocator<ProfileUserCubit>(),
+        ),
       ],
       child: MaterialApp(
         title: 'Urticaria Management',

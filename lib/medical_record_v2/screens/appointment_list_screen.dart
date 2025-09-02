@@ -1,5 +1,5 @@
-import 'package:dr_urticaria/cubits/login/appointment/appointment_list_cubit.dart';
-import 'package:dr_urticaria/cubits/login/appointment/appointment_list_state.dart';
+import 'package:dr_urticaria/cubits/appointment/appointment_list_cubit.dart';
+import 'package:dr_urticaria/cubits/appointment/appointment_list_state.dart';
 import 'package:dr_urticaria/medical_record_v2/screens/vital_record_detail_page.dart';
 import 'package:dr_urticaria/utils/enum/appointment_enum.dart';
 import 'package:dr_urticaria/widget/appbar/custom_app_bar.dart';
@@ -65,7 +65,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      appBar: CustomAppbar.basic(title: 'Danh sách lịch hẹn'),
+      // appBar: CustomAppbar.basic(title: 'Danh sách lịch hẹn'),
       body: Column(
         children: [
           _buildTabs(),
@@ -126,6 +126,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
         borderRadius: BorderRadius.circular(12),
       ),
       child: TabBar(
+        dividerColor: Colors.transparent,
         controller: _tabController,
         indicator: BoxDecoration(
           color: const Color(0xFF3B82F6),
@@ -164,10 +165,10 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
               );
         },
         tabs: const [
-          Tab(text: 'Tất cả'),
           Tab(text: 'Chờ xử lý'),
           Tab(text: 'Đã xác nhận'),
-          Tab(text: 'Hoàn thành'),
+          Tab(text: 'Hoàn thànhn'),
+          Tab(text: 'Đã hủy'),
         ],
       ),
     );
@@ -180,7 +181,6 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
         MaterialPageRoute(
           builder: (context) => VitalRecordDetailPage(
             medicalRecordId: appointment.id,
-       
           ),
         ),
       ),
