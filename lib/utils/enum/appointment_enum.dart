@@ -1,7 +1,13 @@
+import 'package:json_annotation/json_annotation.dart';
+
 enum AppointmentStatus {
+  @JsonValue('PENDING')
   pending('PENDING'),
+  @JsonValue('CONFIRMED')
   confirmed('CONFIRMED'),
+  @JsonValue('CANCELLED')
   cancelled('CANCELLED'),
+  @JsonValue('COMPLETED')
   completed('COMPLETED');
 
   final String serverKey;

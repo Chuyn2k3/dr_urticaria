@@ -1,5 +1,6 @@
 import 'package:dr_urticaria/cubits/login/appointment/appointment_list_cubit.dart';
 import 'package:dr_urticaria/cubits/login/appointment/appointment_list_state.dart';
+import 'package:dr_urticaria/medical_record_v2/screens/vital_record_detail_page.dart';
 import 'package:dr_urticaria/utils/enum/appointment_enum.dart';
 import 'package:dr_urticaria/widget/appbar/custom_app_bar.dart';
 import 'package:dr_urticaria/widget/base_scaffold.dart';
@@ -12,7 +13,7 @@ class AppointmentsListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AppointmentListCubit()..fetch(page: 1, limit: 10),
+      create: (_) => AppointmentListCubit(), // ❌ bỏ ..fetch(page:1,...)
       child: const AppointmentsListView(),
     );
   }
@@ -47,7 +48,9 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 200) {
-        context.read<AppointmentListCubit>().loadMore();
+        context
+            .read<AppointmentListCubit>()
+            .loadMore(status: _selectedStatus); // ✅ truyền status
       }
     });
   }
@@ -76,18 +79,18 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
                 } else if (state is AppointmentListFailure) {
                   return Center(child: Text('Lỗi: ${state.message}'));
                 } else if (state is AppointmentListSuccess) {
-                  final items = state.items.where((a) {
-                    if (_selectedStatus == null) return true;
-                    return a.status == _selectedStatus!.serverKey;
-                  }).toList();
+                  final items = state.items
+                      .where((a) => a.status == _selectedStatus)
+                      .toList();
 
                   if (items.isEmpty) return _buildEmptyState();
 
                   return RefreshIndicator(
                     onRefresh: () async {
-                      await context
-                          .read<AppointmentListCubit>()
-                          .refresh(limit: state.limit);
+                      await context.read<AppointmentListCubit>().refresh(
+                            limit: state.limit,
+                            status: _selectedStatus, // ✅ truyền status
+                          );
                     },
                     child: ListView.builder(
                       controller: _scrollController,
@@ -138,7 +141,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
           AppointmentStatus newStatus = AppointmentStatus.pending;
           switch (index) {
             case 0:
-              newStatus = AppointmentStatus.pending; // All appointments
+              newStatus = AppointmentStatus.pending;
               break;
             case 1:
               newStatus = AppointmentStatus.confirmed;
@@ -151,9 +154,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
               break;
           }
 
-          setState(() {
-            _selectedStatus = newStatus;
-          });
+          setState(() => _selectedStatus = newStatus);
 
           context.read<AppointmentListCubit>().fetch(
                 page: 1,
@@ -173,54 +174,73 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
   }
 
   Widget _buildAppointmentCard(appointment) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VitalRecordDetailPage(
+            medicalRecordId: appointment.id,
+       
           ),
-        ],
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            appointment.patient.fullname,
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'SĐT: ${appointment.patient.phone}',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.shade600,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text(
-                appointment.appointmentDate.toString(),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade700,
-                ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              appointment.patient.fullname,
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'SĐT: ${appointment.patient.phone}',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade600,
               ),
-              const Spacer(),
-              _buildStatusChip(
-                  AppointmentStatus.fromServerKey(appointment.status)),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text(
+                  appointment.appointmentDate.toString(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+                const Spacer(),
+                _buildStatusChip(appointment.status),
+              ],
+            ),
+            Text(
+              'ID: ${appointment.id}',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

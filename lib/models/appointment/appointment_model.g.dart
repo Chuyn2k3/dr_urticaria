@@ -35,8 +35,8 @@ Map<String, dynamic> _$AppointmentModelToJson(AppointmentModel instance) =>
     };
 
 const _$AppointmentStatusEnumMap = {
-  AppointmentStatus.pending: 'pending',
-  AppointmentStatus.confirmed: 'confirmed',
-  AppointmentStatus.cancelled: 'cancelled',
-  AppointmentStatus.completed: 'completed',
+  AppointmentStatus.pending: 'PENDING',
+  AppointmentStatus.confirmed: 'CONFIRMED',
+  AppointmentStatus.cancelled: 'CANCELLED',
+  AppointmentStatus.completed: 'COMPLETED',
 };

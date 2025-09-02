@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'appointments_service.dart';
+part of 'medical_record_service.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -8,8 +8,8 @@ part of 'appointments_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
 
-class _AppointmentsService implements AppointmentsService {
-  _AppointmentsService(
+class _MedicalRecordService implements MedicalRecordService {
+  _MedicalRecordService(
     this._dio, {
     this.baseUrl,
   });
@@ -19,49 +19,61 @@ class _AppointmentsService implements AppointmentsService {
   String? baseUrl;
 
   @override
-  Future<BaseListResponse<AppointmentModel>> getAppointments({
-    required page,
-    required limit,
-    reason,
-    status,
-    appointmentDateFrom,
-    appointmentDateTo,
-  }) async {
+  Future<BaseListResponse<VitalValueModel>> getVitalValues(
+      medicalRecordId) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'page': page,
-      r'limit': limit,
-      r'reason': reason,
-      r'status': status,
-      r'appointmentDateFrom': appointmentDateFrom,
-      r'appointmentDateTo': appointmentDateTo,
-    };
-    queryParameters.removeWhere((k, v) => v == null);
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<BaseListResponse<AppointmentModel>>(Options(
+        _setStreamType<BaseListResponse<VitalValueModel>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              '/api/v1/staff/appointments',
+              '/api/staff/medical-records/${medicalRecordId}/vital-values',
               queryParameters: queryParameters,
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = BaseListResponse<AppointmentModel>.fromJson(
+    final value = BaseListResponse<VitalValueModel>.fromJson(
       _result.data!,
-      (json) => AppointmentModel.fromJson(json as Map<String, dynamic>),
+      (json) => VitalValueModel.fromJson(json as Map<String, dynamic>),
     );
     return value;
   }
 
   @override
-  Future<BaseResponse<AppointmentModel>> updateAppointmentStatus(
-    id,
+  Future<BaseResponse<VitalIndicatorModel>> getIndicator(indicatorId) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<BaseResponse<VitalIndicatorModel>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/api/v1/vitals/indicators/${indicatorId}',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = BaseResponse<VitalIndicatorModel>.fromJson(
+      _result.data!,
+      (json) => VitalIndicatorModel.fromJson(json as Map<String, dynamic>),
+    );
+    return value;
+  }
+
+  @override
+  Future<BaseListResponse<VitalValueModel>> updateVitalValues(
+    medicalRecordId,
     body,
   ) async {
     const _extra = <String, dynamic>{};
@@ -70,21 +82,21 @@ class _AppointmentsService implements AppointmentsService {
     final _data = <String, dynamic>{};
     _data.addAll(body);
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<BaseResponse<AppointmentModel>>(Options(
+        _setStreamType<BaseListResponse<VitalValueModel>>(Options(
       method: 'PATCH',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              '/api/v1/staff/appointments/${id}',
+              '/api/v1/patient/medical-records/${medicalRecordId}/vital-values',
               queryParameters: queryParameters,
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = BaseResponse<AppointmentModel>.fromJson(
+    final value = BaseListResponse<VitalValueModel>.fromJson(
       _result.data!,
-      (json) => AppointmentModel.fromJson(json as Map<String, dynamic>),
+      (json) => VitalValueModel.fromJson(json as Map<String, dynamic>),
     );
     return value;
   }

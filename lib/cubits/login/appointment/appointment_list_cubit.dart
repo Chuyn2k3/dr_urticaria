@@ -7,6 +7,7 @@ import 'appointment_list_state.dart';
 
 class AppointmentListCubit extends Cubit<AppointmentListState> {
   final _repo = serviceLocator<AppointmentsRepository>();
+  bool _isLoadingMore = false; // ✅ chặn double load
 
   AppointmentListCubit() : super(AppointmentListInitial());
 
@@ -20,7 +21,6 @@ class AppointmentListCubit extends Cubit<AppointmentListState> {
     bool isRefresh = false,
     bool isLoadMore = false,
   }) async {
-    // Nếu refresh thì reset về loading
     if (!isLoadMore) {
       emit(AppointmentListLoading());
     }
@@ -51,9 +51,9 @@ class AppointmentListCubit extends Cubit<AppointmentListState> {
       } else {
         emit(AppointmentListSuccess(
           items: res.data,
-          total: res.total,
-          page: res.page,
-          limit: res.limit,
+          total: res.total ?? 0,
+          page: res.page ?? 1,
+          limit: res.limit ?? limit,
           hasMore: hasMore,
         ));
       }
@@ -64,30 +64,28 @@ class AppointmentListCubit extends Cubit<AppointmentListState> {
 
   Future<void> refresh({
     required int limit,
-    String? reason,
     AppointmentStatus? status,
-    DateTime? from,
-    DateTime? to,
   }) async {
     await fetch(
       page: 1,
       limit: limit,
-      reason: reason,
       status: status,
-      from: from,
-      to: to,
       isRefresh: true,
     );
   }
 
-  Future<void> loadMore() async {
+  Future<void> loadMore({AppointmentStatus? status}) async {
+    if (_isLoadingMore) return;
     final current = state;
     if (current is AppointmentListSuccess && current.hasMore) {
+      _isLoadingMore = true;
       await fetch(
         page: current.page + 1,
         limit: current.limit,
+        status: status,
         isLoadMore: true,
       );
+      _isLoadingMore = false;
     }
   }
 }

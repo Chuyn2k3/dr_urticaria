@@ -18,4 +18,10 @@ abstract class AppointmentsService {
     @Query('appointmentDateFrom') String? appointmentDateFrom,
     @Query('appointmentDateTo') String? appointmentDateTo,
   });
+
+  @PATCH('/api/v1/staff/appointments/{id}')
+  Future<BaseResponse<AppointmentModel>> updateAppointmentStatus(
+    @Path('id') int id,
+    @Body() Map<String, dynamic> body,
+  );
 }
