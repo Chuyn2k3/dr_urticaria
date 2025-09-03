@@ -140,7 +140,8 @@ class VitalFieldEditor extends StatelessWidget {
           onTap: () async {
             final picked = await showDatePicker(
               context: context,
-              initialDate: DateTime.tryParse(value?.toString() ?? "") ?? DateTime.now(),
+              initialDate:
+                  DateTime.tryParse(value?.toString() ?? "") ?? DateTime.now(),
               firstDate: DateTime(1970),
               lastDate: DateTime(2100),
             );
@@ -155,17 +156,20 @@ class VitalFieldEditor extends StatelessWidget {
             textController: TextEditingController(
               text: value != null
                   ? DateTime.tryParse(value.toString()) != null
-                      ? DateFormat("yyyy-MM-dd").format(DateTime.parse(value.toString()))
+                      ? DateFormat("yyyy-MM-dd")
+                          .format(DateTime.parse(value.toString()))
                       : value.toString()
                   : "Chọn ngày",
             ),
-            decoration: _decoration(context, label: indicator.name, hint: "Chọn ngày"),
+            decoration:
+                _decoration(context, label: indicator.name, hint: "Chọn ngày"),
           ),
         );
 
       case "range":
         final min = num.tryParse(indicator.minValue ?? '0')?.toDouble() ?? 0;
-        final max = num.tryParse(indicator.maxValue ?? '100')?.toDouble() ?? 100;
+        final max =
+            num.tryParse(indicator.maxValue ?? '100')?.toDouble() ?? 100;
         final range = (value as RangeValues?) ?? RangeValues(min, max);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +205,7 @@ class VitalFieldEditor extends StatelessWidget {
         }
         //return Text("hehe");
         return _buildCustomField(groups, value, onChanged);
-
+        return Text("⚠️ Chưa hỗ trợ loại: ${indicator.valueType}");
       default:
         return Text("⚠️ Chưa hỗ trợ loại: ${indicator.valueType}");
     }
@@ -209,6 +213,7 @@ class VitalFieldEditor extends StatelessWidget {
 
   Widget _buildCustomField(
       dynamic fieldOrGroup, dynamic value, Function(dynamic) onChanged) {
+    print(fieldOrGroup);
     if (fieldOrGroup is List) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,16 +224,14 @@ class VitalFieldEditor extends StatelessWidget {
     }
 
     if (fieldOrGroup is CustomFieldGroup) {
+      //return Text("hehe");
       final group = fieldOrGroup;
       List<Widget> children = [];
+
       if (group.label != null) {
         children.add(
           Text(
             group.label!,
-            style: Theme.of(getContext)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontWeight: FontWeight.bold),
           ),
         );
       }
@@ -249,9 +252,6 @@ class VitalFieldEditor extends StatelessWidget {
               onPressed: null,
               icon: Text(
                 unit!,
-                style: Theme.of(getContext).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.greyColor,
-                    ),
               ),
             )
           : null;
@@ -259,12 +259,15 @@ class VitalFieldEditor extends StatelessWidget {
       switch (field.type) {
         case FieldType.text:
           widgets.add(
+            //Text("hehe")
+            //TextFormField()
             InputTextField(
               label: field.label ?? '',
-              textController: TextEditingController(text: value?.toString() ?? ""),
+              textController:
+                  TextEditingController(text: value?.toString() ?? ""),
               onChanged: onChanged,
-              iconButton: suffixIcon,
-              decoration: _decoration(getContext, label: field.label),
+              // iconButton: suffixIcon,
+              //decoration: _decoration(getContext, label: field.label),
             ),
           );
           break;
@@ -272,11 +275,12 @@ class VitalFieldEditor extends StatelessWidget {
           widgets.add(
             InputTextField(
               label: field.label ?? '',
-              textController: TextEditingController(text: value?.toString() ?? ""),
+              textController:
+                  TextEditingController(text: value?.toString() ?? ""),
               keyboardType: TextInputType.number,
-             // onChanged: (val) => onChanged(num.tryParse(val)),
+              // onChanged: (val) => onChanged(num.tryParse(val)),
               iconButton: suffixIcon,
-              decoration: _decoration(getContext, label: field.label),
+              //decoration: _decoration(getContext, label: field.label),
             ),
           );
           break;
@@ -291,31 +295,32 @@ class VitalFieldEditor extends StatelessWidget {
           );
           break;
         case FieldType.multiSelection:
-          final selected = (value as List<String>?) ?? [];
+          //final selected = (value as List<String>?) ?? [];
           widgets.add(
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(field.label ?? '',
-                    style: Theme.of(getContext).textTheme.bodyMedium),
+                Text(
+                  field.label ?? '',
+                ),
                 Wrap(
                   spacing: 6,
                   children: (field.options ?? []).map((opt) {
-                    final checked = selected.contains(opt);
+                    //final checked = selected.contains(opt);
                     return FilterChip(
                       backgroundColor: AppColors.whiteColor,
                       label: Text(opt),
-                      selected: checked,
+                      //selected: checked,
                       selectedColor: AppColors.primaryColor.withOpacity(0.2),
                       checkmarkColor: AppColors.primaryColor,
                       onSelected: (sel) {
-                        final updated = List<String>.from(selected);
-                        if (sel) {
-                          updated.add(opt);
-                        } else {
-                          updated.remove(opt);
-                        }
-                        onChanged(updated);
+                        // final updated = List<String>.from(selected);
+                        // if (sel) {
+                        //   updated.add(opt);
+                        // } else {
+                        //   updated.remove(opt);
+                        // }
+                        // onChanged(updated);
                       },
                     );
                   }).toList(),
@@ -330,7 +335,8 @@ class VitalFieldEditor extends StatelessWidget {
               onTap: () async {
                 final picked = await showDatePicker(
                   context: getContext,
-                  initialDate: DateTime.tryParse(value?.toString() ?? "") ?? DateTime.now(),
+                  initialDate: DateTime.tryParse(value?.toString() ?? "") ??
+                      DateTime.now(),
                   firstDate: DateTime(1970),
                   lastDate: DateTime(2100),
                 );
@@ -343,11 +349,13 @@ class VitalFieldEditor extends StatelessWidget {
                 textController: TextEditingController(
                   text: value != null
                       ? DateTime.tryParse(value.toString()) != null
-                          ? DateFormat("yyyy-MM-dd").format(DateTime.parse(value.toString()))
+                          ? DateFormat("yyyy-MM-dd")
+                              .format(DateTime.parse(value.toString()))
                           : value.toString()
                       : "Chọn ngày",
                 ),
-                decoration: _decoration(getContext, label: field.label, hint: "Chọn ngày"),
+                // decoration: _decoration(getContext,
+                //     label: field.label, hint: "Chọn ngày"),
               ),
             ),
           );
@@ -356,12 +364,14 @@ class VitalFieldEditor extends StatelessWidget {
           widgets.add(
             InputTextField(
               label: field.label ?? 'Kê đơn thuốc',
-              textController: TextEditingController(text: value?.toString() ?? ""),
+              textController:
+                  TextEditingController(text: value?.toString() ?? ""),
               onChanged: (value) => onChanged(value),
               hintText: 'Nhập tên thuốc hoặc thông tin đơn thuốc',
               prefixIcon: const Icon(Icons.medical_services),
               iconButton: suffixIcon,
-              decoration: _decoration(getContext, label: field.label, hint: "Nhập tên thuốc"),
+              // decoration: _decoration(getContext,
+              //     label: field.label, hint: "Nhập tên thuốc"),
             ),
           );
           break;
@@ -374,10 +384,10 @@ class VitalFieldEditor extends StatelessWidget {
             widgets.add(
               Text(
                 field.label ?? 'Custom Field',
-                style: Theme.of(getContext)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                // style: Theme.of(getContext)
+                //     .textTheme
+                //     .bodyMedium
+                //     ?.copyWith(fontWeight: FontWeight.bold),
               ),
             );
           }
@@ -399,7 +409,8 @@ class VitalFieldEditor extends StatelessWidget {
     }
 
     if (fieldOrGroup is Map<String, dynamic>) {
-      return _buildCustomField(CustomField.fromJson(fieldOrGroup), value, onChanged);
+      //return Text("hehe");
+      _buildCustomField(CustomField.fromJson(fieldOrGroup), value, onChanged);
     }
 
     return const SizedBox.shrink();
@@ -422,12 +433,13 @@ class VitalFieldEditor extends StatelessWidget {
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide:
-            BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
+        borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+        borderSide:
+            BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
     );

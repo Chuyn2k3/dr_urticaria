@@ -89,7 +89,7 @@ class _MedicalRecordService implements MedicalRecordService {
     )
             .compose(
               _dio.options,
-              '/api/v1/patient/medical-records/${medicalRecordId}/vital-values',
+              '/api/staff/medical-records/${medicalRecordId}/vital-values',
               queryParameters: queryParameters,
               data: _data,
             )

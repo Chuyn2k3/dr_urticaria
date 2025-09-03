@@ -19,7 +19,7 @@ abstract class MedicalRecordService {
   Future<BaseResponse<VitalIndicatorModel>> getIndicator(
       @Path('id') int indicatorId);
 
-  @PATCH('/api/v1/patient/medical-records/{id}/vital-values')
+  @PATCH('/api/staff/medical-records/{id}/vital-values')
   Future<BaseListResponse<VitalValueModel>> updateVitalValues(
     @Path('id') int medicalRecordId,
     @Body() Map<String, dynamic> body,

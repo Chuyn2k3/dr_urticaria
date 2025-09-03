@@ -46,6 +46,7 @@ class VitalRecordRepositoryImpl implements VitalRecordRepository {
     try {
       final indicatorRes = await service.getIndicator(v.vitalIndicatorId);
       final indicator = indicatorRes.data;
+      print(indicator == null ? true : false);
       return VitalRecordItem(value: v, indicator: indicator!);
     } catch (e) {
       rethrow;
@@ -74,7 +75,7 @@ class VitalRecordRepositoryImpl implements VitalRecordRepository {
         continue;
       }
       grouped.putIfAbsent(g.id, () => VitalRecordGroup(group: g, items: []));
-      grouped[g.id]!.items.add(item);
+      grouped[g.id]?.items.add(item);
     }
     return grouped.values.toList()
       ..sort((a, b) => a.group.name.compareTo(b.group.name));
