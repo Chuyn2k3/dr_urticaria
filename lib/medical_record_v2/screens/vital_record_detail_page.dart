@@ -10,10 +10,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class VitalRecordDetailPage extends StatelessWidget {
   final int medicalRecordId;
+  final AppointmentStatus appointmentStatus;
 
   const VitalRecordDetailPage({
     super.key,
     required this.medicalRecordId,
+    required this.appointmentStatus,
   });
 
   @override
@@ -28,18 +30,27 @@ class VitalRecordDetailPage extends StatelessWidget {
           create: (ctx) => AppointmentUpdateStatusCubit(),
         ),
       ],
-      child: _VitalRecordDetailView(appointmentId: medicalRecordId),
+      child: _VitalRecordDetailView(
+        appointmentId: medicalRecordId,
+        initialStatus: appointmentStatus, // 👈 truyền xuống
+      ),
     );
   }
 }
 
 class _VitalRecordDetailView extends StatelessWidget {
   final int appointmentId;
-  const _VitalRecordDetailView({required this.appointmentId});
+  final AppointmentStatus initialStatus; // 👈 nhận vào
+
+  const _VitalRecordDetailView({
+    required this.appointmentId,
+    required this.initialStatus,
+  });
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme.primary;
+
     return MultiBlocListener(
       listeners: [
         BlocListener<VitalRecordDetailCubit, VitalRecordDetailState>(
@@ -130,7 +141,7 @@ class _VitalRecordDetailView extends StatelessWidget {
                           final vitalId = item.value.id;
                           final current = state.editedValues[vitalId] ??
                               item.value.value?.value ??
-                              0;
+                              "";
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Column(
@@ -225,20 +236,62 @@ class _VitalRecordDetailView extends StatelessWidget {
                     AppointmentUpdateStatusState>(
                   builder: (context, state) {
                     final loading = state is AppointmentUpdateStatusLoading;
-                    return FilledButton.icon(
-                      onPressed: loading
-                          ? null
-                          : () => context
-                              .read<AppointmentUpdateStatusCubit>()
-                              .updateStatus(
-                                appointmentId,
-                                AppointmentStatus.confirmed,
-                              ),
-                      icon: const Icon(Icons.check_circle_outline),
-                      label: loading
-                          ? const Text("Đang cập nhật...")
-                          : const Text("Xác nhận lịch hẹn"),
-                    );
+
+                    // 👉 Dùng trực tiếp status truyền vào
+                    final currentStatus = initialStatus;
+
+                    Widget? button;
+
+                    if (currentStatus == AppointmentStatus.pending) {
+                      button = Row(
+                        children: [
+                          Expanded(
+                            child: FilledButton.icon(
+                              onPressed: loading
+                                  ? null
+                                  : () => context
+                                      .read<AppointmentUpdateStatusCubit>()
+                                      .updateStatus(appointmentId,
+                                          AppointmentStatus.confirmed),
+                              icon: const Icon(Icons.check_circle_outline),
+                              label: loading
+                                  ? const Text("Đang xác nhận...")
+                                  : const Text("Xác nhận"),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: loading
+                                  ? null
+                                  : () => context
+                                      .read<AppointmentUpdateStatusCubit>()
+                                      .updateStatus(appointmentId,
+                                          AppointmentStatus.cancelled),
+                              icon: const Icon(Icons.cancel_outlined),
+                              label: loading
+                                  ? const Text("Đang huỷ...")
+                                  : const Text("Huỷ"),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else if (currentStatus == AppointmentStatus.confirmed) {
+                      button = FilledButton.icon(
+                        onPressed: loading
+                            ? null
+                            : () => context
+                                .read<AppointmentUpdateStatusCubit>()
+                                .updateStatus(
+                                    appointmentId, AppointmentStatus.completed),
+                        icon: const Icon(Icons.done_all),
+                        label: loading
+                            ? const Text("Đang hoàn thành...")
+                            : const Text("Hoàn thành"),
+                      );
+                    }
+
+                    return button ?? const SizedBox.shrink();
                   },
                 ),
               ],

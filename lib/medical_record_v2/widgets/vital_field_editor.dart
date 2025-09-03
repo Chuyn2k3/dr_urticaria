@@ -50,7 +50,7 @@ class VitalFieldEditor extends StatelessWidget {
         return InputTextField(
           label: indicator.name,
           textController: TextEditingController(text: value?.toString() ?? ""),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          //keyboardType: const TextInputType.numberWithOptions(decimal: true),
           onChanged: (val) => onChanged(num.tryParse(val)),
           iconButton: suffixIcon,
           decoration: _decoration(
@@ -277,7 +277,7 @@ class VitalFieldEditor extends StatelessWidget {
               label: field.label ?? '',
               textController:
                   TextEditingController(text: value?.toString() ?? ""),
-              keyboardType: TextInputType.number,
+              // keyboardType: TextInputType.number,
               // onChanged: (val) => onChanged(num.tryParse(val)),
               iconButton: suffixIcon,
               //decoration: _decoration(getContext, label: field.label),
