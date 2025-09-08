@@ -7,6 +7,8 @@ import 'package:dr_urticaria/widget/base_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../models/appointment/appointment_model.dart';
+
 class AppointmentsListScreen extends StatelessWidget {
   const AppointmentsListScreen({super.key});
 
@@ -174,16 +176,23 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
     );
   }
 
-  Widget _buildAppointmentCard(appointment) {
+  Widget _buildAppointmentCard(AppointmentModel appointment) {
+    final id = (appointment.medicalRecords != null &&
+            appointment.medicalRecords!.isNotEmpty)
+        ? appointment.medicalRecords!.lastOrNull?.id
+        : null;
+
     return InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VitalRecordDetailPage(
-            medicalRecordId: appointment.id,
-          ),
-        ),
-      ),
+      onTap: id != null
+          ? () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VitalRecordDetailPage(
+                    medicalRecordId: id,
+                  ),
+                ),
+              )
+          : null,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -204,9 +213,10 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
             Text(
               appointment.patient.fullname,
               style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
             const SizedBox(height: 4),
             Text(

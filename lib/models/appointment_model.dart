@@ -1,5 +1,9 @@
+import 'package:dr_urticaria/models/patient/patient_model.dart';
 import 'package:dr_urticaria/utils/enum/appointment_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+import 'doctor/doctor_model.dart';
 
 class AppointmentModel {
   final String id;

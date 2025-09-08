@@ -30,6 +30,7 @@ class VitalRecordRepositoryImpl implements VitalRecordRepository {
 
   @override
   Future<List<VitalRecordItem>> fetchVitalItems(int medicalRecordId) async {
+    print(medicalRecordId);
     final valuesRes = await service.getVitalValues(medicalRecordId);
     final values = valuesRes.data;
     print(values.length);
@@ -59,6 +60,8 @@ class VitalRecordRepositoryImpl implements VitalRecordRepository {
     final Map<int, VitalRecordGroup> grouped = {};
 
     for (final item in items) {
+      print(item.value.toJson());
+      print("jjjj+ ${item.indicator.toJson()}");
       final g = item.indicator.group;
       if (g == null) {
         // Put ungrouped in a pseudo group

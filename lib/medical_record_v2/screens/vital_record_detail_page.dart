@@ -127,10 +127,11 @@ class _VitalRecordDetailView extends StatelessWidget {
                       childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                       children: [
                         ...g.items.map((item) {
-                          final vitalId = item.value.id;
+                          print("huhu ${item.indicator.toJson()}");
+                          final vitalId = item.value.vitalIndicatorId;
                           final current = state.editedValues[vitalId] ??
-                              item.value.value?.value ??
-                              0;
+                              item.value.value ??
+                              "";
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Column(
