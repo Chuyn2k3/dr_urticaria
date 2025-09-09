@@ -63,6 +63,8 @@ dependencies:
   another_flushbar: ^1.12.30
   permission_handler: ^11.3.1
   camera:
+  firebase_messaging: ^14.7.15
+  firebase_core: ^2.25.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

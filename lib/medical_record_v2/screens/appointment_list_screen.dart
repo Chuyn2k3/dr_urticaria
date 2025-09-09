@@ -190,6 +190,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
                 context,
                 MaterialPageRoute(
                   builder: (context) => VitalRecordDetailPage(
+                    appointmentId: appointment.id,
                     medicalRecordId: id,
                     selectedStatus: _selectedStatus,
                   ),

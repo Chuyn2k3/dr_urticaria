@@ -10,11 +10,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class VitalRecordDetailPage extends StatelessWidget {
   final int medicalRecordId;
+  final int appointmentId;
   final AppointmentStatus selectedStatus;
   const VitalRecordDetailPage({
     super.key,
     required this.medicalRecordId,
     required this.selectedStatus,
+    required this.appointmentId,
   });
 
   @override
@@ -30,7 +32,8 @@ class VitalRecordDetailPage extends StatelessWidget {
         ),
       ],
       child: _VitalRecordDetailView(
-        appointmentId: medicalRecordId,
+        appointmentId: appointmentId,
+        medicalRecordId: medicalRecordId,
         selectedStatus: selectedStatus,
       ),
     );
@@ -39,9 +42,12 @@ class VitalRecordDetailPage extends StatelessWidget {
 
 class _VitalRecordDetailView extends StatelessWidget {
   final int appointmentId;
+  final int medicalRecordId;
   final AppointmentStatus selectedStatus;
   const _VitalRecordDetailView(
-      {required this.appointmentId, required this.selectedStatus});
+      {required this.appointmentId,
+      required this.selectedStatus,
+      required this.medicalRecordId});
 
   @override
   Widget build(BuildContext context) {
