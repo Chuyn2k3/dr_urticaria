@@ -10,10 +10,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class VitalRecordDetailPage extends StatelessWidget {
   final int medicalRecordId;
-
+  final AppointmentStatus selectedStatus;
   const VitalRecordDetailPage({
     super.key,
     required this.medicalRecordId,
+    required this.selectedStatus,
   });
 
   @override
@@ -28,14 +29,19 @@ class VitalRecordDetailPage extends StatelessWidget {
           create: (ctx) => AppointmentUpdateStatusCubit(),
         ),
       ],
-      child: _VitalRecordDetailView(appointmentId: medicalRecordId),
+      child: _VitalRecordDetailView(
+        appointmentId: medicalRecordId,
+        selectedStatus: selectedStatus,
+      ),
     );
   }
 }
 
 class _VitalRecordDetailView extends StatelessWidget {
   final int appointmentId;
-  const _VitalRecordDetailView({required this.appointmentId});
+  final AppointmentStatus selectedStatus;
+  const _VitalRecordDetailView(
+      {required this.appointmentId, required this.selectedStatus});
 
   @override
   Widget build(BuildContext context) {
@@ -222,31 +228,67 @@ class _VitalRecordDetailView extends StatelessWidget {
                   label: const Text('Lưu tất cả thay đổi'),
                 ),
                 const SizedBox(height: 8),
-                BlocBuilder<AppointmentUpdateStatusCubit,
-                    AppointmentUpdateStatusState>(
-                  builder: (context, state) {
-                    final loading = state is AppointmentUpdateStatusLoading;
-                    return FilledButton.icon(
-                      onPressed: loading
-                          ? null
-                          : () => context
-                              .read<AppointmentUpdateStatusCubit>()
-                              .updateStatus(
-                                appointmentId,
-                                AppointmentStatus.confirmed,
-                              ),
-                      icon: const Icon(Icons.check_circle_outline),
-                      label: loading
-                          ? const Text("Đang cập nhật...")
-                          : const Text("Xác nhận lịch hẹn"),
-                    );
-                  },
-                ),
+                if (selectedStatus != AppointmentStatus.cancelled)
+                  BlocBuilder<AppointmentUpdateStatusCubit,
+                      AppointmentUpdateStatusState>(
+                    builder: (context, state) {
+                      final loading = state is AppointmentUpdateStatusLoading;
+                      return FilledButton.icon(
+                        onPressed: loading
+                            ? null
+                            : () => context
+                                .read<AppointmentUpdateStatusCubit>()
+                                .updateStatus(
+                                  appointmentId,
+                                  getNextStatus(selectedStatus),
+                                ),
+                        icon: const Icon(Icons.check_circle_outline),
+                        label: loading
+                            ? const Text("Đang cập nhật...")
+                            : const Text("Xác nhận lịch hẹn"),
+                      );
+                    },
+                  ),
+                if (selectedStatus == AppointmentStatus.pending)
+                  BlocBuilder<AppointmentUpdateStatusCubit,
+                      AppointmentUpdateStatusState>(
+                    builder: (context, state) {
+                      final loading = state is AppointmentUpdateStatusLoading;
+
+                      return FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor:
+                              Colors.red, // 🔴 màu cảnh báo khi hủy
+                        ),
+                        onPressed: loading
+                            ? null
+                            : () => context
+                                .read<AppointmentUpdateStatusCubit>()
+                                .updateStatus(
+                                  appointmentId,
+                                  AppointmentStatus.cancelled,
+                                ),
+                        icon: const Icon(Icons.cancel_outlined), // ❌ icon hủy
+                        label: loading
+                            ? const Text("Đang hủy lịch...")
+                            : const Text("Hủy lịch hẹn"),
+                      );
+                    },
+                  )
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  AppointmentStatus getNextStatus(AppointmentStatus selectedStatus) {
+    if (selectedStatus == AppointmentStatus.pending)
+      return AppointmentStatus.confirmed;
+
+    if (selectedStatus == AppointmentStatus.confirmed)
+      return AppointmentStatus.completed;
+    return AppointmentStatus.confirmed;
   }
 }

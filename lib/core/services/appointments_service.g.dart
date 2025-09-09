@@ -26,6 +26,7 @@ class _AppointmentsService implements AppointmentsService {
     status,
     appointmentDateFrom,
     appointmentDateTo,
+    orderDirection,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -35,6 +36,7 @@ class _AppointmentsService implements AppointmentsService {
       r'status': status,
       r'appointmentDateFrom': appointmentDateFrom,
       r'appointmentDateTo': appointmentDateTo,
+      r'orderDirection': orderDirection,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};

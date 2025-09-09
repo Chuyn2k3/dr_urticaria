@@ -11,16 +11,16 @@ class AppointmentListCubit extends Cubit<AppointmentListState> {
 
   AppointmentListCubit() : super(AppointmentListInitial());
 
-  Future<void> fetch({
-    required int page,
-    required int limit,
-    String? reason,
-    AppointmentStatus? status,
-    DateTime? from,
-    DateTime? to,
-    bool isRefresh = false,
-    bool isLoadMore = false,
-  }) async {
+  Future<void> fetch(
+      {required int page,
+      required int limit,
+      String? reason,
+      AppointmentStatus? status,
+      DateTime? from,
+      DateTime? to,
+      bool isRefresh = false,
+      bool isLoadMore = false,
+      String orderDirection = "DESC"}) async {
     if (!isLoadMore) {
       emit(AppointmentListLoading());
     }
@@ -28,13 +28,13 @@ class AppointmentListCubit extends Cubit<AppointmentListState> {
     try {
       final res = await _repo.fetchAppointments(
         AppointmentsQuery(
-          page: page,
-          limit: limit,
-          reason: reason,
-          status: status,
-          appointmentDateFrom: from,
-          appointmentDateTo: to,
-        ),
+            page: page,
+            limit: limit,
+            reason: reason,
+            status: status,
+            appointmentDateFrom: from,
+            appointmentDateTo: to,
+            orderDirection: orderDirection),
       );
 
       final hasMore = res.data.length == limit;

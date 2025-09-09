@@ -359,7 +359,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 12),
                           const Text(
-                            'Bác sĩ: doctor@hospital.com\nY tá: nurse@hospital.com\nMật khẩu: 123456',
+                            'Bác sĩ: chuyen\nY tá: chuyen\nMật khẩu: 123456',
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 14,

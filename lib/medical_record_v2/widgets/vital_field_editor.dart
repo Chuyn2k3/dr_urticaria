@@ -8,6 +8,7 @@ import '../../widget/text_field/input_text_field.dart';
 import 'custom_checkbox_group.dart';
 import 'custom_radio_group.dart';
 import 'custom_multiple_choice_with_images.dart';
+import 'image_upload_field.dart';
 
 class VitalFieldEditor extends StatefulWidget {
   final VitalIndicatorModel indicator;
@@ -97,8 +98,11 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
           enabled: true,
         );
       case FieldType.multiSelection:
+        print("multiSelection ${widget.value}");
+        print("valueOptions ${widget.indicator.valueOptions}");
         final hasImages = widget.indicator.valueOptions is Map &&
             widget.indicator.valueOptions.containsKey('image_upload');
+
         if (hasImages) {
           final options = (widget.indicator.valueOptions['options'] as List?)
                   ?.cast<String>() ??
@@ -108,13 +112,26 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
           final imagePaths = widget.value is Map
               ? widget.value['image_paths'] as Map<String, List<String>>? ?? {}
               : {};
+
           return CustomMultipleChoiceWithImages(
             label: widget.indicator.name,
-            selectedValues: widget.value is List ? widget.value : [],
+            selectedValues: widget.value is List<String>
+                ? widget.value
+                : (widget.value is Map && widget.value['values'] is List
+                    ? List<String>.from(widget.value['values'])
+                    : []),
             options: options,
             subOptions: subOptions,
             imagePaths: imagePaths as Map<String, List<String>>,
-            onChanged: widget.onChanged,
+            onChanged: (newValues) {
+              if (widget.value is Map) {
+                final updatedValue = Map<String, dynamic>.from(widget.value);
+                updatedValue['values'] = newValues;
+                widget.onChanged(updatedValue);
+              } else {
+                widget.onChanged(newValues);
+              }
+            },
             onImagesChanged: (newImagePaths) {
               final updatedValue = Map<String, dynamic>.from(
                   widget.value is Map ? widget.value : {});
@@ -126,11 +143,26 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
         } else {
           return CustomCheckboxGroup(
             label: widget.indicator.name,
-            selectedValues: widget.value is List<String> ? widget.value : [],
+            selectedValues: widget.value is List
+                ? List<String>.from(
+                    widget.value.map((e) => e.toString().trim()))
+                : (widget.value is Map && widget.value['values'] is List
+                    ? List<String>.from(
+                        widget.value['values'].map((e) => e.toString().trim()))
+                    : []),
             options: widget.indicator.valueOptions is List
-                ? List<String>.from(widget.indicator.valueOptions)
+                ? List<String>.from(widget.indicator.valueOptions
+                    .map((e) => e.toString().trim()))
                 : [],
-            onChanged: widget.onChanged,
+            onChanged: (newValues) {
+              if (widget.value is Map) {
+                final updatedValue = Map<String, dynamic>.from(widget.value);
+                updatedValue['values'] = newValues;
+                widget.onChanged(updatedValue);
+              } else {
+                widget.onChanged(newValues);
+              }
+            },
             isRequired: false,
             enabled: true,
           );
@@ -173,6 +205,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
           ),
         );
       case FieldType.custom:
+        print("custom data VitalFieldEditor ${widget.value}");
         return CustomFieldEditor(
           groups: widget.indicator.valueOptions != null
               ? CustomField.fromJson(widget.indicator.valueOptions).groups
@@ -205,292 +238,6 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
   }
 }
 
-// class CustomFieldEditor extends StatefulWidget {
-//   final List<CustomFieldGroup>? groups;
-//   final Map<String, dynamic> value;
-//   final ValueChanged<Map<String, dynamic>> onChanged;
-//
-//   const CustomFieldEditor({
-//     super.key,
-//     this.groups,
-//     required this.value,
-//     required this.onChanged,
-//   });
-//
-//   @override
-//   State<CustomFieldEditor> createState() => _CustomFieldEditorState();
-// }
-//
-// class _CustomFieldEditorState extends State<CustomFieldEditor> {
-//   final Map<String, TextEditingController> _controllers = {};
-//
-//   @override
-//   void didUpdateWidget(covariant CustomFieldEditor oldWidget) {
-//     super.didUpdateWidget(oldWidget);
-//     for (final group in widget.groups ?? []) {
-//       for (var i = 0; i < group.fields.length; i++) {
-//         final field = group.fields[i];
-//         final fieldKey = field.label ?? group.label ?? 'field_$i';
-//         final fieldValue = widget.value[fieldKey] ??
-//             (field.type == FieldType.custom ? {} : null);
-//         if (field.type == FieldType.text || field.type == FieldType.number) {
-//           _controllers[fieldKey] ??= TextEditingController();
-//           if (_controllers[fieldKey]!.text != (fieldValue?.toString() ?? '')) {
-//             _controllers[fieldKey]!.text = fieldValue?.toString() ?? '';
-//           }
-//         }
-//       }
-//     }
-//   }
-//
-//   @override
-//   void dispose() {
-//     _controllers.values.forEach((controller) => controller.dispose());
-//     super.dispose();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     if (widget.groups == null || widget.groups!.isEmpty) {
-//       return const Text('Không có trường dữ liệu');
-//     }
-//
-//     return SingleChildScrollView(
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: widget.groups!.asMap().entries.map((entry) {
-//           final group = entry.value;
-//           final groupIndex = entry.key;
-//           return Card(
-//             elevation: 1,
-//             margin: const EdgeInsets.symmetric(vertical: 4),
-//             child: Padding(
-//               padding: const EdgeInsets.all(8.0),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   if (group.label != null)
-//                     Padding(
-//                       padding: const EdgeInsets.only(bottom: 8),
-//                       child: Text(
-//                         group.label!,
-//                         style: TextStyle(
-//                           fontWeight: FontWeight.bold,
-//                           fontSize: 16,
-//                           color: AppColors.bgBlueDark,
-//                         ),
-//                       ),
-//                     ),
-//                   ...group.fields.asMap().entries.map((fieldEntry) {
-//                     final field = fieldEntry.value;
-//                     final fieldIndex = fieldEntry.key;
-//                     final fieldKey =
-//                         field.label ?? group.label ?? 'field_$fieldIndex';
-//                     final fieldValue = widget.value[fieldKey] ??
-//                         (field.type == FieldType.custom ? {} : null);
-//
-//                     return Padding(
-//                       padding: const EdgeInsets.symmetric(vertical: 4.0),
-//                       child: _buildFieldEditor(
-//                         context,
-//                         field,
-//                         fieldValue,
-//                         group,
-//                         fieldKey,
-//                         groupIndex,
-//                         fieldIndex,
-//                         '',
-//                       ),
-//                     );
-//                   }).toList(),
-//                 ],
-//               ),
-//             ),
-//           );
-//         }).toList(),
-//       ),
-//     );
-//   }
-//
-//   Widget _buildFieldEditor(
-//     BuildContext context,
-//     CustomField field,
-//     dynamic fieldValue,
-//     CustomFieldGroup group,
-//     String fieldKey,
-//     int groupIndex,
-//     int fieldIndex,
-//     String prefix,
-//   ) {
-//     final fullKey = prefix.isEmpty ? fieldKey : '$prefix.$fieldKey';
-//     if (field.dependsOn != null && field.dependsOnValues != null) {
-//       final parentValue = widget.value[field.dependsOn] as String?;
-//       if (parentValue == null ||
-//           !field.dependsOnValues!.contains(parentValue)) {
-//         return const SizedBox.shrink();
-//       }
-//     }
-//     switch (field.type) {
-//       case FieldType.text:
-//       case FieldType.number:
-//         _controllers[fullKey] ??=
-//             TextEditingController(text: fieldValue?.toString() ?? '');
-//         return InputTextField(
-//           label: field.label ?? 'Trường $fieldIndex',
-//           keyboardType: field.type == FieldType.number
-//               ? TextInputType.numberWithOptions(decimal: true)
-//               : TextInputType.text,
-//           textController: _controllers[fullKey],
-//           validator: (field.requiredFields?.isNotEmpty ?? false)
-//               ? (val) =>
-//                   val == null || val.isEmpty ? 'Vui lòng điền trường này' : null
-//               : null,
-//           onChanged: (newValue) {
-//             final updatedValue = Map<String, dynamic>.from(widget.value);
-//             if (newValue.isNotEmpty) {
-//               updatedValue[fullKey] = field.type == FieldType.number
-//                   ? num.tryParse(newValue) ?? newValue
-//                   : newValue;
-//             } else {
-//               updatedValue.remove(fullKey);
-//             }
-//             widget.onChanged(updatedValue);
-//           },
-//         );
-//       case FieldType.select:
-//         print("select data ${widget.value}");
-//         return CustomRadioGroup(
-//           label: field.label ?? 'Trường $fieldIndex',
-//           value: fieldValue is String ? fieldValue : null,
-//           options: field.options ?? [],
-//           onChanged: (newValue) {
-//             final updatedValue = Map<String, dynamic>.from(widget.value);
-//             if (newValue != null) {
-//               updatedValue[fullKey] = newValue;
-//             } else {
-//               updatedValue.remove(fullKey);
-//             }
-//             widget.onChanged(updatedValue);
-//           },
-//           isRequired: false,
-//           enabled: true,
-//         );
-//
-//       case FieldType.multiSelection:
-//         final hasImages = field.options != null &&
-//             field.options!.any((opt) => opt.contains('image_upload'));
-//         if (hasImages) {
-//           final options = field.options ?? [];
-//           final subOptions = field.groups!.isNotEmpty
-//               ? {
-//                   for (var g in field.groups!)
-//                     g.label ?? '': g.fields.map((f) => f.label ?? '').toList()
-//                 }
-//               : null;
-//           final imagePaths = fieldValue is Map
-//               ? fieldValue['image_paths'] as Map<String, List<String>>? ?? {}
-//               : {};
-//           return CustomMultipleChoiceWithImages(
-//             label: field.label ?? 'Trường $fieldIndex',
-//             selectedValues: fieldValue is List<String> ? fieldValue : [],
-//             options: options,
-//             subOptions: subOptions,
-//             imagePaths: imagePaths as Map<String, List<String>>,
-//             onChanged: (newValues) {
-//               final updatedValue = Map<String, dynamic>.from(widget.value);
-//               if (newValues.isNotEmpty) {
-//                 updatedValue[fullKey] = newValues;
-//               } else {
-//                 updatedValue.remove(fullKey);
-//               }
-//               widget.onChanged(updatedValue);
-//             },
-//             onImagesChanged: (newImagePaths) {
-//               final updatedValue = Map<String, dynamic>.from(widget.value);
-//               updatedValue[fullKey] = {
-//                 ...?updatedValue[fullKey] as Map<String, dynamic>?,
-//                 'image_paths': newImagePaths,
-//               };
-//               widget.onChanged(updatedValue);
-//             },
-//             isRequired: false,
-//           );
-//         } else {
-//           return CustomCheckboxGroup(
-//             label: field.label ?? 'Trường $fieldIndex',
-//             selectedValues: fieldValue is List<String> ? fieldValue : [],
-//             options: field.options ?? [],
-//             onChanged: (newValues) {
-//               final updatedValue = Map<String, dynamic>.from(widget.value);
-//               if (newValues.isNotEmpty) {
-//                 updatedValue[fullKey] = newValues;
-//               } else {
-//                 updatedValue.remove(fullKey);
-//               }
-//               widget.onChanged(updatedValue);
-//             },
-//             isRequired: false,
-//             enabled: true,
-//           );
-//         }
-//       case FieldType.fullYearRange:
-//         return InkWell(
-//           onTap: () async {
-//             final picked = await showDatePicker(
-//               context: context,
-//               initialDate: DateTime.tryParse(fieldValue?.toString() ?? '') ??
-//                   DateTime.now(),
-//               firstDate: DateTime(1900),
-//               lastDate: DateTime(2100),
-//             );
-//             if (picked != null) {
-//               final updatedValue = Map<String, dynamic>.from(widget.value);
-//               updatedValue[fullKey] = DateFormat('yyyy-MM-dd').format(picked);
-//               widget.onChanged(updatedValue);
-//             }
-//           },
-//           child: InputDecorator(
-//             decoration: InputDecoration(
-//               labelText: field.label ?? 'Trường $fieldIndex',
-//               hintText: 'Chọn ngày',
-//               prefixIcon: const Icon(Icons.calendar_today),
-//               border:
-//                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-//               enabledBorder: OutlineInputBorder(
-//                 borderRadius: BorderRadius.circular(12),
-//                 borderSide: BorderSide(
-//                   color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-//                 ),
-//               ),
-//             ),
-//             child: Text(
-//               fieldValue != null &&
-//                       DateTime.tryParse(fieldValue.toString()) != null
-//                   ? DateFormat('yyyy-MM-dd')
-//                       .format(DateTime.parse(fieldValue.toString()))
-//                   : 'Chọn ngày',
-//             ),
-//           ),
-//         );
-//       case FieldType.custom:
-//         return CustomFieldEditor(
-//           groups: field.groups,
-//           value: fieldValue is Map<String, dynamic> ? fieldValue : {},
-//           onChanged: (newValue) {
-//             final updatedValue = Map<String, dynamic>.from(widget.value);
-//             if (newValue.isNotEmpty) {
-//               updatedValue[fullKey] = newValue;
-//             } else {
-//               updatedValue.remove(fullKey);
-//             }
-//             widget.onChanged(updatedValue);
-//           },
-//         );
-//       default:
-//         return Text('Kiểu dữ liệu không hỗ trợ: ${field.type}');
-//     }
-//   }
-// }
 class CustomFieldEditor extends StatefulWidget {
   final List<CustomFieldGroup>? groups;
   final Map<String, dynamic> value;
@@ -645,7 +392,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                         fieldKey,
                         groupIndex,
                         fieldIndex,
-                        group.label ?? '',
+                        '', // Changed to empty string to avoid duplication
                       ),
                     );
                   }).toList(),
@@ -668,22 +415,64 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
     int fieldIndex,
     String prefix,
   ) {
-    final fullKey = prefix.isEmpty ? fieldKey : '$prefix.$fieldKey';
+    final expandedValue = _expandFormValue(widget.value);
+
+    // --- 🔑 Sinh fullKey: prefix.groupLabel.fieldLabel ---
+    final groupLabel = group.label?.trim() ?? '';
+    final fieldLabel = field.label?.trim() ??
+        (groupLabel.isNotEmpty ? groupLabel : 'field_$fieldIndex');
+
+    final keys = <String>[];
+    if (prefix.isNotEmpty) keys.add(prefix);
+    if (groupLabel.isNotEmpty) keys.add(groupLabel);
+    keys.add(fieldLabel);
+    final fullKey = keys.join('.');
+
+    // --- 🔎 Resolve value bằng cách split key ---
+    dynamic resolvedValue = _getValueByKey(expandedValue, fullKey);
+
+    // --- Nếu bị bọc lặp key => unwrap (for all types) ---
+    if (resolvedValue is Map<String, dynamic> && resolvedValue.length == 1) {
+      final innerKey = resolvedValue.keys.first;
+      if (innerKey == fieldLabel) {
+        resolvedValue = resolvedValue[innerKey];
+      }
+    }
+
+    // --- Additional unwrap for custom if needed ---
+    if (field.type == FieldType.custom &&
+        resolvedValue is Map &&
+        resolvedValue.length == 1) {
+      final innerKey = resolvedValue.keys.first;
+      final innerVal = resolvedValue[innerKey];
+      if (innerVal is Map &&
+          innerVal.length == 1 &&
+          innerVal.containsKey(innerKey)) {
+        resolvedValue = innerVal[innerKey];
+      }
+    }
+
+    debugPrint(
+        "🎯 build field: fullKey=$fullKey, label=$fieldLabel, resolvedValue=$resolvedValue");
 
     // Nếu field có điều kiện hiển thị
     if (field.dependsOn != null && field.dependsOnValues != null) {
-      final parentValue = widget.value[field.dependsOn] as String?;
+      dynamic parentValue = widget.value[field.dependsOn];
+      if (parentValue is Map<String, dynamic> && parentValue.length == 1) {
+        parentValue = parentValue.values.first;
+      }
       if (parentValue == null ||
-          !field.dependsOnValues!.contains(parentValue)) {
+          !field.dependsOnValues!.contains(parentValue.toString())) {
         return const SizedBox.shrink();
       }
     }
 
+    // --- Render widget theo type ---
     switch (field.type) {
       case FieldType.text:
       case FieldType.number:
         _controllers[fullKey] ??=
-            TextEditingController(text: fieldValue?.toString() ?? '');
+            TextEditingController(text: resolvedValue?.toString() ?? '');
         return InputTextField(
           label: field.label ?? 'Trường $fieldIndex',
           keyboardType: field.type == FieldType.number
@@ -692,7 +481,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
           textController: _controllers[fullKey],
           onChanged: (newValue) {
             final updatedValue = Map<String, dynamic>.from(widget.value);
-
             if (newValue.isNotEmpty) {
               updatedValue[fullKey] = field.type == FieldType.number
                   ? num.tryParse(newValue) ?? newValue
@@ -700,8 +488,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             } else {
               updatedValue.remove(fullKey);
             }
-
-            // --- luôn flatten trước khi gửi ra ngoài ---
             widget.onChanged(_flattenFormValue(_expandFormValue(updatedValue)));
           },
         );
@@ -709,7 +495,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       case FieldType.select:
         return CustomRadioGroup(
           label: field.label ?? 'Trường $fieldIndex',
-          value: fieldValue is String ? fieldValue : null,
+          value: resolvedValue is String ? resolvedValue : null,
           options: field.options ?? [],
           onChanged: (newValue) {
             final updatedValue = Map<String, dynamic>.from(widget.value);
@@ -725,29 +511,130 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         );
 
       case FieldType.multiSelection:
-        return CustomCheckboxGroup(
-          label: field.label ?? 'Trường $fieldIndex',
-          selectedValues: fieldValue is List<String> ? fieldValue : [],
-          options: field.options ?? [],
-          onChanged: (newValues) {
-            final updatedValue = Map<String, dynamic>.from(widget.value);
-            if (newValues.isNotEmpty) {
-              updatedValue[fullKey] = newValues;
-            } else {
-              updatedValue.remove(fullKey);
-            }
-            widget.onChanged(_flattenFormValue(_expandFormValue(updatedValue)));
-          },
-          isRequired: false,
-          enabled: true,
-        );
+        final needsImage = (field.requiredFields ?? [])
+            .any((rf) => rf.type == FieldType.image);
+
+        if (needsImage) {
+          Map<String, String?> selectedOptionsWithImages = {};
+          List<String> selectedValues = [];
+
+          if (resolvedValue is Map<String, dynamic>) {
+            selectedOptionsWithImages = Map<String, String?>.from(
+                resolvedValue.map((k, v) => MapEntry(k, v?.toString())));
+            selectedValues = selectedOptionsWithImages.keys.toList();
+          }
+          debugPrint(
+              "🔎 multiSelection: resolvedValue=$resolvedValue, selectedValues=$selectedValues");
+
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CustomCheckboxGroup(
+                    label: field.label ?? 'Trường $fieldIndex',
+                    selectedValues: selectedValues,
+                    options: field.options ?? [],
+                    onChanged: (newValues) {
+                      final updatedValue =
+                          Map<String, dynamic>.from(widget.value);
+                      final newOptionsWithImages = <String, String?>{};
+
+                      for (String option in newValues) {
+                        newOptionsWithImages[option] =
+                            selectedOptionsWithImages[option] ?? null;
+                      }
+
+                      if (newOptionsWithImages.isNotEmpty) {
+                        updatedValue[fullKey] = newOptionsWithImages;
+                      } else {
+                        updatedValue.remove(fullKey);
+                      }
+                      debugPrint("✅ Selected options: $newValues");
+                      setState(() {
+                        selectedOptionsWithImages = newOptionsWithImages;
+                        selectedValues = newValues;
+                      });
+                      widget.onChanged(
+                          _flattenFormValue(_expandFormValue(updatedValue)));
+                    },
+                    isRequired: false,
+                    enabled: true,
+                  ),
+                  ...selectedValues.map((option) {
+                    debugPrint(
+                        "🔍 Rendering ImageUploadField for option: $option");
+                    final requiredField =
+                        (field.requiredFields ?? []).firstWhere(
+                      (rf) => rf.type == FieldType.image,
+                    );
+
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: ImageUploadField(
+                        label: requiredField.description ?? "Ảnh cho $option",
+                        templateId: 16,
+                        initialImageUrl: selectedOptionsWithImages[option],
+                        onChanged: (imageUrl) {
+                          debugPrint("📸 Image changed for $option: $imageUrl");
+                          final updatedValue =
+                              Map<String, dynamic>.from(widget.value);
+                          final currentData = _getValueByKey(
+                                      _expandFormValue(updatedValue), fullKey)
+                                  as Map<String, dynamic>? ??
+                              {};
+                          final updatedData = Map<String, String?>.from(
+                              currentData
+                                  .map((k, v) => MapEntry(k, v?.toString())));
+
+                          if (imageUrl != null && imageUrl.isNotEmpty) {
+                            updatedData[option] = imageUrl;
+                          } else {
+                            updatedData[option] = null;
+                          }
+
+                          updatedValue[fullKey] = updatedData;
+                          widget.onChanged(_flattenFormValue(
+                              _expandFormValue(updatedValue)));
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ],
+              );
+            },
+          );
+        } else {
+          // Standard multiSelection without images
+          return CustomCheckboxGroup(
+            label: field.label ?? 'Trường $fieldIndex',
+            selectedValues: resolvedValue is List<String>
+                ? resolvedValue
+                : (resolvedValue is List
+                    ? List<String>.from(resolvedValue.map((e) => e.toString()))
+                    : []),
+            options: field.options ?? [],
+            onChanged: (newValues) {
+              final updatedValue = Map<String, dynamic>.from(widget.value);
+              if (newValues.isNotEmpty) {
+                updatedValue[fullKey] = newValues;
+              } else {
+                updatedValue.remove(fullKey);
+              }
+              widget
+                  .onChanged(_flattenFormValue(_expandFormValue(updatedValue)));
+            },
+            isRequired: false,
+            enabled: true,
+          );
+        }
 
       case FieldType.fullYearRange:
         return InkWell(
           onTap: () async {
             final picked = await showDatePicker(
               context: context,
-              initialDate: DateTime.tryParse(fieldValue?.toString() ?? '') ??
+              initialDate: DateTime.tryParse(resolvedValue?.toString() ?? '') ??
                   DateTime.now(),
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
@@ -755,7 +642,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             if (picked != null) {
               final updatedValue = Map<String, dynamic>.from(widget.value);
               updatedValue[fullKey] = DateFormat('yyyy-MM-dd').format(picked);
-
               widget
                   .onChanged(_flattenFormValue(_expandFormValue(updatedValue)));
             }
@@ -769,10 +655,10 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(
-              fieldValue != null &&
-                      DateTime.tryParse(fieldValue.toString()) != null
+              resolvedValue != null &&
+                      DateTime.tryParse(resolvedValue.toString()) != null
                   ? DateFormat('yyyy-MM-dd')
-                      .format(DateTime.parse(fieldValue.toString()))
+                      .format(DateTime.parse(resolvedValue.toString()))
                   : 'Chọn ngày',
             ),
           ),
@@ -781,7 +667,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       case FieldType.custom:
         return CustomFieldEditor(
           groups: field.groups,
-          value: fieldValue is Map<String, dynamic> ? fieldValue : {},
+          value: resolvedValue is Map<String, dynamic> ? resolvedValue : {},
           onChanged: (newValue) {
             final updatedValue = Map<String, dynamic>.from(widget.value);
             if (newValue.isNotEmpty) {
@@ -794,7 +680,20 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         );
 
       default:
-        return Text('Kiểu dữ liệu không hỗ trợ: ${field.type}');
+        return Text('⚠️ Kiểu dữ liệu không hỗ trợ: ${field.type}');
     }
+  }
+
+  dynamic _getValueByKey(Map<String, dynamic> map, String fullKey) {
+    final parts = fullKey.split('.');
+    dynamic current = map;
+    for (final part in parts) {
+      if (current is Map<String, dynamic> && current.containsKey(part)) {
+        current = current[part];
+      } else {
+        return null;
+      }
+    }
+    return current;
   }
 }

@@ -6,6 +6,7 @@ enum FieldType {
   fullYearRange,
   custom, // nested group
   prescription,
+  image,
   unknown,
 }
 
@@ -17,6 +18,8 @@ FieldType parseFieldType(String? type) {
       return FieldType.number;
     case "select":
       return FieldType.select;
+    case "selection":
+      return FieldType.select;
     case "multi_selection":
       return FieldType.multiSelection;
     case "full_year_range":
@@ -25,6 +28,8 @@ FieldType parseFieldType(String? type) {
       return FieldType.custom;
     case "prescription":
       return FieldType.prescription;
+    case "image":
+      return FieldType.image;
     default:
       return FieldType.unknown;
   }
@@ -40,6 +45,7 @@ class CustomField {
   final List<CustomField>? requiredFields; // Có điều kiện
   final String? dependsOn;
   final List<String>? dependsOnValues;
+
   CustomField({
     this.label,
     this.description,

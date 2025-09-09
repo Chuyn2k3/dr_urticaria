@@ -1,7 +1,9 @@
 import 'package:dr_urticaria/cubits/appointment/appointment_list_cubit.dart';
 import 'package:dr_urticaria/cubits/appointment/appointment_list_state.dart';
+import 'package:dr_urticaria/medical_record_v2/screens/acute_urticaria_form_screen.dart';
 import 'package:dr_urticaria/medical_record_v2/screens/vital_record_detail_page.dart';
 import 'package:dr_urticaria/utils/enum/appointment_enum.dart';
+import 'package:dr_urticaria/utils/snack_bar.dart';
 import 'package:dr_urticaria/widget/appbar/custom_app_bar.dart';
 import 'package:dr_urticaria/widget/base_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -189,10 +191,16 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
                 MaterialPageRoute(
                   builder: (context) => VitalRecordDetailPage(
                     medicalRecordId: id,
+                    selectedStatus: _selectedStatus,
                   ),
                 ),
               )
-          : null,
+          : () {
+              context.showSnackBarFail(
+                text: "Không có thông tin bệnh án",
+                positionTop: true,
+              );
+            },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),

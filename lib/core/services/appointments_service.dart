@@ -17,6 +17,7 @@ abstract class AppointmentsService {
     @Query('status') String? status,
     @Query('appointmentDateFrom') String? appointmentDateFrom,
     @Query('appointmentDateTo') String? appointmentDateTo,
+    @Query('orderDirection') String? orderDirection,
   });
 
   @PATCH('/api/v1/staff/appointments/{id}')
