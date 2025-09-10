@@ -26,6 +26,8 @@ class AppointmentsRepositoryImpl implements AppointmentsRepository {
       limit: q.limit,
       reason: q.reason,
       status: q.status?.serverKey,
+      //phone: q.phone,
+      fullName: q.fullName,
       appointmentDateFrom: q.appointmentDateFrom != null
           ? _iso.format(q.appointmentDateFrom!.toUtc())
           : null,

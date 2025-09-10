@@ -15,6 +15,8 @@ abstract class AppointmentsService {
     @Query('limit') required int limit,
     @Query('reason') String? reason,
     @Query('status') String? status,
+    @Query('fullName') String? fullName,
+    @Query('phone') String? phone,
     @Query('appointmentDateFrom') String? appointmentDateFrom,
     @Query('appointmentDateTo') String? appointmentDateTo,
     @Query('orderDirection') String? orderDirection,
