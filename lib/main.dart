@@ -2,6 +2,8 @@ import 'package:dr_urticaria/di/locator.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/acute_urticaria/acute_urticaria_cubit.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/chronic_followup/chronic_followup_cubit.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/chronic_initital/chronic_initial_cubit.dart';
+import 'package:dr_urticaria/screens/live/live_detail.dart';
+import 'package:dr_urticaria/screens/live/live_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'cubits/auth_cubit.dart';
@@ -44,6 +46,8 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/doctor-dashboard': (context) => const DoctorDashboard(),
           '/nurse-dashboard': (context) => const DoctorDashboard(),
+          '/live_page': (context) => const LivePage(),
+          '/live-detail': (context) => const LiveDetailPage(),
         },
       ),
     );

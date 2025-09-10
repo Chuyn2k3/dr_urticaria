@@ -277,6 +277,23 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               Row(
                 children: [
                   Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed('/live_page');
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color: Colors.yellow,
+                        ),
+                        width: 100,
+                        height: 50,
+                        alignment: Alignment.center,
+                        child: const Text("Livestream"),
+                      ),
+                    ),
+                  ),
+                  Expanded(
                     child: _buildStatCard(
                       'Chờ duyệt',
                       '${waitingApproval.length}',

@@ -1,4 +1,3 @@
-import 'package:dr_urticaria/constant/config.dart';
 import 'package:dr_urticaria/cubits/login/login_cubit.dart';
 import 'package:dr_urticaria/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +6,6 @@ import '../cubits/auth_cubit.dart';
 import '../models/user_model.dart';
 import '../utils/app_theme.dart';
 import 'dashboard/doctor_dashboard.dart';
-import 'dashboard/nurse_dashboard.dart';
-import 'dashboard/receptionist_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

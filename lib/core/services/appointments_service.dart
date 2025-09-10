@@ -3,6 +3,10 @@ import 'package:dr_urticaria/models/appointment/appointment_model.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
 
+import '../data/model/api_response.dart';
+import '../data/model/create_live_payload.dart';
+import '../data/model/create_live_response.dart';
+
 part 'appointments_service.g.dart';
 
 @RestApi()
@@ -18,4 +22,7 @@ abstract class AppointmentsService {
     @Query('appointmentDateFrom') String? appointmentDateFrom,
     @Query('appointmentDateTo') String? appointmentDateTo,
   });
+
+  @POST('/livestream')
+  Future<CreateLiveResponse> createLive(@Body() CreateLivePayload payload);
 }

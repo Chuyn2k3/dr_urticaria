@@ -62,6 +62,8 @@ dependencies:
   go_router: ^6.0.9
   another_flushbar: ^1.12.30
   permission_handler: ^11.3.1
+  agora_rtc_engine: ^6.5.2
+  socket_io_client: ^3.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
