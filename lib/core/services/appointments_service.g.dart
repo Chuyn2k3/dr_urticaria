@@ -24,8 +24,11 @@ class _AppointmentsService implements AppointmentsService {
     required limit,
     reason,
     status,
+    fullName,
+    phone,
     appointmentDateFrom,
     appointmentDateTo,
+    orderDirection,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -33,8 +36,11 @@ class _AppointmentsService implements AppointmentsService {
       r'limit': limit,
       r'reason': reason,
       r'status': status,
+      r'fullName': fullName,
+      r'phone': phone,
       r'appointmentDateFrom': appointmentDateFrom,
       r'appointmentDateTo': appointmentDateTo,
+      r'orderDirection': orderDirection,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
@@ -60,26 +66,32 @@ class _AppointmentsService implements AppointmentsService {
   }
 
   @override
-  Future<CreateLiveResponse> createLive(payload) async {
+  Future<BaseResponse<AppointmentModel>> updateAppointmentStatus(
+    id,
+    body,
+  ) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    _data.addAll(payload.toJson());
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<CreateLiveResponse>(Options(
-      method: 'POST',
+    _data.addAll(body);
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<BaseResponse<AppointmentModel>>(Options(
+      method: 'PATCH',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              '/livestream',
+              '/api/v1/staff/appointments/${id}',
               queryParameters: queryParameters,
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = CreateLiveResponse.fromJson(_result.data!);
+    final value = BaseResponse<AppointmentModel>.fromJson(
+      _result.data!,
+      (json) => AppointmentModel.fromJson(json as Map<String, dynamic>),
+    );
     return value;
   }
 

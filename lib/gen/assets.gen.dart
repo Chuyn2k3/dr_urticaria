@@ -749,6 +749,64 @@ class $AssetsImagesGen {
       ];
 }
 
+class $AssetsOverlaysGen {
+  const $AssetsOverlaysGen();
+
+  /// File path: assets/overlays/895ba2df-0f7b-497b-9568-cabdb547652b.jpeg
+  AssetGenImage get a895ba2df0f7b497b9568Cabdb547652b => const AssetGenImage(
+      'assets/overlays/895ba2df-0f7b-497b-9568-cabdb547652b.jpeg');
+
+  /// File path: assets/overlays/body_front.jpeg
+  AssetGenImage get bodyFront =>
+      const AssetGenImage('assets/overlays/body_front.jpeg');
+
+  /// File path: assets/overlays/face_front.jpeg
+  AssetGenImage get faceFront =>
+      const AssetGenImage('assets/overlays/face_front.jpeg');
+
+  /// File path: assets/overlays/face_left.jpeg
+  AssetGenImage get faceLeft =>
+      const AssetGenImage('assets/overlays/face_left.jpeg');
+
+  /// File path: assets/overlays/foot_bottom.jpeg
+  AssetGenImage get footBottom =>
+      const AssetGenImage('assets/overlays/foot_bottom.jpeg');
+
+  /// File path: assets/overlays/foot_top.jpeg
+  AssetGenImage get footTop =>
+      const AssetGenImage('assets/overlays/foot_top.jpeg');
+
+  /// File path: assets/overlays/forearm_inner.jpeg
+  AssetGenImage get forearmInner =>
+      const AssetGenImage('assets/overlays/forearm_inner.jpeg');
+
+  /// File path: assets/overlays/genital.jpeg
+  AssetGenImage get genital =>
+      const AssetGenImage('assets/overlays/genital.jpeg');
+
+  /// File path: assets/overlays/hand_back.jpeg
+  AssetGenImage get handBack =>
+      const AssetGenImage('assets/overlays/hand_back.jpeg');
+
+  /// File path: assets/overlays/upperarm_inner.jpeg
+  AssetGenImage get upperarmInner =>
+      const AssetGenImage('assets/overlays/upperarm_inner.jpeg');
+
+  /// List of all assets
+  List<AssetGenImage> get values => [
+        a895ba2df0f7b497b9568Cabdb547652b,
+        bodyFront,
+        faceFront,
+        faceLeft,
+        footBottom,
+        footTop,
+        forearmInner,
+        genital,
+        handBack,
+        upperarmInner
+      ];
+}
+
 class $AssetsSoundsGen {
   const $AssetsSoundsGen();
 
@@ -1054,6 +1112,7 @@ class Assets {
   static const String data = 'assets/data.json';
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
+  static const $AssetsOverlaysGen overlays = $AssetsOverlaysGen();
   static const $AssetsSoundsGen sounds = $AssetsSoundsGen();
 
   /// List of all assets

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "900234166367",
+    "project_id": "dr-urticaria",
+    "storage_bucket": "dr-urticaria.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900234166367:android:2e8cf0361c90ebaa7d1bea",
+        "android_client_info": {
+          "package_name": "com.example.dr_urticaria"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUbTBc-8nFZwBOej5IfNvStVi_iREyM8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

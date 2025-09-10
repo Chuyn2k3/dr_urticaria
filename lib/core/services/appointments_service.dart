@@ -3,10 +3,6 @@ import 'package:dr_urticaria/models/appointment/appointment_model.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
 
-import '../data/model/api_response.dart';
-import '../data/model/create_live_payload.dart';
-import '../data/model/create_live_response.dart';
-
 part 'appointments_service.g.dart';
 
 @RestApi()
@@ -19,10 +15,16 @@ abstract class AppointmentsService {
     @Query('limit') required int limit,
     @Query('reason') String? reason,
     @Query('status') String? status,
+    @Query('fullName') String? fullName,
+    @Query('phone') String? phone,
     @Query('appointmentDateFrom') String? appointmentDateFrom,
     @Query('appointmentDateTo') String? appointmentDateTo,
+    @Query('orderDirection') String? orderDirection,
   });
 
-  @POST('/livestream')
-  Future<CreateLiveResponse> createLive(@Body() CreateLivePayload payload);
+  @PATCH('/api/v1/staff/appointments/{id}')
+  Future<BaseResponse<AppointmentModel>> updateAppointmentStatus(
+    @Path('id') int id,
+    @Body() Map<String, dynamic> body,
+  );
 }

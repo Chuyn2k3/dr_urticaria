@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dr_urticaria/core/base/base_response.dart';
+import 'package:dr_urticaria/models/profile/model/user_info_model.dart';
 import 'package:dr_urticaria/models/user/credential_model.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -12,6 +13,6 @@ abstract class UserServices {
   Future<BaseResponse<CredentialModel>> loginUser(
       @Body() Map<String, dynamic> request);
 
-  // @GET("/api/v1/patients/owner/me")
-  // Future<BaseResponse<UserInfoModel>> getProfile();
+  @GET("/api/v1/staffs/owner/me")
+  Future<BaseResponse<UserInfoModel>> getProfile();
 }

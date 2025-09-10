@@ -60,9 +60,9 @@ BaseListResponse<T> _$BaseListResponseFromJson<T>(
 ) =>
     BaseListResponse<T>(
       data: (json['data'] as List<dynamic>).map(fromJsonT).toList(),
-      total: (json['total'] as num).toInt(),
-      page: (json['page'] as num).toInt(),
-      limit: (json['limit'] as num).toInt(),
+      total: (json['total'] as num?)?.toInt(),
+      page: (json['page'] as num?)?.toInt(),
+      limit: (json['limit'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$BaseListResponseToJson<T>(

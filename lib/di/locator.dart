@@ -1,9 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:dr_urticaria/core/repositories/appointments_repository.dart';
 import 'package:dr_urticaria/core/repositories/user_repository.dart';
+import 'package:dr_urticaria/core/repositories/vital_record_repository.dart';
 import 'package:dr_urticaria/core/services/appointments_service.dart';
+import 'package:dr_urticaria/core/services/medical_record_service.dart';
 import 'package:dr_urticaria/core/services/user_service.dart';
 import 'package:dr_urticaria/cubits/login/login_cubit.dart';
+import 'package:dr_urticaria/cubits/profile/profile_cubit.dart';
 import 'package:dr_urticaria/utils/http_services.dart';
 import 'package:dr_urticaria/utils/navigation_service.dart';
 import 'package:dr_urticaria/utils/shared_preferences_manager.dart';
@@ -16,7 +19,7 @@ Future<void> setupLocator() async {
   //serviceLocator
   serviceLocator.registerLazySingleton(() => NavigationService());
   final sharedPreferences = await SharedPreferences.getInstance();
-  //serviceLocator.registerLazySingleton(() => ProfileUserCubit());
+  serviceLocator.registerLazySingleton(() => ProfileUserCubit());
   serviceLocator.registerLazySingleton(
       () => SharedPreferencesManager(sharedPreferences: sharedPreferences));
 
@@ -41,4 +44,12 @@ Future<void> setupLocator() async {
 
   serviceLocator.registerFactory<UserRepository>(
       () => UserRepositoryImpl(userServices: serviceLocator<UserServices>()));
+
+  serviceLocator.registerLazySingleton<MedicalRecordService>(
+      () => MedicalRecordService(dio));
+
+// Repositories
+  serviceLocator.registerLazySingleton<VitalRecordRepository>(() =>
+      VitalRecordRepositoryImpl(
+          service: serviceLocator<MedicalRecordService>()));
 }

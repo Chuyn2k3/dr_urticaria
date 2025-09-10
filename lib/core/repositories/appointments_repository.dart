@@ -7,6 +7,8 @@ import '../services/appointments_service.dart';
 abstract class AppointmentsRepository {
   Future<BaseListResponse<AppointmentModel>> fetchAppointments(
       AppointmentsQuery query);
+  Future<BaseResponse<AppointmentModel>> changeAppointmentStatus(
+      int id, String status);
 }
 
 class AppointmentsRepositoryImpl implements AppointmentsRepository {
@@ -24,12 +26,21 @@ class AppointmentsRepositoryImpl implements AppointmentsRepository {
       limit: q.limit,
       reason: q.reason,
       status: q.status?.serverKey,
+      //phone: q.phone,
+      fullName: q.fullName,
       appointmentDateFrom: q.appointmentDateFrom != null
           ? _iso.format(q.appointmentDateFrom!.toUtc())
           : null,
       appointmentDateTo: q.appointmentDateTo != null
           ? _iso.format(q.appointmentDateTo!.toUtc())
           : null,
+      orderDirection: q.orderDirection,
     );
+  }
+
+  @override
+  Future<BaseResponse<AppointmentModel>> changeAppointmentStatus(
+      int id, String status) {
+    return _service.updateAppointmentStatus(id, {"status": status});
   }
 }

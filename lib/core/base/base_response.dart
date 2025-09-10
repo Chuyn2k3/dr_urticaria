@@ -66,9 +66,9 @@ class DataResponse<T> {
 @JsonSerializable(genericArgumentFactories: true)
 class BaseListResponse<T> {
   final List<T> data;
-  final int total;
-  final int page;
-  final int limit;
+  final int? total;
+  final int? page;
+  final int? limit;
 
   BaseListResponse({
     required this.data,

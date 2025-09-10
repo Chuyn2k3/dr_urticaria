@@ -1,10 +1,65 @@
+import 'package:dr_urticaria/cubits/profile/profile_cubit.dart';
+import 'package:dr_urticaria/models/profile/model/user_info_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../cubits/auth_cubit.dart';
-import '../../models/user_model.dart';
+import 'package:get_it/get_it.dart';
+
+import '../../constant/config.dart';
+import '../../utils/shared_preferences_manager.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => ProfileUserCubit()..getProfile(),
+      child: BlocBuilder<ProfileUserCubit, ProfileUserState>(
+        builder: (context, state) {
+          if (state is ProfileUserLoadingState) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          if (state is ProfileUserErrorState) {
+            return Scaffold(
+              appBar: AppBar(title: const Text("Thông tin cá nhân")),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(state.error,
+                        style: const TextStyle(color: Colors.red)),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () =>
+                          context.read<ProfileUserCubit>().getProfile(),
+                      child: const Text("Thử lại"),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          if (state is ProfileUserLoadedState) {
+            return ProfileView(user: state.user);
+          }
+
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ProfileView extends StatelessWidget {
+  final UserInfoModel user;
+
+  const ProfileView({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -13,158 +68,105 @@ class ProfileScreen extends StatelessWidget {
         title: const Text('Thông tin cá nhân'),
         automaticallyImplyLeading: false,
       ),
-      body: BlocBuilder<AuthCubit, AuthState>(
-        builder: (context, state) {
-          final user = state.user!;
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // Profile Header
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor: _getRoleColor(user.role),
-                          child: Text(
-                            user.name.split(' ').last[0],
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Header
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.blue,
+                      child: Text(
+                        user.fullname?.split(' ').last[0] ?? "",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          user.name,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      user.fullname ?? '-',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        user.isActive != null
+                            ? user.isActive!
+                                ? "Đang hoạt động"
+                                : "Ngưng hoạt động"
+                            : "-",
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w500,
                         ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _getRoleColor(user.role).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            _getRoleDisplayName(user.role),
-                            style: TextStyle(
-                              color: _getRoleColor(user.role),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // User Information
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Thông tin cá nhân',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildInfoRow('Họ và tên', user.name),
-                        _buildInfoRow('Email', user.email),
-                        _buildInfoRow('Khoa', user.department ?? "-"),
-                        _buildInfoRow(
-                            'Chức vụ', _getRoleDisplayName(user.role)),
-                        _buildInfoRow('Mã nhân viên', user.id),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Settings
-                Card(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: const Icon(Icons.notifications),
-                        title: const Text('Cài đặt thông báo'),
-                        trailing: const Icon(Icons.arrow_forward_ios),
-                        onTap: () {
-                          // Navigate to notification settings
-                        },
                       ),
-                      const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.security),
-                        title: const Text('Đổi mật khẩu'),
-                        trailing: const Icon(Icons.arrow_forward_ios),
-                        onTap: () {
-                          _showChangePasswordDialog(context);
-                        },
-                      ),
-                      const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.help),
-                        title: const Text('Hướng dẫn sử dụng'),
-                        trailing: const Icon(Icons.arrow_forward_ios),
-                        onTap: () {
-                          // Navigate to help
-                        },
-                      ),
-                      const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.info),
-                        title: const Text('Về ứng dụng'),
-                        trailing: const Icon(Icons.arrow_forward_ios),
-                        onTap: () {
-                          _showAboutDialog(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Logout Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => _logout(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text(
-                      'Đăng xuất',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          );
-        },
+
+            const SizedBox(height: 24),
+
+            // Thông tin cá nhân
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Thông tin cá nhân',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildInfoRow('Họ và tên', user.fullname ?? "-"),
+                    _buildInfoRow('Email', user.email ?? "-"),
+                    _buildInfoRow('Số điện thoại', user.phone ?? "-"),
+                    _buildInfoRow('Ngày sinh', user.birthday ?? "-"),
+                    _buildInfoRow('Giới tính', user.gender?.name ?? "-"),
+                    _buildInfoRow('Địa chỉ', user.address ?? "-"),
+                    _buildInfoRow('Mã nhân viên', user.id.toString()),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Nút đăng xuất
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => _logout(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text('Đăng xuất', style: TextStyle(fontSize: 16)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -188,119 +190,8 @@ class ProfileScreen extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w500),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Color _getRoleColor(UserRole role) {
-    switch (role) {
-      case UserRole.doctor:
-        return Colors.blue;
-      case UserRole.nurse:
-        return Colors.green;
-    }
-  }
-
-  String _getRoleDisplayName(UserRole role) {
-    switch (role) {
-      case UserRole.doctor:
-        return 'Bác sĩ';
-      case UserRole.nurse:
-        return 'Y tá';
-    }
-  }
-
-  void _showChangePasswordDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Đổi mật khẩu'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Mật khẩu hiện tại',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Mật khẩu mới',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Xác nhận mật khẩu mới',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Đổi mật khẩu thành công'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            child: const Text('Đổi mật khẩu'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAboutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Về ứng dụng'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Ứng dụng Quản lý Mề đay',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text('Phiên bản: 1.0.0'),
-            SizedBox(height: 8),
-            Text('Bệnh viện Da liễu Trung ương'),
-            SizedBox(height: 16),
-            Text(
-              'Ứng dụng hỗ trợ quản lý bệnh án và quy trình khám chữa bệnh mề đay tại bệnh viện.',
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Đóng'),
           ),
         ],
       ),
@@ -321,7 +212,15 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              context.read<AuthCubit>().logout();
+              final sharedPreferences =
+                  GetIt.instance<SharedPreferencesManager>();
+              sharedPreferences.remove(
+                AppConfig.SL_USERNAME,
+              );
+              sharedPreferences.remove(
+                AppConfig.SL_PASSWORD,
+              );
+              // TODO: gọi cubit logout
               Navigator.pushReplacementNamed(context, '/login');
             },
             style: ElevatedButton.styleFrom(

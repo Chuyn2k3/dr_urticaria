@@ -21,24 +21,60 @@ class MedicalRecordItem {
 
 class MedicalRecordsListScreen extends StatelessWidget {
   const MedicalRecordsListScreen({super.key});
+  Widget _buildEmptyState({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+  }) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF374151),
+            ),
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+            ),
+          ]
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final records = _getMockRecords();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Danh sách bệnh án'),
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: records.length,
-        itemBuilder: (context, index) {
-          final record = records[index];
-          return _buildRecordCard(context, record);
-        },
-      ),
-    );
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text('Danh sách bệnh án'),
+        ),
+        body: _buildEmptyState(
+          icon: Icons.event_busy,
+          title: "Chưa có bệnh án",
+          subtitle: "Bạn chưa có bệnh án nào",
+        )
+        // ListView.builder(
+        //   padding: const EdgeInsets.all(16),
+        //   itemCount: records.length,
+        //   itemBuilder: (context, index) {
+        //     final record = records[index];
+        //     return _buildRecordCard(context, record);
+        //   },
+        // ),
+        );
   }
 
   Widget _buildRecordCard(BuildContext context, MedicalRecordItem record) {
