@@ -1,4 +1,6 @@
+import 'package:dr_urticaria/medical_record_v2/screens/acute_urticaria_form_screen.dart';
 import 'package:dr_urticaria/utils/app_theme.dart';
+import 'package:dr_urticaria/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../cubits/profile/profile_cubit.dart';
@@ -110,6 +112,10 @@ class HomeTabScreen extends StatelessWidget {
                       Icons.add_circle,
                       Colors.green,
                       () {
+                        context.showSnackBarSuccess(
+                          text: "Chức năng đang phát triển",
+                          positionTop: true,
+                        );
                         // Navigator.push(
                         //   context,
                         //   MaterialPageRoute(
@@ -127,20 +133,30 @@ class HomeTabScreen extends StatelessWidget {
                       'Quản lý bệnh án',
                       Icons.folder_open,
                       Colors.orange,
-                      () => Navigator.pushNamed(context, '/medical-records'),
+                      () {
+                        context.showSnackBarSuccess(
+                          text: "Chức năng đang phát triển",
+                          positionTop: true,
+                        );
+                      },
                     ),
                     _buildQuickActionCard(
                       'Chỉ định XN',
                       Icons.science,
                       Colors.purple,
-                      () => Navigator.pushNamed(context, '/lab-orders'),
+                      () {
+                        context.showSnackBarSuccess(
+                          text: "Chức năng đang phát triển",
+                          positionTop: true,
+                        );
+                      },
                     ),
-                    _buildQuickActionCard(
-                      'Hàng đợi bệnh nhân',
-                      Icons.people_alt,
-                      Colors.blue,
-                      () => Navigator.pushNamed(context, '/patient-queue'),
-                    ),
+                    // _buildQuickActionCard(
+                    //   'Hàng đợi bệnh nhân',
+                    //   Icons.people_alt,
+                    //   Colors.blue,
+                    //   () => Navigator.pushNamed(context, '/patient-queue'),
+                    // ),
                   ],
                 ),
               ],

@@ -2,6 +2,10 @@ import 'package:dr_urticaria/cubits/profile/profile_cubit.dart';
 import 'package:dr_urticaria/models/profile/model/user_info_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+
+import '../../constant/config.dart';
+import '../../utils/shared_preferences_manager.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -208,6 +212,14 @@ class ProfileView extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
+              final sharedPreferences =
+                  GetIt.instance<SharedPreferencesManager>();
+              sharedPreferences.remove(
+                AppConfig.SL_USERNAME,
+              );
+              sharedPreferences.remove(
+                AppConfig.SL_PASSWORD,
+              );
               // TODO: gọi cubit logout
               Navigator.pushReplacementNamed(context, '/login');
             },

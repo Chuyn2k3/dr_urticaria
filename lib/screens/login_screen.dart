@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final sp = GetIt.instance.get<SharedPreferencesManager>();
     final user = sp.getString(AppConfig.SL_USERNAME);
     final pass = sp.getString(AppConfig.SL_PASSWORD);
-    if (user != null && pass != null) {
+    if (user != null && pass != null && user.isNotEmpty && pass.isNotEmpty) {
       _cubitLogin.handleLogin(phone: user, password: pass);
     }
     //}
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 hintText: 'Nhập user name của bạn',
                               ),
                               //  keyboardType: TextInputType.emailAddress,
-                              textInputAction: TextInputAction.next,
+
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Vui lòng nhập số điện thoại';
@@ -332,44 +332,44 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
 
                     // Demo Accounts
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border:
-                            Border.all(color: Colors.white.withOpacity(0.3)),
-                      ),
-                      child: Column(
-                        children: [
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.info_outline,
-                                  color: Colors.white, size: 16),
-                              SizedBox(width: 8),
-                              Text(
-                                'Tài khoản demo',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'Bác sĩ: chuyen\nY tá: chuyen\nMật khẩu: 123456',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                              height: 1.5,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Container(
+                    //   padding: const EdgeInsets.all(16),
+                    //   decoration: BoxDecoration(
+                    //     color: Colors.white.withOpacity(0.15),
+                    //     borderRadius: BorderRadius.circular(12),
+                    //     border:
+                    //         Border.all(color: Colors.white.withOpacity(0.3)),
+                    //   ),
+                    //   child: Column(
+                    //     children: [
+                    //       const Row(
+                    //         mainAxisAlignment: MainAxisAlignment.center,
+                    //         children: [
+                    //           Icon(Icons.info_outline,
+                    //               color: Colors.white, size: 16),
+                    //           SizedBox(width: 8),
+                    //           Text(
+                    //             'Tài khoản demo',
+                    //             style: TextStyle(
+                    //               color: Colors.white,
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //       const SizedBox(height: 12),
+                    //       const Text(
+                    //         'Bác sĩ: chuyen\nY tá: chuyen\nMật khẩu: 123456',
+                    //         style: TextStyle(
+                    //           color: Colors.white70,
+                    //           fontSize: 14,
+                    //           height: 1.5,
+                    //         ),
+                    //         textAlign: TextAlign.center,
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

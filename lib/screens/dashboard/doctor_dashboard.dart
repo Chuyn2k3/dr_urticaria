@@ -105,20 +105,20 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           ),
         ],
       ),
-      floatingActionButton: _currentIndex == 2
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AppointmentsListScreen(),
-                  ),
-                );
-              },
-              backgroundColor: AppTheme.doctorColor,
-              child: const Icon(Icons.add, color: Colors.white),
-            )
-          : null,
+      // floatingActionButton: _currentIndex == 2
+      //     ? FloatingActionButton(
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute(
+      //               builder: (_) => const AppointmentsListScreen(),
+      //             ),
+      //           );
+      //         },
+      //         backgroundColor: AppTheme.doctorColor,
+      //         child: const Icon(Icons.add, color: Colors.white),
+      //       )
+      //     : null,
     );
   }
 
