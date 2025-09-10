@@ -151,6 +151,14 @@ class HomeTabScreen extends StatelessWidget {
                         );
                       },
                     ),
+                    _buildQuickActionCard(
+                      'Tạo livestream',
+                      Icons.live_tv,
+                      Colors.blue,
+                          () {
+                        Navigator.of(context).pushNamed('/live_page');
+                      },
+                    ),
                     // _buildQuickActionCard(
                     //   'Hàng đợi bệnh nhân',
                     //   Icons.people_alt,

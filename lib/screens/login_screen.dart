@@ -5,6 +5,7 @@ import 'package:dr_urticaria/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import '../constant/config.dart';
 import '../cubits/auth_cubit.dart';
 import '../models/user_model.dart';
 import '../utils/app_theme.dart';
