@@ -13,6 +13,8 @@ import 'package:dr_urticaria/utils/shared_preferences_manager.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/services/firebase_service/remote_config_service.dart';
+
 GetIt serviceLocator = GetIt.instance;
 
 Future<void> setupLocator() async {
@@ -22,9 +24,9 @@ Future<void> setupLocator() async {
   serviceLocator.registerLazySingleton(() => ProfileUserCubit());
   serviceLocator.registerLazySingleton(
       () => SharedPreferencesManager(sharedPreferences: sharedPreferences));
-
-  final Dio dio =
-      await setupDio(baseUrl: "https://hospital.huyit.lat", isHaveToken: true);
+  final url = await FireBaseRemoteConfigService.getSavedUrl();
+  final Dio dio = await setupDio(
+      baseUrl: url ?? "https://hospital.huyit.lat", isHaveToken: true);
   serviceLocator.registerLazySingleton(() => LoginCubit());
   serviceLocator.registerLazySingleton<UserServices>(() => UserServices(dio));
   // sl.registerLazySingleton<UrticariaApiService>(

@@ -19,155 +19,157 @@ class HomeTabScreen extends StatelessWidget {
         if (state is ProfileUserLoadedState) {
           final user = state.user;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// --- Welcome card ---
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppTheme.doctorColor,
-                        AppTheme.doctorColor.withOpacity(0.8),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.doctorColor.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+          return SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// --- Welcome card ---
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.doctorColor,
+                          AppTheme.doctorColor.withOpacity(0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.white,
-                        child: Text(
-                          user.fullname?.split(' ').last[0] ?? "",
-                          style: const TextStyle(
-                            color: AppTheme.doctorColor,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.doctorColor.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.white,
+                          child: Text(
+                            user.fullname?.split(' ').last[0] ?? "",
+                            style: const TextStyle(
+                              color: AppTheme.doctorColor,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'BS. ${user.fullname}',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'BS. ${user.fullname}',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '${user.phone} • ${user.address}',
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
+                              Text(
+                                '${user.phone} • ${user.address}',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  /// --- Quick Actions ---
+                  const Text(
+                    'Thao tác nhanh',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1.3,
+                    children: [
+                      _buildQuickActionCard(
+                        'Tạo bệnh án',
+                        Icons.add_circle,
+                        Colors.green,
+                        () {
+                          context.showSnackBarSuccess(
+                            text: "Chức năng đang phát triển",
+                            positionTop: true,
+                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (_) => CreateMedicalRecordScreen(
+                          //       createdBy: 'doctor',
+                          //       doctorId: user.id,
+                          //       doctorName: user.fullname,
+                          //       roomNumber: "P101",
+                          //     ),
+                          //   ),
+                          // );
+                        },
                       ),
+                      _buildQuickActionCard(
+                        'Quản lý bệnh án',
+                        Icons.folder_open,
+                        Colors.orange,
+                        () {
+                          context.showSnackBarSuccess(
+                            text: "Chức năng đang phát triển",
+                            positionTop: true,
+                          );
+                        },
+                      ),
+                      _buildQuickActionCard(
+                        'Chỉ định XN',
+                        Icons.science,
+                        Colors.purple,
+                        () {
+                          context.showSnackBarSuccess(
+                            text: "Chức năng đang phát triển",
+                            positionTop: true,
+                          );
+                        },
+                      ),
+                      _buildQuickActionCard(
+                        'Tạo livestream',
+                        Icons.live_tv,
+                        Colors.blue,
+                        () {
+                          Navigator.of(context).pushNamed('/live_page');
+                        },
+                      ),
+                      // _buildQuickActionCard(
+                      //   'Hàng đợi bệnh nhân',
+                      //   Icons.people_alt,
+                      //   Colors.blue,
+                      //   () => Navigator.pushNamed(context, '/patient-queue'),
+                      // ),
                     ],
                   ),
-                ),
-
-                const SizedBox(height: 24),
-
-                /// --- Quick Actions ---
-                const Text(
-                  'Thao tác nhanh',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.3,
-                  children: [
-                    _buildQuickActionCard(
-                      'Tạo bệnh án',
-                      Icons.add_circle,
-                      Colors.green,
-                      () {
-                        context.showSnackBarSuccess(
-                          text: "Chức năng đang phát triển",
-                          positionTop: true,
-                        );
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (_) => CreateMedicalRecordScreen(
-                        //       createdBy: 'doctor',
-                        //       doctorId: user.id,
-                        //       doctorName: user.fullname,
-                        //       roomNumber: "P101",
-                        //     ),
-                        //   ),
-                        // );
-                      },
-                    ),
-                    _buildQuickActionCard(
-                      'Quản lý bệnh án',
-                      Icons.folder_open,
-                      Colors.orange,
-                      () {
-                        context.showSnackBarSuccess(
-                          text: "Chức năng đang phát triển",
-                          positionTop: true,
-                        );
-                      },
-                    ),
-                    _buildQuickActionCard(
-                      'Chỉ định XN',
-                      Icons.science,
-                      Colors.purple,
-                      () {
-                        context.showSnackBarSuccess(
-                          text: "Chức năng đang phát triển",
-                          positionTop: true,
-                        );
-                      },
-                    ),
-                    _buildQuickActionCard(
-                      'Tạo livestream',
-                      Icons.live_tv,
-                      Colors.blue,
-                          () {
-                        Navigator.of(context).pushNamed('/live_page');
-                      },
-                    ),
-                    // _buildQuickActionCard(
-                    //   'Hàng đợi bệnh nhân',
-                    //   Icons.people_alt,
-                    //   Colors.blue,
-                    //   () => Navigator.pushNamed(context, '/patient-queue'),
-                    // ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           );
         }
