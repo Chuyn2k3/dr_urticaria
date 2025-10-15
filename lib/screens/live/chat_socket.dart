@@ -5,10 +5,10 @@ import '../../core/services/firebase_service/remote_config_service.dart';
 class ChatSocket {
   IO.Socket? socket;
 
-  void initSocket() async {
+  Future<void> initSocket() async {
     final url = await FireBaseRemoteConfigService.getSavedUrl();
     socket = IO.io(
-      (url ?? 'https://hospital.huyit.lat') + '/live', // namespace
+      '${url ?? 'https://hospital.huyit.lat'}/live', // namespace
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .setPath('/socket.io') // path mặc định

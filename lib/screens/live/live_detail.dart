@@ -1239,7 +1239,7 @@ class _LiveDetailPageState extends State<LiveDetailPage>
   final ValueNotifier<bool> _isJoined = ValueNotifier(false);
   final ValueNotifier<bool> _muted = ValueNotifier(false);
   final ValueNotifier<bool> _cameraOff = ValueNotifier(false);
-  final ValueNotifier<bool> _chatExpanded = ValueNotifier(true);
+  final ValueNotifier<bool> _chatExpanded = ValueNotifier(false);
   final ValueNotifier<String> _videoQuality = ValueNotifier('medium');
   final ValueNotifier<bool> _isNetworkConnected = ValueNotifier(true);
   final ValueNotifier<bool> _engineReady = ValueNotifier(false);
@@ -1482,11 +1482,17 @@ class _LiveDetailPageState extends State<LiveDetailPage>
     });
   }
 
-  void initSocket() {
+  void initSocket() async {
     final profileCubit = serviceLocator<ProfileUserCubit>();
     final user = profileCubit.inforUser();
     final userId = user?.id ?? 15;
-    chatSocket.initSocket();
+    await chatSocket.initSocket();
+    if (chatSocket.socket == null) {
+      debugPrint("Socket initialization failed: socket is null");
+      _showSnackBar("Lỗi: Không thể khởi tạo socket");
+      return;
+    }
+    debugPrint("Socket initialized, attempting to connect...");
     chatSocket.socket?.off('connect');
     chatSocket.socket?.off('disconnect');
     chatSocket.socket?.off('reconnect');

@@ -4,6 +4,7 @@ enum FieldType {
   select,
   multiSelection,
   fullYearRange,
+  fullDate,
   custom, // nested group
   prescription,
   image,
@@ -24,6 +25,8 @@ FieldType parseFieldType(String? type) {
       return FieldType.multiSelection;
     case "full_year_range":
       return FieldType.fullYearRange;
+    case "full_date":
+      return FieldType.fullDate;
     case "custom":
       return FieldType.custom;
     case "prescription":
