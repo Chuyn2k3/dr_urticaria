@@ -9,6 +9,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+// 👇 THÊM: localizations
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'core/services/firebase_service/remote_config_service.dart';
 import 'cubits/auth_cubit.dart';
 import 'cubits/medical_record_cubit.dart';
@@ -50,13 +54,27 @@ class MyApp extends StatelessWidget {
         title: 'Urticaria Management',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
+
+        // 👇 THÊM: cấu hình i18n để DatePicker/TimePicker/Nút, tháng… dùng tiếng Việt
+        locale: const Locale(
+            'vi'), // ép UI tiếng Việt; muốn theo máy thì bỏ dòng này
+        supportedLocales: const [
+          Locale('vi'),
+          Locale('en'),
+        ],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+
         home: const SplashScreen(),
         routes: {
           '/login': (context) => const LoginScreen(),
           '/doctor-dashboard': (context) => const DoctorDashboard(),
           '/nurse-dashboard': (context) => const DoctorDashboard(),
           '/live_page': (context) => const LivePage(),
-          '/live-detail': (context) => const LiveDetailPage(),
+          //'/live-detail': (context) => const LiveDetailPage(),
         },
       ),
     );

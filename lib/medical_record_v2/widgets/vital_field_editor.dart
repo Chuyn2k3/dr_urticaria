@@ -1650,6 +1650,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
         return InkWell(
           onTap: () async {
             final picked = await showDatePicker(
+              locale: Locale('vi'),
               context: context,
               initialDate: dateValue ?? DateTime.now(),
               firstDate: DateTime(1970),
@@ -1679,6 +1680,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
         return InkWell(
           onTap: () async {
             final picked = await showDatePicker(
+              locale: Locale('vi'),
               context: context,
               initialDate: DateTime.tryParse(widget.value?.toString() ?? '') ??
                   DateTime.now(),
