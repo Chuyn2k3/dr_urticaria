@@ -30,6 +30,10 @@
 	<string>Main</string>
 	<key>NSCameraUsageDescription</key>
     <string>Ứng dụng cần dùng camera để chụp ảnh</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Ứng dụng cần quyền truy cập thư viện ảnh để chọn và tải lên hình ảnh.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Ứng dụng cần quyền lưu ảnh vào thư viện để chia sẻ và tải xuống hình ảnh.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

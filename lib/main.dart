@@ -1,5 +1,6 @@
 import 'package:dr_urticaria/cubits/profile/profile_cubit.dart';
 import 'package:dr_urticaria/di/locator.dart';
+import 'package:dr_urticaria/firebase_options.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/acute_urticaria/acute_urticaria_cubit.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/chronic_followup/chronic_followup_cubit.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/chronic_initital/chronic_initial_cubit.dart';
@@ -26,7 +27,9 @@ import 'utils/app_theme.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+   await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await FireBaseRemoteConfigService.getConfig();
   await setupLocator();
   runApp(const MyApp());
