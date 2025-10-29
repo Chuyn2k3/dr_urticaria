@@ -5,6 +5,8 @@ class AppColors {
   static const Color primaryColor = Color(0xFF007CCC);
   static const Color strokeColor = Color(0xFF2E6CB4);
   static const Color handledColor = Color(0xCCFAFAFA);
+  static const Color backgroundColor = Color(0xFFF8FAFC);
+  static const Color textSecondary = Color(0xFF64748B);
   static const Color yellowColor = Color(0xFFFDCC14);
   static const Color yellowColor1 = Color(0xFFF4B400);
   static const Color borderColor = Color(0x80479FD7);

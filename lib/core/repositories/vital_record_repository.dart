@@ -2,19 +2,25 @@ import 'package:dr_urticaria/core/services/medical_record_service.dart';
 import 'package:dr_urticaria/models/vital_indicator_model.dart';
 import 'package:dr_urticaria/models/vital_value_model.dart';
 
+import '../../medical_record_v2/create_medical_record/model/medical_record_request.dart';
+import '../../medical_record_v2/create_medical_record/model/medical_record_template_model.dart';
+import '../../medical_record_v2/create_medical_record/model/vital_group.dart';
+import '../base/base_response.dart';
+
 class VitalRecordItem {
   final VitalValueModel value;
-  final VitalIndicatorModel indicator;
+  final VitalIndicator indicator;
   VitalRecordItem({required this.value, required this.indicator});
 }
 
 class VitalRecordGroup {
-  final VitalGroupModel group;
+  final VitalGroupInfo group;
   final List<VitalRecordItem> items;
   VitalRecordGroup({required this.group, required this.items});
 }
 
 abstract class VitalRecordRepository {
+  Future<BaseResponse<MedicalRecordTemplate>> getTemplate(int id);
   Future<List<VitalRecordItem>> fetchVitalItems(int medicalRecordId);
   Future<List<VitalRecordGroup>> fetchVitalGroups(int medicalRecordId);
 
@@ -22,6 +28,9 @@ abstract class VitalRecordRepository {
     required int medicalRecordId,
     required Map<String, dynamic> vitalValues,
   });
+  Future<BaseResponse<VitalGroup>> getVitalGroup(int id);
+  Future<BaseResponse<dynamic>> createMedicalRecord(
+      MedicalRecordRequest request);
 }
 
 class VitalRecordRepositoryImpl implements VitalRecordRepository {
@@ -65,7 +74,7 @@ class VitalRecordRepositoryImpl implements VitalRecordRepository {
       final g = item.indicator.group;
       if (g == null) {
         // Put ungrouped in a pseudo group
-        final pseudo = VitalGroupModel(
+        final pseudo = VitalGroupInfo(
           id: -1,
           name: 'Khác',
           description: null,
@@ -91,5 +100,21 @@ class VitalRecordRepositoryImpl implements VitalRecordRepository {
   }) async {
     final res = await service.updateVitalValues(medicalRecordId, vitalValues);
     return res.data;
+  }
+
+  @override
+  Future<BaseResponse<MedicalRecordTemplate>> getTemplate(int id) {
+    return service.getTemplate(id);
+  }
+
+  @override
+  Future<BaseResponse<VitalGroup>> getVitalGroup(int id) {
+    return service.getVitalGroup(id);
+  }
+
+  @override
+  Future<BaseResponse<dynamic>> createMedicalRecord(
+      MedicalRecordRequest request) {
+    return service.createMedicalRecord(request);
   }
 }

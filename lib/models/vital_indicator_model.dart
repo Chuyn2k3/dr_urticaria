@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 part 'vital_indicator_model.g.dart';
 @JsonSerializable(explicitToJson: true)
-class VitalIndicatorModel {
+class VitalIndicator {
   final int id;
   final String code;
   final String name;
@@ -11,16 +11,16 @@ class VitalIndicatorModel {
     /// valueOptions có thể là List<String>, Map<String,dynamic>, hoặc null
   @JsonKey(fromJson: _fromDynamic, toJson: _toDynamic)
   final dynamic valueOptions;
-
+  final List<String>? visibility;
   final String? minValue;
   final String? maxValue;
   final bool isActive;
   final int? groupId;
-  final VitalGroupModel? group;
+  final VitalGroupInfo? group;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  VitalIndicatorModel({
+  VitalIndicator({
     required this.id,
     required this.code,
     required this.name,
@@ -28,6 +28,7 @@ class VitalIndicatorModel {
     this.description,
     required this.valueType,
     this.valueOptions,
+    this.visibility,
     this.minValue,
     this.maxValue,
     required this.isActive,
@@ -36,10 +37,12 @@ class VitalIndicatorModel {
     required this.createdAt,
     required this.updatedAt,
   });
-
-  factory VitalIndicatorModel.fromJson(Map<String, dynamic> json) =>
-      _$VitalIndicatorModelFromJson(json);
-  Map<String, dynamic> toJson() => _$VitalIndicatorModelToJson(this);
+  bool get isVisibleToPatient => visibility != null
+      ? (visibility!.contains('patient') || visibility!.isEmpty)
+      : true;
+  factory VitalIndicator.fromJson(Map<String, dynamic> json) =>
+      _$VitalIndicatorFromJson(json);
+  Map<String, dynamic> toJson() => _$VitalIndicatorToJson(this);
 
   /// Parse dynamic cho valueOptions
   static dynamic _fromDynamic(dynamic json) {
@@ -53,14 +56,14 @@ class VitalIndicatorModel {
 }
 
 @JsonSerializable()
-class VitalGroupModel {
+class VitalGroupInfo {
   final int id;
   final String name;
   final String? description;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  VitalGroupModel({
+  VitalGroupInfo({
     required this.id,
     required this.name,
     this.description,
@@ -68,7 +71,8 @@ class VitalGroupModel {
     required this.updatedAt,
   });
 
-  factory VitalGroupModel.fromJson(Map<String, dynamic> json) =>
-      _$VitalGroupModelFromJson(json);
-  Map<String, dynamic> toJson() => _$VitalGroupModelToJson(this);
+  factory VitalGroupInfo.fromJson(Map<String, dynamic> json) =>
+      _$VitalGroupInfoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$VitalGroupInfoToJson(this);
 }

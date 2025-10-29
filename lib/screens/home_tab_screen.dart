@@ -4,6 +4,7 @@ import 'package:dr_urticaria/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../cubits/profile/profile_cubit.dart';
+import '../medical_record_v2/create_medical_record/screen.dart';
 
 class HomeTabScreen extends StatelessWidget {
   const HomeTabScreen({super.key});
@@ -113,21 +114,15 @@ class HomeTabScreen extends StatelessWidget {
                         Icons.add_circle,
                         Colors.green,
                         () {
-                          context.showSnackBarSuccess(
-                            text: "Chức năng đang phát triển",
-                            positionTop: true,
-                          );
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (_) => CreateMedicalRecordScreen(
-                          //       createdBy: 'doctor',
-                          //       doctorId: user.id,
-                          //       doctorName: user.fullname,
-                          //       roomNumber: "P101",
-                          //     ),
-                          //   ),
+                          // context.showSnackBarSuccess(
+                          //   text: "Chức năng đang phát triển",
+                          //   positionTop: true,
                           // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => StaffTemplatePickerScreen()),
+                          );
                         },
                       ),
                       _buildQuickActionCard(

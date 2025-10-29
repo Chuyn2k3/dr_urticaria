@@ -6,28 +6,30 @@ part of 'vital_indicator_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-VitalIndicatorModel _$VitalIndicatorModelFromJson(Map<String, dynamic> json) =>
-    VitalIndicatorModel(
+VitalIndicator _$VitalIndicatorFromJson(Map<String, dynamic> json) =>
+    VitalIndicator(
       id: (json['id'] as num).toInt(),
       code: json['code'] as String,
       name: json['name'] as String,
       unit: json['unit'] as String?,
       description: json['description'] as String?,
       valueType: json['valueType'] as String,
-      valueOptions: VitalIndicatorModel._fromDynamic(json['valueOptions']),
+      valueOptions: VitalIndicator._fromDynamic(json['valueOptions']),
+      visibility: (json['visibility'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       minValue: json['minValue'] as String?,
       maxValue: json['maxValue'] as String?,
       isActive: json['isActive'] as bool,
       groupId: (json['groupId'] as num?)?.toInt(),
       group: json['group'] == null
           ? null
-          : VitalGroupModel.fromJson(json['group'] as Map<String, dynamic>),
+          : VitalGroupInfo.fromJson(json['group'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$VitalIndicatorModelToJson(
-        VitalIndicatorModel instance) =>
+Map<String, dynamic> _$VitalIndicatorToJson(VitalIndicator instance) =>
     <String, dynamic>{
       'id': instance.id,
       'code': instance.code,
@@ -35,7 +37,8 @@ Map<String, dynamic> _$VitalIndicatorModelToJson(
       'unit': instance.unit,
       'description': instance.description,
       'valueType': instance.valueType,
-      'valueOptions': VitalIndicatorModel._toDynamic(instance.valueOptions),
+      'valueOptions': VitalIndicator._toDynamic(instance.valueOptions),
+      'visibility': instance.visibility,
       'minValue': instance.minValue,
       'maxValue': instance.maxValue,
       'isActive': instance.isActive,
@@ -45,8 +48,8 @@ Map<String, dynamic> _$VitalIndicatorModelToJson(
       'updatedAt': instance.updatedAt.toIso8601String(),
     };
 
-VitalGroupModel _$VitalGroupModelFromJson(Map<String, dynamic> json) =>
-    VitalGroupModel(
+VitalGroupInfo _$VitalGroupInfoFromJson(Map<String, dynamic> json) =>
+    VitalGroupInfo(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       description: json['description'] as String?,
@@ -54,7 +57,7 @@ VitalGroupModel _$VitalGroupModelFromJson(Map<String, dynamic> json) =>
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$VitalGroupModelToJson(VitalGroupModel instance) =>
+Map<String, dynamic> _$VitalGroupInfoToJson(VitalGroupInfo instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

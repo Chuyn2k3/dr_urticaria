@@ -1481,7 +1481,7 @@ import 'custom_radio_group.dart';
 import 'image_upload_field.dart';
 
 class VitalFieldEditor extends StatefulWidget {
-  final VitalIndicatorModel indicator;
+  final VitalIndicator indicator;
   final dynamic value;
   final String? unit;
   final ValueChanged<dynamic> onChanged;
