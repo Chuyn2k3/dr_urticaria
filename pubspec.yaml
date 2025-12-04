@@ -70,6 +70,7 @@ dependencies:
   firebase_core: ^2.25.4
   retry:
   firebase_remote_config:
+  flutter_html:
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -5,11 +5,35 @@ part 'medical_record_request.g.dart';
 @JsonSerializable(explicitToJson: true)
 class MedicalRecordRequest {
   final int templateId;
+  final int patientId; // NEW
+
+  // các trường tùy chọn, nếu API có dùng
+  @JsonKey(includeIfNull: false)
+  final int? doctorId;
+
+  @JsonKey(includeIfNull: false)
+  final int? appointmentId;
+
+  @JsonKey(includeIfNull: false)
+  final String? diagnosis;
+
+  @JsonKey(includeIfNull: false)
+  final String? symptoms;
+
+  @JsonKey(includeIfNull: false)
+  final String? notes;
+
   final List<VitalValueRequest> vitalValues;
 
   MedicalRecordRequest({
     required this.templateId,
+    required this.patientId,
     required this.vitalValues,
+    this.doctorId,
+    this.appointmentId,
+    this.diagnosis,
+    this.symptoms,
+    this.notes,
   });
 
   factory MedicalRecordRequest.fromJson(Map<String, dynamic> json) =>

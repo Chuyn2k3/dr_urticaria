@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 part 'vital_indicator_model.g.dart';
+
 @JsonSerializable(explicitToJson: true)
 class VitalIndicator {
   final int id;
@@ -8,7 +9,7 @@ class VitalIndicator {
   final String? unit;
   final String? description;
   final String valueType; // text, number, select, date, boolean
-    /// valueOptions có thể là List<String>, Map<String,dynamic>, hoặc null
+  /// valueOptions có thể là List<String>, Map<String,dynamic>, hoặc null
   @JsonKey(fromJson: _fromDynamic, toJson: _toDynamic)
   final dynamic valueOptions;
   final List<String>? visibility;
@@ -38,7 +39,7 @@ class VitalIndicator {
     required this.updatedAt,
   });
   bool get isVisibleToPatient => visibility != null
-      ? (visibility!.contains('patient') || visibility!.isEmpty)
+      ? (visibility!.contains('staff') || visibility!.isEmpty)
       : true;
   factory VitalIndicator.fromJson(Map<String, dynamic> json) =>
       _$VitalIndicatorFromJson(json);

@@ -67,7 +67,10 @@ class MedicalFormCubit extends Cubit<MedicalFormState> {
     ));
   }
 
-  Future<void> submitMedicalRecord({required int templateId}) async {
+  Future<void> submitMedicalRecord({
+    required int templateId,
+    required int patientId,
+  }) async {
     if (state is! MedicalFormLoaded) return;
     final current = state as MedicalFormLoaded;
 
@@ -97,6 +100,7 @@ class MedicalFormCubit extends Cubit<MedicalFormState> {
 
       final request = MedicalRecordRequest(
         templateId: templateId,
+        patientId: patientId,
         vitalValues: vitalValues,
       );
 

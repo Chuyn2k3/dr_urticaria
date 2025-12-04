@@ -63,6 +63,7 @@ BaseListResponse<T> _$BaseListResponseFromJson<T>(
       total: (json['total'] as num?)?.toInt(),
       page: (json['page'] as num?)?.toInt(),
       limit: (json['limit'] as num?)?.toInt(),
+      message: json['message'] as String?,
     );
 
 Map<String, dynamic> _$BaseListResponseToJson<T>(
@@ -74,4 +75,5 @@ Map<String, dynamic> _$BaseListResponseToJson<T>(
       'total': instance.total,
       'page': instance.page,
       'limit': instance.limit,
+      'message': instance.message,
     };

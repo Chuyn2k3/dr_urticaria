@@ -89,8 +89,8 @@ class VitalRecordRepositoryImpl implements VitalRecordRepository {
       grouped.putIfAbsent(g.id, () => VitalRecordGroup(group: g, items: []));
       grouped[g.id]?.items.add(item);
     }
-    return grouped.values.toList()
-      ..sort((a, b) => a.group.name.compareTo(b.group.name));
+    return grouped.values.toList();
+    //..sort((a, b) => a.group.name.compareTo(b.group.name));
   }
 
   @override

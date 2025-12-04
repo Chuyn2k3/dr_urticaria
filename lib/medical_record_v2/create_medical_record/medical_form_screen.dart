@@ -17,24 +17,29 @@ import 'model/vital_group.dart';
 
 class MedicalFormScreen extends StatelessWidget {
   final int templateId;
-
+  final int patientId;
   const MedicalFormScreen({
     super.key,
     required this.templateId,
+    required this.patientId,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => MedicalFormCubit()..loadMedicalForm(templateId),
-      child: _MedicalFormView(templateId: templateId),
+      child: _MedicalFormView(
+        templateId: templateId,
+        patientId: patientId,
+      ),
     );
   }
 }
 
 class _MedicalFormView extends StatefulWidget {
   final int templateId;
-  const _MedicalFormView({required this.templateId});
+  final int patientId;
+  const _MedicalFormView({required this.templateId, required this.patientId});
 
   @override
   State<_MedicalFormView> createState() => _MedicalFormViewState();
@@ -329,6 +334,7 @@ class _MedicalFormViewState extends State<_MedicalFormView> {
                                         .read<MedicalFormCubit>()
                                         .submitMedicalRecord(
                                           templateId: widget.templateId,
+                                          patientId: widget.patientId,
                                         );
                                   } else {
                                     nextStep(visibleGroups.length);

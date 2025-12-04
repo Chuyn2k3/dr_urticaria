@@ -26,6 +26,7 @@ FieldType parseFieldType(String? type) {
     case "full_year_range":
       return FieldType.fullYearRange;
     case "full_date":
+    case "fullDate":
       return FieldType.fullDate;
     case "custom":
       return FieldType.custom;

@@ -69,12 +69,13 @@ class BaseListResponse<T> {
   final int? total;
   final int? page;
   final int? limit;
-
+  final String? message;
   BaseListResponse({
     required this.data,
     required this.total,
     required this.page,
     required this.limit,
+    this.message,
   });
 
   factory BaseListResponse.fromJson(

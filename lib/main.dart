@@ -1,6 +1,7 @@
 import 'package:dr_urticaria/cubits/profile/profile_cubit.dart';
 import 'package:dr_urticaria/di/locator.dart';
 import 'package:dr_urticaria/firebase_options.dart';
+import 'package:dr_urticaria/medical_record_v2/create_medical_record/cubit/patient_search_cubit.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/acute_urticaria/acute_urticaria_cubit.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/chronic_followup/chronic_followup_cubit.dart';
 import 'package:dr_urticaria/medical_record_v2/cubits/chronic_initital/chronic_initial_cubit.dart';
@@ -27,7 +28,7 @@ import 'utils/app_theme.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-   await Firebase.initializeApp(
+  await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await FireBaseRemoteConfigService.getConfig();
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => serviceLocator<ProfileUserCubit>(),
         ),
+        BlocProvider(create: (context) => serviceLocator<PatientSearchCubit>()),
       ],
       child: MaterialApp(
         title: 'Urticaria Management',

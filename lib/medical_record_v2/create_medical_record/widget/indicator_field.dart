@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 import '../../../constant/color.dart';
 import '../../../models/vital_indicator_model.dart';
@@ -90,6 +91,49 @@ class _IndicatorFieldState extends State<IndicatorField> {
     return c;
   }
 
+  bool _hasHtml(String s) {
+    // Tạm thời nhận diện rất đơn giản: có thẻ <img>, <br>, <p>, ...
+    return s.contains('<img') || s.contains('<br') || s.contains('<p');
+  }
+
+  Widget _buildIndicatorLabel({
+    String? textOverride,
+    TextStyle? textStyle,
+  }) {
+    final raw = textOverride ?? widget.indicator.name;
+    // Nếu có HTML, dùng Html widget
+    if (_hasHtml(raw)) {
+      return Html(
+        data: raw,
+        style: {
+          // style thân
+          'body': Style(
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+            fontSize: FontSize(14),
+            fontWeight: FontWeight.w500,
+          ),
+          // style ảnh
+          'img': Style(
+            margin: Margins.only(bottom: 8),
+            // có thể giới hạn width nếu muốn
+            // width: Width(200),
+          ),
+        },
+      );
+    }
+
+    // Nếu không có HTML thì hiển thị Text bình thường
+    return Text(
+      raw,
+      style: textStyle ??
+          const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+    );
+  }
+
   // ====== Build ======
   @override
   Widget build(BuildContext context) {
@@ -142,6 +186,25 @@ class _IndicatorFieldState extends State<IndicatorField> {
 
       case "selection":
         final options = widget.indicator.valueOptions as List<String>? ?? [];
+
+        // Nếu trong name có HTML/ảnh (ví dụ id 192), hiển thị label riêng
+        if (_hasHtml(widget.indicator.name)) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildIndicatorLabel(),
+              const SizedBox(height: 8),
+              CustomRadioGroup(
+                label: '', // không cần label text nữa
+                value: widget.value,
+                options: options,
+                onChanged: widget.onChanged,
+              ),
+            ],
+          );
+        }
+
+        // Các indicator selection bình thường
         return CustomRadioGroup(
           label: widget.indicator.name,
           value: widget.value,
@@ -249,7 +312,39 @@ class _IndicatorFieldState extends State<IndicatorField> {
             ),
           ),
         );
+      case "fullDate":
+        final dateValue = widget.value is String && widget.value.isNotEmpty
+            ? DateTime.tryParse(widget.value)
+            : null;
 
+        return InkWell(
+          onTap: () async {
+            final picked = await showDatePicker(
+              // locale: const Locale('vi'),
+              context: context,
+              initialDate: dateValue ?? DateTime.now(),
+              firstDate: DateTime(1970),
+              lastDate: DateTime(2100),
+            );
+            if (picked != null) {
+              widget.onChanged(picked.toIso8601String());
+            }
+          },
+          child: IgnorePointer(
+            child: InputTextField(
+              label: widget.indicator.name,
+              enabled: false,
+              prefixIcon: const Icon(Icons.calendar_today),
+              textController: TextEditingController(
+                text: dateValue != null
+                    ? "${dateValue.day.toString().padLeft(2, '0')}/"
+                        "${dateValue.month.toString().padLeft(2, '0')}/"
+                        "${dateValue.year}"
+                    : '',
+              ),
+            ),
+          ),
+        );
       case "range":
         final range =
             (widget.value as RangeValues?) ?? const RangeValues(0, 100);
@@ -720,7 +815,39 @@ class _IndicatorFieldState extends State<IndicatorField> {
             }
             break;
           }
+        case FieldType.fullDate:
+          final dateValue = widget.value is String && widget.value.isNotEmpty
+              ? DateTime.tryParse(widget.value)
+              : null;
 
+          return InkWell(
+            onTap: () async {
+              final picked = await showDatePicker(
+                // locale: const Locale('vi'),
+                context: context,
+                initialDate: dateValue ?? DateTime.now(),
+                firstDate: DateTime(1970),
+                lastDate: DateTime(2100),
+              );
+              if (picked != null) {
+                widget.onChanged(picked.toIso8601String());
+              }
+            },
+            child: IgnorePointer(
+              child: InputTextField(
+                label: widget.indicator.name,
+                enabled: false,
+                prefixIcon: const Icon(Icons.calendar_today),
+                textController: TextEditingController(
+                  text: dateValue != null
+                      ? "${dateValue.day.toString().padLeft(2, '0')}/"
+                          "${dateValue.month.toString().padLeft(2, '0')}/"
+                          "${dateValue.year}"
+                      : '',
+                ),
+              ),
+            ),
+          );
         case FieldType.fullYearRange:
           {
             final dateValue = value is String && value.isNotEmpty

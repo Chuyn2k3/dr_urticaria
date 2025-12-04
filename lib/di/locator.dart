@@ -1,12 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:dr_urticaria/core/repositories/appointments_repository.dart';
+import 'package:dr_urticaria/core/repositories/patient_repository.dart';
 import 'package:dr_urticaria/core/repositories/user_repository.dart';
 import 'package:dr_urticaria/core/repositories/vital_record_repository.dart';
 import 'package:dr_urticaria/core/services/appointments_service.dart';
 import 'package:dr_urticaria/core/services/medical_record_service.dart';
+import 'package:dr_urticaria/core/services/patient_service.dart';
 import 'package:dr_urticaria/core/services/user_service.dart';
 import 'package:dr_urticaria/cubits/login/login_cubit.dart';
 import 'package:dr_urticaria/cubits/profile/profile_cubit.dart';
+import 'package:dr_urticaria/medical_record_v2/create_medical_record/cubit/patient_search_cubit.dart';
 import 'package:dr_urticaria/utils/http_services.dart';
 import 'package:dr_urticaria/utils/navigation_service.dart';
 import 'package:dr_urticaria/utils/shared_preferences_manager.dart';
@@ -22,6 +25,7 @@ Future<void> setupLocator() async {
   serviceLocator.registerLazySingleton(() => NavigationService());
   final sharedPreferences = await SharedPreferences.getInstance();
   serviceLocator.registerLazySingleton(() => ProfileUserCubit());
+  serviceLocator.registerLazySingleton(() => PatientSearchCubit());
   serviceLocator.registerLazySingleton(
       () => SharedPreferencesManager(sharedPreferences: sharedPreferences));
   final url = await FireBaseRemoteConfigService.getSavedUrl();
@@ -49,7 +53,11 @@ Future<void> setupLocator() async {
 
   serviceLocator.registerLazySingleton<MedicalRecordService>(
       () => MedicalRecordService(dio));
+  serviceLocator.registerFactory<PatientRepository>(() => PatientRepositoryImpl(
+      patientServices: serviceLocator<PatientServices>()));
 
+  serviceLocator
+      .registerLazySingleton<PatientServices>(() => PatientServices(dio));
 // Repositories
   serviceLocator.registerLazySingleton<VitalRecordRepository>(() =>
       VitalRecordRepositoryImpl(

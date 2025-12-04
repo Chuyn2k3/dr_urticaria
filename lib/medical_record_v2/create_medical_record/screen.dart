@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'medical_form_screen.dart';
+import 'patient_picker_screen.dart';
+import 'package:dr_urticaria/models/patient/patient_model.dart';
 
 class StaffTemplatePickerScreen extends StatelessWidget {
   const StaffTemplatePickerScreen({super.key});
@@ -25,11 +27,27 @@ class StaffTemplatePickerScreen extends StatelessWidget {
             child: ListTile(
               title: Text(t.name),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {
+              onTap: () async {
+                // 1. Chọn bệnh nhân
+                final selectedPatient = await Navigator.push<PatientModel>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const PatientPickerScreen(),
+                  ),
+                );
+
+                if (selectedPatient == null) return;
+
+                // 2. Mở form tạo bệnh án với templateId + patientId
+                // Ở đây có thể dùng pushReplacement nếu muốn.
+                // ignore: use_build_context_synchronously
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => MedicalFormScreen(templateId: t.id),
+                    builder: (_) => MedicalFormScreen(
+                      templateId: t.id,
+                      patientId: selectedPatient.id,
+                    ),
                   ),
                 );
               },
