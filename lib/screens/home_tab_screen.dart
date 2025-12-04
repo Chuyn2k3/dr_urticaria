@@ -1,4 +1,4 @@
-import 'package:dr_urticaria/medical_record_v2/screens/acute_urticaria_form_screen.dart';
+//import 'package:dr_urticaria/medical_record_v2/screens/acute_urticaria_form_screen.dart';
 import 'package:dr_urticaria/utils/app_theme.dart';
 import 'package:dr_urticaria/utils/snack_bar.dart';
 import 'package:flutter/material.dart';

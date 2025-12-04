@@ -2,9 +2,7 @@ import 'package:dr_urticaria/cubits/profile/profile_cubit.dart';
 import 'package:dr_urticaria/di/locator.dart';
 import 'package:dr_urticaria/firebase_options.dart';
 import 'package:dr_urticaria/medical_record_v2/create_medical_record/cubit/patient_search_cubit.dart';
-import 'package:dr_urticaria/medical_record_v2/cubits/acute_urticaria/acute_urticaria_cubit.dart';
-import 'package:dr_urticaria/medical_record_v2/cubits/chronic_followup/chronic_followup_cubit.dart';
-import 'package:dr_urticaria/medical_record_v2/cubits/chronic_initital/chronic_initial_cubit.dart';
+
 import 'package:dr_urticaria/screens/live/live_detail.dart';
 import 'package:dr_urticaria/screens/live/live_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -47,8 +45,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => MedicalRecordCubit()),
         //  BlocProvider(create: (context) => AppointmentCubit()),
         BlocProvider(create: (context) => NotificationCubit()),
-        BlocProvider(create: (context) => AcuteUrticariaCubit()),
-        BlocProvider(create: (context) => ChronicInitialCubit()),
+        // BlocProvider(create: (context) => AcuteUrticariaCubit()),
+        //BlocProvider(create: (context) => ChronicInitialCubit()),
         //  BlocProvider(create: (context) => ChronicFollowupCubit()),
         BlocProvider(
           create: (_) => serviceLocator<ProfileUserCubit>(),

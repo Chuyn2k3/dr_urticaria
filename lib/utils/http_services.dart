@@ -41,7 +41,7 @@ class HttpService {
               requestHeader: true,
               requestBody: true,
               responseBody:
-                  false, // Có 1 API response bị lỗi hiện thị nên bị crash response nên disable đi.
+                  true, // Có 1 API response bị lỗi hiện thị nên bị crash response nên disable đi.
             ),
       );
     }

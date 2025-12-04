@@ -1,6 +1,7 @@
 import 'package:dr_urticaria/medical_record_v2/screens/appointment_list_screen.dart';
+import 'package:dr_urticaria/medical_record_v2/screens/medical_record_list_screen.dart';
 import 'package:dr_urticaria/screens/home_tab_screen.dart';
-import 'package:dr_urticaria/screens/medical_records/medical_records_list_screen.dart';
+//import 'package:dr_urticaria/screens/medical_records/medical_records_list_screen.dart';
 import 'package:flutter/material.dart';
 import '../profile/profile_screen.dart';
 import '../../utils/app_theme.dart';
@@ -71,12 +72,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         index: _currentIndex,
         children: const [
           HomeTabScreen(),
-          AppointmentsListScreen(),
+          MedicalRecordListScreen(),
           // PatientQueueScreen(
           //   doctorId: user.id,
           //   roomNumber: user.roomNumber ?? 'P101',
           // ),
-          MedicalRecordsListScreen(),
+          // MedicalRecordsListScreen(),
           //MedicalRecordListScreen(doctorId: user.id),
           ProfileScreen(),
         ],
@@ -95,10 +96,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             icon: Icon(Icons.people_alt),
             label: 'Hàng đợi',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services),
-            label: 'Bệnh án',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.medical_services),
+          //   label: 'Bệnh án',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Cá nhân',

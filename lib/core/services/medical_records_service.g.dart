@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'patient_service.dart';
+part of 'medical_records_service.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -8,8 +8,8 @@ part of 'patient_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
 
-class _PatientServices implements PatientServices {
-  _PatientServices(
+class _MedicalRecordsService implements MedicalRecordsService {
+  _MedicalRecordsService(
     this._dio, {
     this.baseUrl,
   });
@@ -19,42 +19,52 @@ class _PatientServices implements PatientServices {
   String? baseUrl;
 
   @override
-  Future<BaseListResponse<PatientModel>> getPatients(
-    limit,
-    page, {
-    search,
+  Future<BaseListResponse<MedicalRecordListItem>> getMedicalRecords({
+    required page,
+    required limit,
+    diagnosis,
+    symptoms,
     phone,
-    identityNumber,
-    sort,
+    fullName,
+    appointmentId,
+    createdAtFrom,
+    createdAtTo,
+    updatedAtFrom,
+    updatedAtTo,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
-      r'limit': limit,
       r'page': page,
-      r'search': search,
+      r'limit': limit,
+      r'diagnosis': diagnosis,
+      r'symptoms': symptoms,
       r'phone': phone,
-      r'identityNumber': identityNumber,
-      r'sort': sort,
+      r'fullName': fullName,
+      r'appointmentId': appointmentId,
+      r'createdAtFrom': createdAtFrom,
+      r'createdAtTo': createdAtTo,
+      r'updatedAtFrom': updatedAtFrom,
+      r'updatedAtTo': updatedAtTo,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<BaseListResponse<PatientModel>>(Options(
+        _setStreamType<BaseListResponse<MedicalRecordListItem>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              '/api/v1/staff/patients',
+              '/api/staff/medical-records',
               queryParameters: queryParameters,
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = BaseListResponse<PatientModel>.fromJson(
+    final value = BaseListResponse<MedicalRecordListItem>.fromJson(
       _result.data!,
-      (json) => PatientModel.fromJson(json as Map<String, dynamic>),
+      (json) => MedicalRecordListItem.fromJson(json as Map<String, dynamic>),
     );
     return value;
   }

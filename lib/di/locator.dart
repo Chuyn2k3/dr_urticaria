@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:dr_urticaria/core/repositories/appointments_repository.dart';
+import 'package:dr_urticaria/core/repositories/medical_records_repository.dart';
 import 'package:dr_urticaria/core/repositories/patient_repository.dart';
 import 'package:dr_urticaria/core/repositories/user_repository.dart';
 import 'package:dr_urticaria/core/repositories/vital_record_repository.dart';
 import 'package:dr_urticaria/core/services/appointments_service.dart';
 import 'package:dr_urticaria/core/services/medical_record_service.dart';
+import 'package:dr_urticaria/core/services/medical_records_service.dart';
 import 'package:dr_urticaria/core/services/patient_service.dart';
 import 'package:dr_urticaria/core/services/user_service.dart';
 import 'package:dr_urticaria/cubits/login/login_cubit.dart';
@@ -43,10 +45,15 @@ Future<void> setupLocator() async {
   // Cubits
   serviceLocator.registerLazySingleton<AppointmentsService>(
       () => AppointmentsService(dio));
-
-// Repositories
   serviceLocator.registerLazySingleton<AppointmentsRepository>(
       () => AppointmentsRepositoryImpl(serviceLocator<AppointmentsService>()));
+// Repositories
+  serviceLocator.registerLazySingleton<MedicalRecordsRepository>(() =>
+      MedicalRecordsRepositoryImpl(serviceLocator<MedicalRecordsService>()));
+  serviceLocator.registerLazySingleton<MedicalRecordsService>(
+      () => MedicalRecordsService(dio));
+
+// Repositories
 
   serviceLocator.registerFactory<UserRepository>(
       () => UserRepositoryImpl(userServices: serviceLocator<UserServices>()));
