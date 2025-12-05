@@ -21,7 +21,6 @@ import 'cubits/notification_cubit.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/dashboard/doctor_dashboard.dart';
-import 'screens/dashboard/nurse_dashboard.dart';
 import 'utils/app_theme.dart';
 
 void main() async {

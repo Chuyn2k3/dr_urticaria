@@ -125,17 +125,17 @@ class HomeTabScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      _buildQuickActionCard(
-                        'Quản lý bệnh án',
-                        Icons.folder_open,
-                        Colors.orange,
-                        () {
-                          context.showSnackBarSuccess(
-                            text: "Chức năng đang phát triển",
-                            positionTop: true,
-                          );
-                        },
-                      ),
+                      // _buildQuickActionCard(
+                      //   'Quản lý bệnh án',
+                      //   Icons.folder_open,
+                      //   Colors.orange,
+                      //   () {
+                      //     context.showSnackBarSuccess(
+                      //       text: "Chức năng đang phát triển",
+                      //       positionTop: true,
+                      //     );
+                      //   },
+                      // ),
                       _buildQuickActionCard(
                         'Chỉ định XN',
                         Icons.science,

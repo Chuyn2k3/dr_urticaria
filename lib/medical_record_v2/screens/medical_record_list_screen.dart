@@ -195,7 +195,10 @@ class _MedicalRecordListViewState extends State<_MedicalRecordListView> {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      appBar: AppBar(title: const Text('Danh sách bệnh án')),
+      appBar: AppBar(
+        title: const Text('Danh sách bệnh án'),
+        automaticallyImplyLeading: false,
+      ),
       body: Column(
         children: [
           _buildSearchBar(),

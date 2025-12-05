@@ -101,7 +101,8 @@ class _MedicalFormViewState extends State<_MedicalFormView> {
             context.showSnackBarSuccess(
                 text: "✅ Tạo bệnh án thành công", positionTop: true);
             await Future.delayed(const Duration(milliseconds: 600));
-            if (mounted) Navigator.pop(context, true);
+            if (mounted) Navigator.of(context).pop(true);
+            Navigator.of(context).pop(true);
           } else if (state is MedicalFormError) {
             context.showSnackBarFail(
                 text: "❌ Lỗi tạo bệnh án", positionTop: true);

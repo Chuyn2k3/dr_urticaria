@@ -761,6 +761,51 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             enabled: true,
           );
         }
+      case FieldType.fullDate:
+        return InkWell(
+          onTap: () async {
+            // xác định initialDate
+            DateTime initial = DateTime.now();
+            if (resolvedValue is String && resolvedValue.isNotEmpty) {
+              final parsed = DateTime.tryParse(resolvedValue);
+              if (parsed != null) initial = parsed;
+            } else if (resolvedValue is DateTime) {
+              initial = resolvedValue;
+            }
+
+            final picked = await showDatePicker(
+              context: context,
+              initialDate: initial,
+              firstDate: DateTime(1900),
+              lastDate: DateTime(2100),
+            );
+
+            if (picked != null) {
+              final updated = Map<String, dynamic>.from(widget.value);
+
+              // Chuẩn hoá về 00:00:00 và lưu ISO string để gửi API
+              final normalized =
+                  DateTime(picked.year, picked.month, picked.day);
+              updated[fullKey] = normalized.toIso8601String();
+
+              widget.onChanged(
+                _flattenFormValue(_expandFormValue(updated)),
+              );
+            }
+          },
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelText: field.label ?? '',
+              hintText: 'Chọn ngày',
+              prefixIcon: const Icon(Icons.calendar_today),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text(
+              _formatDisplayDate(resolvedValue),
+            ),
+          ),
+        );
 
       case FieldType.fullYearRange:
         return InkWell(
@@ -812,7 +857,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         );
 
       default:
-        return Text('⚠️ Kiểu dữ liệu không hỗ trợ: ${field.type}');
+        return Text('⚠️ Kiểu dữ liệu không hỗ trợ1: ${field.type}');
     }
   }
 
@@ -831,5 +876,17 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       }
     }
     return current;
+  }
+
+  String _formatDisplayDate(dynamic raw) {
+    if (raw == null) return 'Chọn ngày';
+    DateTime? dt;
+    if (raw is DateTime) {
+      dt = raw;
+    } else if (raw is String) {
+      dt = DateTime.tryParse(raw);
+    }
+    if (dt == null) return 'Chọn ngày';
+    return DateFormat('dd/MM/yyyy').format(dt);
   }
 }
