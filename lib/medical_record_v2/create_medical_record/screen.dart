@@ -41,7 +41,7 @@ class StaffTemplatePickerScreen extends StatelessWidget {
                 // 2. Mở form tạo bệnh án với templateId + patientId
                 // Ở đây có thể dùng pushReplacement nếu muốn.
                 // ignore: use_build_context_synchronously
-                final created = Navigator.push(
+                final created = await Navigator.push<bool>(
                   context,
                   MaterialPageRoute(
                     builder: (_) => MedicalFormScreen(
@@ -50,6 +50,9 @@ class StaffTemplatePickerScreen extends StatelessWidget {
                     ),
                   ),
                 );
+                if (created ?? false) {
+                  setState() {}
+                }
               },
             ),
           );

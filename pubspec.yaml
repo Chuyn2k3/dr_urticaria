@@ -101,57 +101,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
-    - assets/canvas/
-    - assets/icons/
-    - assets/icons/doctor_appointment/
-    - assets/icons/new/
-    - assets/icons/ehr_icon/
-    - assets/icons/tabbar/
-    - assets/icons/medical_packages/
-    - assets/icons/profile/
-    - assets/icons/new_icon_personal/
-    - assets/icons/electronic_signature_icons/
-    - assets/data.json
-    - assets/sounds/speech_to_text_listening.m4r
-    - assets/sounds/speech_to_text_cancel.m4r
-    - assets/sounds/speech_to_text_stop.m4r
     - assets/overlays/
-  fonts:
-    - family: Inter
-      fonts:
-        - asset: assets/fonts/Inter-VariableFont_slnt,wght.ttf
-    - family: InterBlack
-      fonts:
-        - asset: assets/fonts/Inter-Black.ttf
-    - family: InterBold
-      fonts:
-        - asset: assets/fonts/Inter-Bold.ttf
-          weight: 900
-    - family: InterExtraBold
-      fonts:
-        - asset: assets/fonts/Inter-ExtraBold.ttf
-          weight: 900
-    - family: InterExtraLight
-      fonts:
-        - asset: assets/fonts/Inter-ExtraLight.ttf
-    - family: InterLight
-      fonts:
-        - asset: assets/fonts/Inter-Light.ttf
-    - family: InterMedium
-      fonts:
-        - asset: assets/fonts/Inter-Medium.ttf
-    - family: InterRegular
-      fonts:
-        - asset: assets/fonts/Inter-Regular.ttf
-    - family: InterSemiBold
-      fonts:
-        - asset: assets/fonts/Inter-SemiBold.ttf
-    - family: InterThin
-      fonts:
-        - asset: assets/fonts/Inter-Thin.ttf
-    - family: Sans
-      fonts:
-        - asset: assets/fonts/SourceSansPro-Bold.ttf
+
 flutter_launcher_icons:
   android: true
   ios: true

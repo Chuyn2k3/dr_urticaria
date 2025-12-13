@@ -94,7 +94,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people_alt),
-            label: 'Hàng đợi',
+            label: 'Quản lý bệnh án',
           ),
           // BottomNavigationBarItem(
           //   icon: Icon(Icons.medical_services),

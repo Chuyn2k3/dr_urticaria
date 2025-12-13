@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/auth_cubit.dart';
 import 'login_screen.dart';
 import 'dashboard/doctor_dashboard.dart';
-import 'dashboard/nurse_dashboard.dart';
-import 'dashboard/receptionist_dashboard.dart';
 import '../models/user_model.dart';
 import '../utils/app_theme.dart';
 
