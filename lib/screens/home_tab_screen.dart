@@ -1,4 +1,7 @@
 //import 'package:dr_urticaria/medical_record_v2/screens/acute_urticaria_form_screen.dart';
+import 'package:dr_urticaria/feature/uas7/uas7_patient_daily_screen.dart';
+import 'package:dr_urticaria/medical_record_v2/create_medical_record/patient_picker_screen.dart';
+import 'package:dr_urticaria/models/patient/patient_model.dart';
 import 'package:dr_urticaria/utils/app_theme.dart';
 import 'package:dr_urticaria/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -134,6 +137,29 @@ class HomeTabScreen extends StatelessWidget {
                             text: "Chức năng đang phát triển",
                             positionTop: true,
                           );
+                        },
+                      ),
+                      _buildQuickActionCard(
+                        'Theo dõi UAS7',
+                        Icons.timeline,
+                        Colors.redAccent,
+                        () {
+                          Navigator.push<PatientModel>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PatientPickerScreen(),
+                            ),
+                          ).then((selectedPatient) {
+                            if (selectedPatient == null) return;
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => Uas7PatientDailyScreen(
+                                    patient: selectedPatient),
+                              ),
+                            );
+                          });
                         },
                       ),
                       _buildQuickActionCard(

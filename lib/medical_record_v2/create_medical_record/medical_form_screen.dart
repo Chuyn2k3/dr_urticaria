@@ -102,6 +102,7 @@ class _MedicalFormViewState extends State<_MedicalFormView> {
                 text: "✅ Tạo bệnh án thành công", positionTop: true);
             await Future.delayed(const Duration(milliseconds: 600));
             if (mounted) Navigator.pop(context, true);
+            Navigator.pop(context);
           } else if (state is MedicalFormError) {
             context.showSnackBarFail(
                 text: "❌ Lỗi tạo bệnh án", positionTop: true);
@@ -110,7 +111,7 @@ class _MedicalFormViewState extends State<_MedicalFormView> {
         child: BlocBuilder<MedicalFormCubit, MedicalFormState>(
           builder: (context, state) {
             if (state is MedicalFormLoading) {
-              return Scaffold(
+              return const Scaffold(
                   backgroundColor: AppColors.primaryColor,
                   body: CustomProgressIndicator());
             }
