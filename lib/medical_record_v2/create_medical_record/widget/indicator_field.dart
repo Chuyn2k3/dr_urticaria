@@ -96,6 +96,54 @@ class _IndicatorFieldState extends State<IndicatorField> {
     return s.contains('<img') || s.contains('<br') || s.contains('<p');
   }
 
+  String _fmtDate(DateTime d) {
+    final dd = d.day.toString().padLeft(2, '0');
+    final mm = d.month.toString().padLeft(2, '0');
+    return '$dd/$mm/${d.year}';
+  }
+
+  DateTimeRange? _parseDateRangeValue(dynamic value) {
+    if (value == null) return null;
+
+    // shape recommended: {"start": "...iso...", "end": "...iso..."}
+    if (value is Map) {
+      final s = value['start']?.toString();
+      final e = value['end']?.toString();
+      final sd = s == null ? null : DateTime.tryParse(s);
+      final ed = e == null ? null : DateTime.tryParse(e);
+      if (sd != null && ed != null) return DateTimeRange(start: sd, end: ed);
+    }
+
+    // fallback: List [startIso, endIso]
+    if (value is List && value.length >= 2) {
+      final sd = DateTime.tryParse(value[0].toString());
+      final ed = DateTime.tryParse(value[1].toString());
+      if (sd != null && ed != null) return DateTimeRange(start: sd, end: ed);
+    }
+
+    return null;
+  }
+
+  int? _weeksFromDateRange(DateTimeRange? r) {
+    if (r == null) return null;
+    final days = r.end.difference(r.start).inDays;
+    if (days < 0) return null;
+    // Công thức: số ngày giữa 2 mốc / 7
+    return (days / 7).ceil();
+  }
+
+// ✅ 1) THÊM helper label có unit (áp dụng cho Xét nghiệm: WBC (G/L), CRP (mg/L)...)
+  String _indicatorLabelWithUnit() {
+    final name = widget.indicator.name;
+    final unit = widget.indicator.unit?.toString().trim();
+
+    // tránh phá HTML label
+    if (_hasHtml(name)) return name;
+
+    if (unit == null || unit.isEmpty) return name;
+    return '$name ($unit)';
+  }
+
   Widget _buildIndicatorLabel({
     String? textOverride,
     TextStyle? textStyle,
@@ -137,17 +185,18 @@ class _IndicatorFieldState extends State<IndicatorField> {
   // ====== Build ======
   @override
   Widget build(BuildContext context) {
+    final indicatorLabel = _indicatorLabelWithUnit();
     switch (widget.indicator.valueType) {
       case "text":
         return InputTextField(
-          label: widget.indicator.name,
+          label: indicatorLabel,
           textController: _textCtrl,
           onChanged: widget.onChanged,
         );
 
       case "number":
         return InputTextField(
-          label: widget.indicator.name,
+          label: indicatorLabel,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           textController: _numCtrl,
           onChanged: (val) => widget.onChanged(num.tryParse(val) ?? val),
@@ -157,8 +206,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.indicator.name,
-                style: Theme.of(context).textTheme.bodyMedium),
+            Text(indicatorLabel, style: Theme.of(context).textTheme.bodyMedium),
             Row(
               children: [
                 Expanded(
@@ -192,7 +240,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildIndicatorLabel(),
+              _buildIndicatorLabel(textOverride: widget.indicator.name),
               const SizedBox(height: 8),
               CustomRadioGroup(
                 label: '', // không cần label text nữa
@@ -206,7 +254,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
 
         // Các indicator selection bình thường
         return CustomRadioGroup(
-          label: widget.indicator.name,
+          label: indicatorLabel,
           value: widget.value,
           options: options,
           onChanged: widget.onChanged,
@@ -230,7 +278,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomRadioGroup(
-                label: widget.indicator.name,
+                label: indicatorLabel,
                 value: radioValue,
                 options: const [
                   "Một cách ngẫu nhiên",
@@ -272,7 +320,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
         // Mặc định indicator-level (không ảnh)
         final selected = (widget.value as List<String>?) ?? [];
         return CustomCheckboxGroup(
-          label: widget.indicator.name,
+          label: indicatorLabel,
           selectedValues: selected,
           options: options,
           onChanged: widget.onChanged,
@@ -299,7 +347,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
           },
           child: IgnorePointer(
             child: InputTextField(
-              label: widget.indicator.name,
+              label: indicatorLabel,
               enabled: false,
               prefixIcon: const Icon(Icons.calendar_today),
               textController: TextEditingController(
@@ -332,7 +380,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
           },
           child: IgnorePointer(
             child: InputTextField(
-              label: widget.indicator.name,
+              label: indicatorLabel,
               enabled: false,
               prefixIcon: const Icon(Icons.calendar_today),
               textController: TextEditingController(
@@ -351,7 +399,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.indicator.name),
+            Text(indicatorLabel),
             RangeSlider(
               values: range,
               min: 0,
@@ -373,25 +421,185 @@ class _IndicatorFieldState extends State<IndicatorField> {
         }
 
         // Đặc thù 64/175 giữ nguyên
+        // if (widget.indicator.id == 64 || widget.indicator.id == 175) {
+        //   final allValues = (widget.value as Map<String, dynamic>?) ?? {};
+
+        //   final previousEpisodeKey =
+        //       "Trước đây bạn đã từng bị đợt nào như vậy chưa?";
+        //   final previousEpisodeValue = allValues[previousEpisodeKey];
+        //   final shouldShowEpisodeDropdown = (previousEpisodeValue is Map &&
+        //           previousEpisodeValue[previousEpisodeKey] == 'Có') ||
+        //       (previousEpisodeValue is String &&
+        //           previousEpisodeValue.trim() == 'Có');
+
+        //   final episodeCountKey = "${widget.indicator.name}_episode_count";
+        //   final episodeCount =
+        //       shouldShowEpisodeDropdown ? (allValues[episodeCountKey] ?? 1) : 1;
+
+        //   List<CustomFieldGroup> filteredGroups = [];
+        //   if (groups.isNotEmpty) filteredGroups.add(groups[0]);
+        //   if (shouldShowEpisodeDropdown && episodeCount > 1) {
+        //     filteredGroups.addAll(groups.skip(1).take(episodeCount - 1));
+        //   }
+
+        //   return Column(
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       Text(widget.indicator.name,
+        //           style: const TextStyle(fontWeight: FontWeight.bold)),
+        //       const SizedBox(height: 8),
+        //       if (filteredGroups.isNotEmpty)
+        //         buildCustomField(filteredGroups[0], widget.value,
+        //             (updatedValue) {
+        //           final updatedValues = Map<String, dynamic>.from(allValues);
+        //           if (updatedValue is Map<String, dynamic>) {
+        //             updatedValues.addAll(updatedValue);
+        //           }
+        //           final newPrev = updatedValues[previousEpisodeKey];
+        //           final newShouldShow =
+        //               (newPrev is Map && newPrev[previousEpisodeKey] == 'Có') ||
+        //                   (newPrev is String && newPrev.trim() == 'Có');
+
+        //           if (!newShouldShow) {
+        //             updatedValues.remove(episodeCountKey);
+        //             for (int i = 1; i < groups.length; i++) {
+        //               final group = groups[i];
+        //               final groupLabel = group.label?.trim() ?? '';
+        //               for (final field in group.fields) {
+        //                 final fieldLabel = field.label?.trim() ?? '';
+        //                 final fk = groupLabel.isNotEmpty
+        //                     ? '$groupLabel.$fieldLabel'
+        //                     : fieldLabel;
+        //                 updatedValues.remove(fk);
+        //                 updatedValues.remove("${fk}_image");
+        //               }
+        //             }
+        //           }
+        //           widget.onChanged(updatedValues);
+        //         }),
+        //       if (shouldShowEpisodeDropdown) ...[
+        //         const SizedBox(height: 16),
+        //         Text("Chọn số đợt đã trải qua:",
+        //             style: TextStyle(
+        //                 fontWeight: FontWeight.w600,
+        //                 color: AppColors.primaryColor)),
+        //         const SizedBox(height: 8),
+        //         DropdownButton<int>(
+        //           value: episodeCount,
+        //           isExpanded: true,
+        //           items: const [
+        //             DropdownMenuItem(value: 1, child: Text("1 đợt")),
+        //             DropdownMenuItem(value: 2, child: Text("2 đợt")),
+        //             DropdownMenuItem(value: 3, child: Text("3 đợt")),
+        //             DropdownMenuItem(value: 4, child: Text("4 đợt")),
+        //           ],
+        //           onChanged: (newCount) {
+        //             if (newCount != null) {
+        //               final updatedValues =
+        //                   Map<String, dynamic>.from(allValues);
+        //               updatedValues[episodeCountKey] = newCount;
+        //               for (int i = newCount; i < groups.length; i++) {
+        //                 final group = groups[i];
+        //                 final groupLabel = group.label?.trim() ?? '';
+        //                 for (final field in group.fields) {
+        //                   final fieldLabel = field.label?.trim() ?? '';
+        //                   final fk = groupLabel.isNotEmpty
+        //                       ? '$groupLabel.$fieldLabel'
+        //                       : fieldLabel;
+        //                   updatedValues.remove(fk);
+        //                   updatedValues.remove("${fk}_image");
+        //                 }
+        //               }
+        //               widget.onChanged(updatedValues);
+        //             }
+        //           },
+        //         ),
+        //         const SizedBox(height: 16),
+        //       ],
+        //       if (shouldShowEpisodeDropdown && episodeCount > 1)
+        //         ...filteredGroups.skip(1).map((group) =>
+        //             buildCustomField(group, widget.value, (updatedValue) {
+        //               final updatedValues =
+        //                   Map<String, dynamic>.from(allValues);
+        //               if (updatedValue is Map<String, dynamic>) {
+        //                 updatedValues.addAll(updatedValue);
+        //               }
+        //               widget.onChanged(updatedValues);
+        //             })),
+        //     ],
+        //   );
+        // }
+// Đặc thù 64/175: hiển thị nhóm Thông tin đợt 1/2/3 theo lựa chọn "Số đợt bị tương tự..."
         if (widget.indicator.id == 64 || widget.indicator.id == 175) {
           final allValues = (widget.value as Map<String, dynamic>?) ?? {};
 
-          final previousEpisodeKey =
-              "Trước đây bạn đã từng bị đợt nào như vậy chưa?";
-          final previousEpisodeValue = allValues[previousEpisodeKey];
-          final shouldShowEpisodeDropdown = (previousEpisodeValue is Map &&
-                  previousEpisodeValue[previousEpisodeKey] == 'Có') ||
-              (previousEpisodeValue is String &&
-                  previousEpisodeValue.trim() == 'Có');
+          String? _findFieldLabelContains(CustomFieldGroup g, String needle) {
+            for (final f in g.fields) {
+              final l = f.label?.trim();
+              if (l != null && l.contains(needle)) return l;
+            }
+            return null;
+          }
 
-          final episodeCountKey = "${widget.indicator.name}_episode_count";
-          final episodeCount =
-              shouldShowEpisodeDropdown ? (allValues[episodeCountKey] ?? 1) : 1;
+          bool _isYes(dynamic v, String key) {
+            if (v is String) return v.trim() == 'Có';
+            if (v is Map) return v[key]?.toString().trim() == 'Có';
+            return false;
+          }
 
-          List<CustomFieldGroup> filteredGroups = [];
+          int _parseCount(dynamic v) {
+            if (v == null) return 0;
+            if (v is num) return v.toInt();
+            final s = v.toString();
+            final m = RegExp(r'(\d+)').firstMatch(s);
+            return m == null ? 0 : (int.tryParse(m.group(1)!) ?? 0);
+          }
+
+          final rootGroup = groups.isNotEmpty ? groups.first : null;
+
+          // Tìm đúng label theo JSON (tránh hardcode sai câu)
+          final prevLabel = rootGroup == null
+              ? null
+              : _findFieldLabelContains(
+                  rootGroup, "Trước đây bạn đã từng bị đợt nào");
+          final countLabel = rootGroup == null
+              ? null
+              : _findFieldLabelContains(rootGroup, "Số đợt bị tương tự");
+
+          final prevYes = (prevLabel != null)
+              ? _isYes(allValues[prevLabel], prevLabel)
+              : false;
+
+          // Count lấy trực tiếp từ field selection "1 đợt/2 đợt/3 đợt"
+          final count = (prevYes && countLabel != null)
+              ? _parseCount(allValues[countLabel])
+              : 0;
+
+          // Root (Thông tin đợt này) luôn có
+          // Nếu count = 1 => show Thông tin đợt 1
+          // Nếu count = 2 => show Thông tin đợt 1 + 2
+          // Nếu count = 3 => show 1 + 2 + 3
+          final List<CustomFieldGroup> filteredGroups = [];
           if (groups.isNotEmpty) filteredGroups.add(groups[0]);
-          if (shouldShowEpisodeDropdown && episodeCount > 1) {
-            filteredGroups.addAll(groups.skip(1).take(episodeCount - 1));
+          if (prevYes && count > 0) {
+            filteredGroups
+                .addAll(groups.skip(1).take(count.clamp(0, groups.length - 1)));
+          }
+
+          void _cleanupHiddenEpisodeGroups(Map<String, dynamic> map,
+              {required int keepCount}) {
+            // Xóa dữ liệu các group "Thông tin đợt i" bị ẩn (i > keepCount)
+            // groups[0] = root, groups[1] = đợt 1, groups[2] = đợt 2, groups[3] = đợt 3
+            for (int i = 1 + keepCount; i < groups.length; i++) {
+              final g = groups[i];
+              final gl = g.label?.trim() ?? '';
+              for (final field in g.fields) {
+                final fl = field.label?.trim() ?? '';
+                final fk = gl.isNotEmpty ? '$gl.$fl' : fl;
+                map.remove(fk);
+                map.remove('${fk}_image');
+              }
+            }
           }
 
           return Column(
@@ -400,84 +608,47 @@ class _IndicatorFieldState extends State<IndicatorField> {
               Text(widget.indicator.name,
                   style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
+
+              // Root group: chứa "Trước đây..." và "Số đợt..." (field "Số đợt" sẽ được ẩn nếu chọn "Không" ở phần 2 bên dưới)
               if (filteredGroups.isNotEmpty)
                 buildCustomField(filteredGroups[0], widget.value,
                     (updatedValue) {
-                  final updatedValues = Map<String, dynamic>.from(allValues);
-                  if (updatedValue is Map<String, dynamic>) {
-                    updatedValues.addAll(updatedValue);
-                  }
-                  final newPrev = updatedValues[previousEpisodeKey];
-                  final newShouldShow =
-                      (newPrev is Map && newPrev[previousEpisodeKey] == 'Có') ||
-                          (newPrev is String && newPrev.trim() == 'Có');
+                  final updated = (updatedValue is Map<String, dynamic>)
+                      ? Map<String, dynamic>.from(updatedValue)
+                      : Map<String, dynamic>.from(allValues);
 
-                  if (!newShouldShow) {
-                    updatedValues.remove(episodeCountKey);
-                    for (int i = 1; i < groups.length; i++) {
-                      final group = groups[i];
-                      final groupLabel = group.label?.trim() ?? '';
-                      for (final field in group.fields) {
-                        final fieldLabel = field.label?.trim() ?? '';
-                        final fk = groupLabel.isNotEmpty
-                            ? '$groupLabel.$fieldLabel'
-                            : fieldLabel;
-                        updatedValues.remove(fk);
-                        updatedValues.remove("${fk}_image");
-                      }
-                    }
+                  // Nếu đổi từ "Có" -> "Không": xóa count + xóa toàn bộ nhóm đợt 1/2/3
+                  final newPrevYes = (prevLabel != null)
+                      ? _isYes(updated[prevLabel], prevLabel)
+                      : false;
+
+                  // dọn luôn key dropdown cũ nếu còn tồn tại (do code cũ tạo)
+                  updated.remove("${widget.indicator.name}_episode_count");
+
+                  if (!newPrevYes) {
+                    if (countLabel != null) updated.remove(countLabel);
+                    _cleanupHiddenEpisodeGroups(updated, keepCount: 0);
+                  } else {
+                    // Nếu có "Có" thì dọn theo count hiện tại (nếu người dùng giảm số đợt)
+                    final newCount = (countLabel != null)
+                        ? _parseCount(updated[countLabel])
+                        : 0;
+                    _cleanupHiddenEpisodeGroups(updated,
+                        keepCount: newCount.clamp(0, 3));
                   }
-                  widget.onChanged(updatedValues);
+
+                  widget.onChanged(updated);
                 }),
-              if (shouldShowEpisodeDropdown) ...[
-                const SizedBox(height: 16),
-                Text("Chọn số đợt đã trải qua:",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryColor)),
-                const SizedBox(height: 8),
-                DropdownButton<int>(
-                  value: episodeCount,
-                  isExpanded: true,
-                  items: const [
-                    DropdownMenuItem(value: 1, child: Text("1 đợt")),
-                    DropdownMenuItem(value: 2, child: Text("2 đợt")),
-                    DropdownMenuItem(value: 3, child: Text("3 đợt")),
-                    DropdownMenuItem(value: 4, child: Text("4 đợt")),
-                  ],
-                  onChanged: (newCount) {
-                    if (newCount != null) {
-                      final updatedValues =
-                          Map<String, dynamic>.from(allValues);
-                      updatedValues[episodeCountKey] = newCount;
-                      for (int i = newCount; i < groups.length; i++) {
-                        final group = groups[i];
-                        final groupLabel = group.label?.trim() ?? '';
-                        for (final field in group.fields) {
-                          final fieldLabel = field.label?.trim() ?? '';
-                          final fk = groupLabel.isNotEmpty
-                              ? '$groupLabel.$fieldLabel'
-                              : fieldLabel;
-                          updatedValues.remove(fk);
-                          updatedValues.remove("${fk}_image");
-                        }
-                      }
-                      widget.onChanged(updatedValues);
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-              ],
-              if (shouldShowEpisodeDropdown && episodeCount > 1)
-                ...filteredGroups.skip(1).map((group) =>
-                    buildCustomField(group, widget.value, (updatedValue) {
-                      final updatedValues =
-                          Map<String, dynamic>.from(allValues);
-                      if (updatedValue is Map<String, dynamic>) {
-                        updatedValues.addAll(updatedValue);
-                      }
-                      widget.onChanged(updatedValues);
-                    })),
+
+              // Render nhóm Thông tin đợt 1/2/3 theo count
+              if (prevYes && count > 0)
+                ...filteredGroups.skip(1).map(
+                    (g) => buildCustomField(g, widget.value, (updatedValue) {
+                          final updated = (updatedValue is Map<String, dynamic>)
+                              ? Map<String, dynamic>.from(updatedValue)
+                              : Map<String, dynamic>.from(allValues);
+                          widget.onChanged(updated);
+                        })),
             ],
           );
         }
@@ -485,7 +656,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.indicator.name,
+            Text(indicatorLabel,
                 style: const TextStyle(fontWeight: FontWeight.bold)),
             buildCustomField(groups, widget.value, widget.onChanged),
           ],
@@ -560,6 +731,23 @@ class _IndicatorFieldState extends State<IndicatorField> {
                   (sv.trim() == 'Giảm xuống' || sv.trim() == 'Nặng lên'));
           shouldShowField = ok;
         }
+// Chỉ hiện "Số đợt bị tương tự..." khi câu "Trước đây..." = Có
+        if (fieldLabel.contains("Số đợt bị") &&
+            fieldLabel.contains("tương tự")) {
+          final prevKey = group.fields
+              .map((x) => x.label?.trim() ?? '')
+              .firstWhere((l) => l.contains("Trước đây bạn đã từng bị đợt nào"),
+                  orElse: () => '');
+
+          if (prevKey.isNotEmpty) {
+            final pv = allValues[prevKey];
+            final isYes = (pv is String && pv.trim() == 'Có') ||
+                (pv is Map && pv[prevKey]?.toString().trim() == 'Có');
+            shouldShowField = isYes;
+          } else {
+            shouldShowField = false;
+          }
+        }
 
         if (!shouldShowField) continue;
 
@@ -586,8 +774,62 @@ class _IndicatorFieldState extends State<IndicatorField> {
                 // Ghi phẳng giá trị field (String/List/Map/URL)
                 if (_isValueNotEmpty(updatedValue)) {
                   newMap[fieldKey] = updatedValue;
+                  // NEW: nếu field hiện tại là range (date range) -> tự tính "Số tuần bị đợt này"
+                  if (f.type == FieldType.range) {
+                    // tìm field "Số tuần bị đợt này" trong cùng group
+                    final weekField = group.fields.firstWhere(
+                      (x) => (x.label ?? '').contains("Số tuần bị đợt này"),
+                      orElse: () => CustomField(
+                          label: null,
+                          description: null,
+                          type: FieldType.unknown),
+                    );
+
+                    final weekLabel = weekField.label?.trim();
+                    if (weekLabel != null && weekLabel.isNotEmpty) {
+                      final weekKey = groupLabel.isNotEmpty
+                          ? '$groupLabel.$weekLabel'
+                          : weekLabel;
+
+                      final r = _parseDateRangeValue(newMap[fieldKey]);
+                      final weeks = _weeksFromDateRange(r);
+
+                      if (weeks != null) {
+                        newMap[weekKey] = weeks; // auto set number
+                      } else {
+                        newMap.remove(weekKey);
+                      }
+                    }
+                  }
                 } else {
-                  newMap.remove(fieldKey);
+                  newMap.remove(
+                      fieldKey); // NEW: nếu field hiện tại là range (date range) -> tự tính "Số tuần bị đợt này"
+                  if (f.type == FieldType.range) {
+                    // tìm field "Số tuần bị đợt này" trong cùng group
+                    final weekField = group.fields.firstWhere(
+                      (x) => (x.label ?? '').contains("Số tuần bị đợt này"),
+                      orElse: () => CustomField(
+                          label: null,
+                          description: null,
+                          type: FieldType.unknown),
+                    );
+
+                    final weekLabel = weekField.label?.trim();
+                    if (weekLabel != null && weekLabel.isNotEmpty) {
+                      final weekKey = groupLabel.isNotEmpty
+                          ? '$groupLabel.$weekLabel'
+                          : weekLabel;
+
+                      final r = _parseDateRangeValue(newMap[fieldKey]);
+                      final weeks = _weeksFromDateRange(r);
+
+                      if (weeks != null) {
+                        newMap[weekKey] = weeks; // auto set number
+                      } else {
+                        newMap.remove(weekKey);
+                      }
+                    }
+                  }
                 }
               }
 
@@ -835,7 +1077,8 @@ class _IndicatorFieldState extends State<IndicatorField> {
             },
             child: IgnorePointer(
               child: InputTextField(
-                label: widget.indicator.name,
+                label: field.label ?? 'Chọn ngày',
+                //widget.indicator.name,
                 enabled: false,
                 prefixIcon: const Icon(Icons.calendar_today),
                 textController: TextEditingController(
@@ -879,6 +1122,48 @@ class _IndicatorFieldState extends State<IndicatorField> {
                               "${dateValue.year}"
                           : '',
                     ),
+                  ),
+                ),
+              ),
+            );
+            break;
+          }
+        case FieldType.range:
+          {
+            final current = _parseDateRangeValue(value);
+            final display = (current == null)
+                ? ''
+                : '${_fmtDate(current.start)}  →  ${_fmtDate(current.end)}';
+
+            final c = _ctrlFor(fullKey, display);
+
+            widgets.add(
+              InkWell(
+                onTap: () async {
+                  final picked = await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime(1970),
+                    lastDate: DateTime(2100),
+                    initialDateRange: current,
+                  );
+
+                  if (picked == null) {
+                    onChanged(null);
+                    return;
+                  }
+
+                  onChanged({
+                    "start": picked.start.toIso8601String(),
+                    "end": picked.end.toIso8601String(),
+                  });
+                },
+                child: IgnorePointer(
+                  child: InputTextField(
+                    label: field.label ?? 'Chọn khoảng thời gian',
+                    enabled: false,
+                    prefixIcon: const Icon(Icons.date_range),
+                    textController: c,
+                    onChanged: (_) {},
                   ),
                 ),
               ),

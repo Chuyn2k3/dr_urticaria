@@ -1486,12 +1486,26 @@ class VitalFieldEditor extends StatefulWidget {
   final String? unit;
   final ValueChanged<dynamic> onChanged;
 
+  // NEW: overrides for nested custom fields
+  final String? labelOverride;
+  final String? valueTypeOverride;
+  final dynamic valueOptionsOverride;
+  final dynamic minValueOverride;
+  final dynamic maxValueOverride;
+  final String? unitOverride;
+
   const VitalFieldEditor({
     super.key,
     required this.indicator,
     required this.value,
     this.unit,
     required this.onChanged,
+    this.labelOverride,
+    this.valueTypeOverride,
+    this.valueOptionsOverride,
+    this.minValueOverride,
+    this.maxValueOverride,
+    this.unitOverride,
   });
 
   @override
@@ -1521,13 +1535,57 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
     super.dispose();
   }
 
+  RangeValues _parseRange(dynamic v, double min, double max) {
+    double clamp(double x) => x < min ? min : (x > max ? max : x);
+
+    if (v is RangeValues) {
+      return RangeValues(clamp(v.start), clamp(v.end));
+    }
+
+    if (v is Map) {
+      final s = double.tryParse(v['start']?.toString() ?? '');
+      final e = double.tryParse(v['end']?.toString() ?? '');
+      if (s != null && e != null) return RangeValues(clamp(s), clamp(e));
+    }
+
+    if (v is List && v.length >= 2) {
+      final s = double.tryParse(v[0].toString());
+      final e = double.tryParse(v[1].toString());
+      if (s != null && e != null) return RangeValues(clamp(s), clamp(e));
+    }
+
+    // default
+    return RangeValues(min, max);
+  }
+
+  int? _rangeDivisions(double min, double max) {
+    final span = (max - min).abs();
+    if (span <= 0) return null;
+    // giữ giống bạn: 20 divisions nếu được
+    return span >= 20 ? 20 : span.floor().clamp(1, 20);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final valueType = widget.valueTypeOverride ?? widget.indicator.valueType;
+    final label = widget.labelOverride ?? widget.indicator.name;
+
+    final unit = (widget.unitOverride ?? widget.unit ?? widget.indicator.unit)
+        ?.toString()
+        .trim();
+
+    final minValue = widget.minValueOverride ?? widget.indicator.minValue;
+    final maxValue = widget.maxValueOverride ?? widget.indicator.maxValue;
+
+    final valueOptions =
+        widget.valueOptionsOverride ?? widget.indicator.valueOptions;
+    final displayLabel =
+        (unit == null || unit.isEmpty) ? label : '$label ($unit)';
     switch (parseFieldType(widget.indicator.valueType)) {
       case FieldType.text:
       case FieldType.number:
         return InputTextField(
-          label: widget.indicator.name,
+          label: displayLabel,
           keyboardType: widget.indicator.valueType == 'number'
               ? const TextInputType.numberWithOptions(decimal: true)
               : TextInputType.text,
@@ -1547,7 +1605,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
       case FieldType.select:
         // Indicator-level select (không phải custom). Không xử lý ảnh ở đây.
         return CustomRadioGroup(
-          label: widget.indicator.name,
+          label: displayLabel,
           value: widget.value is String ? widget.value : null,
           options: widget.indicator.valueOptions is List
               ? List<String>.from(widget.indicator.valueOptions)
@@ -1576,7 +1634,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomCheckboxGroup(
-                label: widget.indicator.name,
+                label: displayLabel,
                 selectedValues: widget.value is List<String>
                     ? widget.value
                     : (widget.value is Map && widget.value['values'] is List
@@ -1615,7 +1673,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
             : null;
 
         return CustomCheckboxGroup(
-          label: widget.indicator.name,
+          label: displayLabel,
           selectedValues: selectedFromIdMap ??
               (widget.value is List
                   ? List<String>.from(
@@ -1662,7 +1720,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
           },
           child: IgnorePointer(
             child: InputTextField(
-              label: widget.indicator.name,
+              label: displayLabel,
               enabled: false,
               prefixIcon: const Icon(Icons.calendar_today),
               textController: TextEditingController(
@@ -1693,7 +1751,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
           },
           child: InputDecorator(
             decoration: InputDecoration(
-              labelText: widget.indicator.name,
+              labelText: displayLabel,
               hintText: 'Chọn ngày',
               prefixIcon: const Icon(Icons.calendar_today),
               border:
@@ -1713,6 +1771,40 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
                   : 'Chọn ngày',
             ),
           ),
+        );
+      case FieldType.range:
+        final min =
+            double.tryParse(widget.indicator.minValue?.toString() ?? '') ?? 0.0;
+        final max =
+            double.tryParse(widget.indicator.maxValue?.toString() ?? '') ??
+                100.0;
+
+        final range = _parseRange(widget.value, min, max);
+        final divisions = _rangeDivisions(min, max);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(displayLabel),
+            const SizedBox(height: 8),
+            Text(
+              '${range.start.toStringAsFixed(0)} - ${range.end.toStringAsFixed(0)}'
+              '${widget.unit != null && widget.unit!.trim().isNotEmpty ? " ${widget.unit}" : ""}',
+              style:
+                  const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+            RangeSlider(
+              values: range,
+              min: min,
+              max: max,
+              divisions: divisions,
+              activeColor: AppColors.primaryColor,
+              onChanged: (v) {
+                // Lưu dạng Map để dễ serialize
+                widget.onChanged({"start": v.start, "end": v.end});
+              },
+            ),
+          ],
         );
 
       case FieldType.custom:

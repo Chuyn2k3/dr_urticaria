@@ -3,6 +3,7 @@ enum FieldType {
   number,
   select,
   multiSelection,
+  range,
   fullYearRange,
   fullDate,
   custom, // nested group
@@ -23,6 +24,8 @@ FieldType parseFieldType(String? type) {
       return FieldType.select;
     case "multi_selection":
       return FieldType.multiSelection;
+    case "range": // NEW
+      return FieldType.range;
     case "full_year_range":
       return FieldType.fullYearRange;
     case "full_date":
