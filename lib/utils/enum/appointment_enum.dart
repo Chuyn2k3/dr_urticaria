@@ -20,4 +20,44 @@ enum AppointmentStatus {
       orElse: () => AppointmentStatus.pending,
     );
   }
+
+  String get display {
+    switch (this) {
+      case AppointmentStatus.pending:
+        return 'Chờ xử lý';
+      case AppointmentStatus.confirmed:
+        return 'Đã xác nhận';
+      case AppointmentStatus.completed:
+        return 'Hoàn thành';
+      case AppointmentStatus.cancelled:
+        return 'Đã hủy';
+    }
+  }
+
+  bool get canPrimaryAction =>
+      this == AppointmentStatus.pending || this == AppointmentStatus.confirmed;
+
+  String get primaryActionLabel {
+    switch (this) {
+      case AppointmentStatus.pending:
+        return 'Xác nhận lịch hẹn';
+      case AppointmentStatus.confirmed:
+        return 'Hoàn thành lịch hẹn';
+      case AppointmentStatus.completed:
+      case AppointmentStatus.cancelled:
+        return '';
+    }
+  }
+
+  AppointmentStatus? get nextStatus {
+    switch (this) {
+      case AppointmentStatus.pending:
+        return AppointmentStatus.confirmed;
+      case AppointmentStatus.confirmed:
+        return AppointmentStatus.completed;
+      case AppointmentStatus.completed:
+      case AppointmentStatus.cancelled:
+        return null;
+    }
+  }
 }

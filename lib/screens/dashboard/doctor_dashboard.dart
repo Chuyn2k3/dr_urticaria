@@ -71,7 +71,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
       body: IndexedStack(
         index: _currentIndex,
         children: const [
-          HomeTabScreen(),
+          HomeTabScreen(), AppointmentsListScreen(),
           MedicalRecordListScreen(),
           // PatientQueueScreen(
           //   doctorId: user.id,
@@ -79,6 +79,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           // ),
           // MedicalRecordsListScreen(),
           //MedicalRecordListScreen(doctorId: user.id),
+
           ProfileScreen(),
         ],
       ),
@@ -93,13 +94,13 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             label: 'Tổng quan',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today), // Change the icon here
+            label: 'Danh sách lịch hẹn',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.people_alt),
             label: 'Quản lý bệnh án',
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.medical_services),
-          //   label: 'Bệnh án',
-          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Cá nhân',

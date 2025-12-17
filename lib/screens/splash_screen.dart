@@ -101,9 +101,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: child,
                 );
               },
-              child: Column(
+              child: const Column(
                 children: [
-                  const Text(
+                  Text(
                     'Quản lý Mề đay',
                     style: TextStyle(
                       color: Colors.white,
@@ -111,8 +111,8 @@ class _SplashScreenState extends State<SplashScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  const Text(
+                  SizedBox(height: 12),
+                  Text(
                     'Bệnh viện Da liễu Quốc gia',
                     style: TextStyle(
                       color: Colors.white70,
