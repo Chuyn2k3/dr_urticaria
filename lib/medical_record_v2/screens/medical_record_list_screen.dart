@@ -315,7 +315,10 @@ class _MedicalRecordListViewState extends State<_MedicalRecordListView> {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => VitalRecordDetailPage(medicalRecordId: record.id),
+          builder: (_) => VitalRecordDetailPage(
+            medicalRecordId: record.id,
+            templateId: record.templateId,
+          ),
         ),
       ),
       child: Container(

@@ -49,11 +49,11 @@ class _VitalRecordDetailFollowAppointmentPageState
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) =>
-              VitalRecordDetailCubit(medicalRecordId: widget.medicalRecordId)
-                ..load(),
-        ),
+        // BlocProvider(
+        //   create: (_) =>
+        //       VitalRecordDetailCubit(medicalRecordId: widget.medicalRecordId)
+        //         ..load(),
+        // ),
         BlocProvider(create: (_) => AppointmentUpdateStatusCubit()),
       ],
       child: MultiBlocListener(
@@ -312,15 +312,16 @@ class _VitalRecordDetailFollowAppointmentPageState
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: VitalFieldEditor(
-              indicator: item.indicator,
-              value: item.value?.value ?? "",
-              unit: item.indicator?.unit,
-              onChanged: (val) => context
-                  .read<VitalRecordDetailCubit>()
-                  .editValue(
-                      vitalValueId: item.value?.vitalIndicatorId ?? 0,
-                      newValue: val),
-            ),
+                indicator: item.indicator,
+                value: item.value?.value ?? "",
+                unit: item.indicator?.unit,
+                onChanged: (val) {}
+                // => context
+                //     .read<VitalRecordDetailCubit>()
+                //     .editValue(
+                //         vitalValueId: item.value?.vitalIndicatorId ?? 0,
+                //         newValue: val),
+                ),
           );
         }).toList(),
       ),
@@ -328,10 +329,12 @@ class _VitalRecordDetailFollowAppointmentPageState
   }
 
   AppointmentStatus getNextStatus(AppointmentStatus selectedStatus) {
-    if (selectedStatus == AppointmentStatus.pending)
+    if (selectedStatus == AppointmentStatus.pending) {
       return AppointmentStatus.confirmed;
-    if (selectedStatus == AppointmentStatus.confirmed)
+    }
+    if (selectedStatus == AppointmentStatus.confirmed) {
       return AppointmentStatus.completed;
+    }
     return AppointmentStatus.confirmed;
   }
 }
