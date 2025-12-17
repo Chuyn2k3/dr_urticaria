@@ -5,6 +5,10 @@ import 'package:dr_urticaria/models/user/credential_model.dart';
 import 'package:dr_urticaria/utils/validator.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+
+import '../../constant/config.dart';
+import '../../utils/shared_preferences_manager.dart';
 
 part 'login_state.dart';
 
@@ -33,6 +37,10 @@ class LoginCubit extends Cubit<LoginAppState> {
       final result = await _userRepository.login(phone, password);
       emit(
           LoggedInState(credential: result.data ?? CredentialModel(token: "")));
+      final sharedPreferences =
+          await GetIt.instance.get<SharedPreferencesManager>();
+      sharedPreferences.putString(AppConfig.SL_USERNAME, phone);
+      sharedPreferences.putString(AppConfig.SL_PASSWORD, password);
     } catch (e) {
       final message = GlobalErrorHandle(e).errorMessage();
       final errorCode = GlobalErrorHandle(e).errorCode;

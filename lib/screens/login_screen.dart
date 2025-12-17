@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void checkAutoLogin() async {
     // final isTokenExpired = await context.read<AuthCubit>().isTokenExpired();
     // if (isTokenExpired) {
-    final sp = GetIt.instance.get<SharedPreferencesManager>();
+    final sp = await GetIt.instance.get<SharedPreferencesManager>();
     final user = sp.getString(AppConfig.SL_USERNAME);
     final pass = sp.getString(AppConfig.SL_PASSWORD);
     if (user != null && pass != null && user.isNotEmpty && pass.isNotEmpty) {

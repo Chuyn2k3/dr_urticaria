@@ -149,17 +149,7 @@ class HomeTabScreen extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (_) => const PatientPickerScreen(),
                             ),
-                          ).then((selectedPatient) {
-                            if (selectedPatient == null) return;
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => Uas7PatientDailyScreen(
-                                    patient: selectedPatient),
-                              ),
-                            );
-                          });
+                          );
                         },
                       ),
                       _buildQuickActionCard(

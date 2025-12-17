@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dr_urticaria/constant/color.dart';
 import 'package:dr_urticaria/models/patient/patient_model.dart';
 
+import '../../feature/uas7/uas7_patient_daily_screen.dart';
 import 'cubit/patient_search_cubit.dart';
 import 'cubit/patient_search_state.dart';
 
@@ -178,7 +179,14 @@ class _PatientPickerScreenState extends State<PatientPickerScreen> {
                             ),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () {
-                              Navigator.pop<PatientModel>(context, patient);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      Uas7PatientDailyScreen(patient: patient),
+                                ),
+                              );
+                              // Navigator.pop<PatientModel>(context, patient);
                             },
                           ),
                         );

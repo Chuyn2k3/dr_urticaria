@@ -174,33 +174,40 @@ class _DetailCardState extends State<DetailCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Column(
-                    children: [
-                      const Text('Tổng điểm ngứa (ISS7)'),
-                      const SizedBox(height: 4),
-                      Text(
-                        '$iss7',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryColor,
+                  Flexible(
+                    child: Column(
+                      children: [
+                        const Text('Tổng điểm ngứa (ISS7)'),
+                        const SizedBox(height: 4),
+                        Text(
+                          '$iss7',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryColor,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Column(
-                    children: [
-                      const Text('Tổng điểm sẩn phù (HSS7)'),
-                      const SizedBox(height: 4),
-                      Text(
-                        '$hss7',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryColor,
+                  const VerticalDivider(
+                    width: 2,
+                  ),
+                  Flexible(
+                    child: Column(
+                      children: [
+                        const Text('Tổng điểm sẩn phù (HSS7)'),
+                        const SizedBox(height: 4),
+                        Text(
+                          '$hss7',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryColor,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
