@@ -15,9 +15,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/services/firebase_service/remote_config_service.dart';
 import 'cubits/auth_cubit.dart';
-import 'cubits/medical_record_cubit.dart';
-import 'cubits/appointment_cubit.dart';
-import 'cubits/notification_cubit.dart';
+
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/dashboard/doctor_dashboard.dart';
@@ -41,12 +39,6 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AuthCubit()..checkLogin()),
-        BlocProvider(create: (context) => MedicalRecordCubit()),
-        //  BlocProvider(create: (context) => AppointmentCubit()),
-        BlocProvider(create: (context) => NotificationCubit()),
-        // BlocProvider(create: (context) => AcuteUrticariaCubit()),
-        //BlocProvider(create: (context) => ChronicInitialCubit()),
-        //  BlocProvider(create: (context) => ChronicFollowupCubit()),
         BlocProvider(
           create: (_) => serviceLocator<ProfileUserCubit>(),
         ),

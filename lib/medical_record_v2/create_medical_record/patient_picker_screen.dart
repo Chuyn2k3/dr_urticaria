@@ -9,8 +9,8 @@ import 'cubit/patient_search_cubit.dart';
 import 'cubit/patient_search_state.dart';
 
 class PatientPickerScreen extends StatefulWidget {
-  const PatientPickerScreen({super.key});
-
+  const PatientPickerScreen({super.key, required this.isUas7});
+  final bool isUas7;
   @override
   State<PatientPickerScreen> createState() => _PatientPickerScreenState();
 }
@@ -178,16 +178,20 @@ class _PatientPickerScreenState extends State<PatientPickerScreen> {
                               ],
                             ),
                             trailing: const Icon(Icons.chevron_right),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      Uas7PatientDailyScreen(patient: patient),
-                                ),
-                              );
-                              // Navigator.pop<PatientModel>(context, patient);
-                            },
+                            onTap: widget.isUas7
+                                ? () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => Uas7PatientDailyScreen(
+                                            patient: patient),
+                                      ),
+                                    );
+                                  }
+                                : () {
+                                    Navigator.pop<PatientModel>(
+                                        context, patient);
+                                  },
                           ),
                         );
                       },

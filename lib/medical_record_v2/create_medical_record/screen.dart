@@ -32,7 +32,9 @@ class StaffTemplatePickerScreen extends StatelessWidget {
                 final selectedPatient = await Navigator.push<PatientModel>(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const PatientPickerScreen(),
+                    builder: (_) => const PatientPickerScreen(
+                      isUas7: false,
+                    ),
                   ),
                 );
 

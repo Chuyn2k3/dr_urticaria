@@ -128,17 +128,6 @@ class HomeTabScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      // _buildQuickActionCard(
-                      //   'Quản lý bệnh án',
-                      //   Icons.folder_open,
-                      //   Colors.orange,
-                      //   () {
-                      //     context.showSnackBarSuccess(
-                      //       text: "Chức năng đang phát triển",
-                      //       positionTop: true,
-                      //     );
-                      //   },
-                      // ),
                       _buildQuickActionCard(
                         'Theo dõi UAS7',
                         Icons.timeline,
@@ -147,7 +136,7 @@ class HomeTabScreen extends StatelessWidget {
                           Navigator.push<PatientModel>(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const PatientPickerScreen(),
+                              builder: (_) => const PatientPickerScreen(isUas7: true,),
                             ),
                           );
                         },

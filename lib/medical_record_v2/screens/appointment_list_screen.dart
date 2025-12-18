@@ -477,10 +477,13 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
             appointment.medicalRecords!.isNotEmpty)
         ? appointment.medicalRecords!.lastOrNull?.id
         : null;
-
+    final templateId = (appointment.medicalRecords != null &&
+            appointment.medicalRecords!.isNotEmpty)
+        ? appointment.medicalRecords!.lastOrNull?.templateId
+        : null;
     return InkWell(
       onTap: () async {
-        if (id == null) {
+        if (id == null || templateId == null) {
           context.showSnackBarFail(
               text: "Không có thông tin bệnh án", positionTop: true);
           return;
@@ -492,7 +495,8 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
             builder: (_) => VitalRecordDetailFollowAppointmentPage(
               appointmentId: appointment.id,
               medicalRecordId: id,
-              selectedStatus: appointment.status, // ✅ dùng status thật
+              selectedStatus: appointment.status,
+              templateId: templateId, // ✅ dùng status thật
             ),
           ),
         );
