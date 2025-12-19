@@ -53,7 +53,7 @@
 // // class _VitalRecordDetailViewState extends State<_VitalRecordDetailView>
 // //     with TickerProviderStateMixin {
 // //   // ===== PHÂN LOẠI GROUP ID =====
-// //   static const Set<int> _diagnosisIds = {25, 22, 35, 32}; // Chuẩn đoán
+// //   static const Set<int> _diagnosisIds = {25, 22, 35, 32}; // Chẩn đoán
 // //   static const Set<int> _labIds = {24}; // Xét nghiệm
 // //   static const Set<int> _treatmentIds = {41}; // Điều trị
 // //   static const Set<int> _followUpIds = {49, 37}; // Hẹn
@@ -349,7 +349,7 @@
 // //             tabAlignment: TabAlignment.start,
 // //             tabs: const [
 // //               Tab(text: 'Thông tin bệnh án'),
-// //               Tab(text: 'Chuẩn đoán'),
+// //               Tab(text: 'Chẩn đoán'),
 // //               Tab(text: 'Xét nghiệm'),
 // //               Tab(text: 'Điều trị'),
 // //               Tab(text: 'Hẹn'),
@@ -392,9 +392,9 @@
 // //                 _buildTabContent(normal, state,
 // //                     emptyText: 'Không có thông tin bệnh án'),
 
-// //                 // Tab 2: Chuẩn đoán
+// //                 // Tab 2: Chẩn đoán
 // //                 _buildTabContent(diagnosis, state,
-// //                     emptyText: 'Chưa có chuẩn đoán'),
+// //                     emptyText: 'Chưa có Chẩn đoán'),
 
 // //                 // Tab 3: Xét nghiệm (UI riêng)
 // //                 _buildLabTab(state, all),
@@ -790,7 +790,7 @@
 //             tabAlignment: TabAlignment.start,
 //             tabs: const [
 //               Tab(text: 'Thông tin bệnh án'),
-//               Tab(text: 'Chuẩn đoán'),
+//               Tab(text: 'Chẩn đoán'),
 //               Tab(text: 'Xét nghiệm'),
 //               Tab(text: 'Điều trị'),
 //               Tab(text: 'Hẹn'),
@@ -832,7 +832,7 @@
 //                 _buildTabContent(normal, state,
 //                     emptyText: 'Không có thông tin bệnh án'),
 //                 _buildTabContent(diagnosis, state,
-//                     emptyText: 'Chưa có chuẩn đoán'),
+//                     emptyText: 'Chưa có Chẩn đoán'),
 //                 _buildLabTab(state, all),
 //                 _buildTabContent(treatment, state,
 //                     emptyText: 'Chưa có điều trị'),
@@ -865,6 +865,8 @@ import 'package:dr_urticaria/medical_record_v2/create_medical_record/model/vital
 import 'package:dr_urticaria/cubits/vital_record_detail_cubit.dart';
 import 'package:dr_urticaria/cubits/vital_record_detail_state.dart';
 
+import '../widgets/indicator_label.dart';
+
 class VitalRecordDetailPage extends StatelessWidget {
   final int medicalRecordId;
   final int templateId;
@@ -882,14 +884,14 @@ class VitalRecordDetailPage extends StatelessWidget {
         medicalRecordId: medicalRecordId,
         templateId: templateId,
       )..load(),
-      child: const _VitalRecordDetailView(),
+      child: _VitalRecordDetailView(templateId),
     );
   }
 }
 
 class _VitalRecordDetailView extends StatefulWidget {
-  const _VitalRecordDetailView();
-
+  const _VitalRecordDetailView(this.templateId);
+  final int templateId;
   @override
   State<_VitalRecordDetailView> createState() => _VitalRecordDetailViewState();
 }
@@ -983,9 +985,9 @@ class _VitalRecordDetailViewState extends State<_VitalRecordDetailView>
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
+                      child: FieldLabel(
                         indicator.name ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                     ),
@@ -996,6 +998,7 @@ class _VitalRecordDetailViewState extends State<_VitalRecordDetailView>
                 ),
                 const SizedBox(height: 8),
                 VitalFieldEditor(
+                  //  templateId: widget.templateId,
                   indicator: indicator,
                   value: current,
                   unit: indicator.unit,
@@ -1103,6 +1106,7 @@ class _VitalRecordDetailViewState extends State<_VitalRecordDetailView>
                       style: const TextStyle(fontWeight: FontWeight.w500)),
                   const SizedBox(height: 8),
                   VitalFieldEditor(
+                    // templateId: widget.templateId,
                     indicator: indicator,
                     value: current,
                     unit: indicator.unit,
@@ -1158,7 +1162,7 @@ class _VitalRecordDetailViewState extends State<_VitalRecordDetailView>
             tabAlignment: TabAlignment.start,
             tabs: const [
               Tab(text: 'Thông tin bệnh án'),
-              Tab(text: 'Chuẩn đoán'),
+              Tab(text: 'Chẩn đoán'),
               Tab(text: 'Xét nghiệm'),
               Tab(text: 'Điều trị'),
               Tab(text: 'Hẹn'),
@@ -1187,7 +1191,7 @@ class _VitalRecordDetailViewState extends State<_VitalRecordDetailView>
                     _buildTabContent(normal, state,
                         emptyText: 'Không có thông tin bệnh án'),
                     _buildTabContent(diagnosis, state,
-                        emptyText: 'Không có nhóm chuẩn đoán trong template'),
+                        emptyText: 'Không có nhóm Chẩn đoán trong template'),
                     _buildLabTab(state, all),
                     _buildTabContent(treatment, state,
                         emptyText: 'Không có nhóm điều trị trong template'),

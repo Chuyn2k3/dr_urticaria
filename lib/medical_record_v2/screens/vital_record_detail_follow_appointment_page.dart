@@ -116,7 +116,7 @@
 //                 isScrollable: true,
 //                 tabs: const [
 //                   Tab(text: 'Thông tin bệnh án'),
-//                   Tab(text: 'Chuẩn đoán'),
+//                   Tab(text: 'Chẩn đoán'),
 //                   Tab(text: 'Xét nghiệm'),
 //                   Tab(text: 'Điều trị'),
 //                   Tab(text: 'Hẹn'),
@@ -160,9 +160,9 @@
 //                     _buildTabContent(all, state,
 //                         emptyText: 'Không có thông tin bệnh án'),
 //
-//                     // Tab 2: Chuẩn đoán
+//                     // Tab 2: Chẩn đoán
 //                     _buildTabContent(diagnosis, state,
-//                         emptyText: 'Chưa có chuẩn đoán'),
+//                         emptyText: 'Chưa có Chẩn đoán'),
 //
 //                     // Tab 3: Xét nghiệm
 //                     _buildTabContent(lab, state,
@@ -351,7 +351,9 @@ import 'package:dr_urticaria/utils/enum/appointment_enum.dart';
 // ✅ dùng group/indicator theo TEMPLATE (giống màn create form)
 import 'package:dr_urticaria/medical_record_v2/create_medical_record/model/vital_group.dart';
 
-class VitalRecordDetailFollowAppointmentPage extends StatefulWidget {
+import '../widgets/indicator_label.dart';
+
+class VitalRecordDetailFollowAppointmentPage extends StatelessWidget {
   final int medicalRecordId;
   final int templateId; // ✅ thêm templateId để load form template
   final int appointmentId;
@@ -366,12 +368,43 @@ class VitalRecordDetailFollowAppointmentPage extends StatefulWidget {
   });
 
   @override
-  State<VitalRecordDetailFollowAppointmentPage> createState() =>
-      _VitalRecordDetailFollowAppointmentPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => VitalRecordDetailCubit(
+        medicalRecordId: medicalRecordId,
+        templateId: templateId,
+      )..load(),
+      child: VitalRecordDetailFollowAppointmentView(
+        medicalRecordId: medicalRecordId,
+        templateId: templateId,
+        selectedStatus: selectedStatus,
+        appointmentId: appointmentId,
+      ),
+    );
+  }
 }
 
-class _VitalRecordDetailFollowAppointmentPageState
-    extends State<VitalRecordDetailFollowAppointmentPage>
+class VitalRecordDetailFollowAppointmentView extends StatefulWidget {
+  final int medicalRecordId;
+  final int templateId; // ✅ thêm templateId để load form template
+  final int appointmentId;
+  final AppointmentStatus selectedStatus;
+
+  const VitalRecordDetailFollowAppointmentView({
+    super.key,
+    required this.medicalRecordId,
+    required this.templateId,
+    required this.appointmentId,
+    required this.selectedStatus,
+  });
+
+  @override
+  State<VitalRecordDetailFollowAppointmentView> createState() =>
+      _VitalRecordDetailFollowAppointmentViewState();
+}
+
+class _VitalRecordDetailFollowAppointmentViewState
+    extends State<VitalRecordDetailFollowAppointmentView>
     with TickerProviderStateMixin {
   // giống màn detail mới
   static const Set<int> _diagnosisIds = {25, 35, 52};
@@ -439,12 +472,12 @@ class _VitalRecordDetailFollowAppointmentPageState
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => VitalRecordDetailCubit(
-            medicalRecordId: widget.medicalRecordId,
-            templateId: widget.templateId,
-          )..load(),
-        ),
+        // BlocProvider(
+        //   create: (_) => VitalRecordDetailCubit(
+        //     medicalRecordId: widget.medicalRecordId,
+        //     templateId: widget.templateId,
+        //   )..load(),
+        // ),
         BlocProvider(create: (_) => AppointmentUpdateStatusCubit()),
       ],
       child: MultiBlocListener(
@@ -508,7 +541,7 @@ class _VitalRecordDetailFollowAppointmentPageState
                 isScrollable: true,
                 tabs: const [
                   Tab(text: 'Thông tin bệnh án'),
-                  Tab(text: 'Chuẩn đoán'),
+                  Tab(text: 'Chẩn đoán'),
                   Tab(text: 'Xét nghiệm'),
                   Tab(text: 'Điều trị'),
                   Tab(text: 'Hẹn'),
@@ -558,7 +591,7 @@ class _VitalRecordDetailFollowAppointmentPageState
                                 'Không có nhóm thông tin trong template'),
                         _buildTabContent(diagnosis, state,
                             emptyText:
-                                'Không có nhóm chuẩn đoán trong template'),
+                                'Không có nhóm Chẩn đoán trong template'),
                         _buildTabContent(lab, state,
                             emptyText:
                                 'Không có nhóm xét nghiệm trong template'),
@@ -587,20 +620,23 @@ class _VitalRecordDetailFollowAppointmentPageState
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    BlocBuilder<VitalRecordDetailCubit, VitalRecordDetailState>(
-                      builder: (context, s) {
-                        return FilledButton.icon(
-                          onPressed: s.saving
-                              ? null
-                              : () => context
-                                  .read<VitalRecordDetailCubit>()
-                                  .saveAll(),
-                          icon: const Icon(Icons.save_outlined),
-                          label: Text(
-                              s.saving ? 'Đang lưu...' : 'Lưu tất cả thay đổi'),
-                        );
-                      },
-                    ),
+                    if (_currentStatus == AppointmentStatus.confirmed)
+                      BlocBuilder<VitalRecordDetailCubit,
+                          VitalRecordDetailState>(
+                        builder: (context, s) {
+                          return FilledButton.icon(
+                            onPressed: s.saving
+                                ? null
+                                : () => context
+                                    .read<VitalRecordDetailCubit>()
+                                    .saveAll(),
+                            icon: const Icon(Icons.save_outlined),
+                            label: Text(s.saving
+                                ? 'Đang lưu...'
+                                : 'Lưu tất cả thay đổi'),
+                          );
+                        },
+                      ),
                     const SizedBox(height: 8),
 
                     // ✅ nút primary action theo status hiện tại
@@ -728,12 +764,10 @@ class _VitalRecordDetailFollowAppointmentPageState
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
+                      child: FieldLabel(
                         indicator.name ?? '',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                     ),
                     if (indicator.unit != null)
@@ -746,6 +780,7 @@ class _VitalRecordDetailFollowAppointmentPageState
                 const SizedBox(height: 8),
 
                 VitalFieldEditor(
+                  //templateId: widget.templateId,
                   indicator: indicator,
                   value: current,
                   unit: indicator.unit,
