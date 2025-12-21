@@ -38,7 +38,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView>
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   Timer? _searchDebounce;
-  String _orderBy = 'appointmentDate';
+  String _orderBy = 'updateAt';
   String _orderDirection = 'DESC';
   DateTime? _appointmentDateFrom;
   DateTime? _appointmentDateTo;

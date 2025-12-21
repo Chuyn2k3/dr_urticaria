@@ -50,11 +50,12 @@ class InputTextField extends StatelessWidget {
     this.decoration,
     this.padding,
     this.maxLength,
-    this.keyboardType,
+    this.keyboardType = TextInputType.text,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textDirection: TextDirection.ltr,
       focusNode: focusNode,
       inputFormatters: inputFormatters,
       onTap: ontap,
