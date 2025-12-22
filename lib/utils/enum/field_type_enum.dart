@@ -65,7 +65,6 @@ class CustomField {
   });
 
   factory CustomField.fromJson(Map<String, dynamic> json) {
-    // Phân tích groups từ valueOptions['group'] hoặc trực tiếp 'group' hoặc 'fields'
     final groupJson =
         json['valueOptions']?['group'] ?? json['group'] ?? json['fields'];
     List<CustomFieldGroup>? parsedGroups;
@@ -78,7 +77,7 @@ class CustomField {
       }
     }
 
-    // Phân tích fields trực tiếp từ json['fields'] nếu có
+    // Nếu có trường `fields` và chưa phân tích `groups`, cần xử lý trường hợp này
     if (json['fields'] is List && parsedGroups == null) {
       parsedGroups = [
         CustomFieldGroup(
@@ -90,20 +89,21 @@ class CustomField {
       ];
     }
 
-    // Phân tích requiredFields
+    // Phân tích trường yêu cầu
     List<CustomField>? parsedRequired;
     final reqFields = json['requiredFields'] as List?;
     if (reqFields != null) {
       parsedRequired = reqFields.map((f) => CustomField.fromJson(f)).toList();
     }
 
-    // Xác định type
+    // Xác định loại trường
     FieldType type = parseFieldType(json['type']);
     if (type == FieldType.unknown &&
         (parsedGroups != null || json['fields'] is List)) {
       type = FieldType
-          .custom; // Suy ra type custom nếu có fields hoặc groups lồng nhau
+          .custom; // Nếu có nhóm hoặc trường lồng nhau, gán loại custom
     }
+
     final fieldLabel =
         json['label'] ?? json['name'] ?? 'Field_${json['type'] ?? 'unknown'}';
     return CustomField(

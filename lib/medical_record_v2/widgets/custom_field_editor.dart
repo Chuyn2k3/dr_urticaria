@@ -647,6 +647,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../constant/color.dart';
+import '../../models/vital_indicator_model.dart';
 import '../../utils/enum/field_type_enum.dart';
 import '../../widget/text_field/input_text_field.dart';
 import 'custom_checkbox_group.dart';
@@ -654,6 +655,7 @@ import 'custom_radio_group.dart';
 import 'image_upload_field.dart';
 
 class CustomFieldEditor extends StatefulWidget {
+  final VitalIndicator indicator;
   final List<CustomFieldGroup>? groups;
   final Map<String, dynamic> value; // flat map (key can be "Group.Field")
   final ValueChanged<Map<String, dynamic>> onChanged;
@@ -663,6 +665,7 @@ class CustomFieldEditor extends StatefulWidget {
     this.groups,
     required this.value,
     required this.onChanged,
+    required this.indicator,
   });
 
   @override
@@ -883,9 +886,10 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
     required Map<String, dynamic> expandedValue,
   }) {
     // treatment-dependent fields
-    if (fieldLabel == "Tên thuốc" ||
-        fieldLabel == "Liều thuốc (ghi thời gian nếu nhớ)" ||
-        fieldLabel == "Tình trạng tổn thương khi đang uống thuốc") {
+    if ((fieldLabel == "Tên thuốc" ||
+            fieldLabel == "Liều thuốc (ghi thời gian nếu nhớ)" ||
+            fieldLabel == "Tình trạng tổn thương khi đang uống thuốc") &&
+        (widget.indicator.id == 175 || widget.indicator.id == 64)) {
       String treatmentKey;
       if (groupLabel.isEmpty) {
         treatmentKey =
@@ -1335,6 +1339,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
 
       case FieldType.custom:
         return CustomFieldEditor(
+          indicator: widget.indicator,
           groups: field.groups,
           value: resolvedValue is Map<String, dynamic>
               ? resolvedValue

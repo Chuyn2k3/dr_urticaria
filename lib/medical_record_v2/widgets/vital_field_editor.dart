@@ -447,6 +447,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
 
         // Root group
         CustomFieldEditor(
+          indicator: widget.indicator,
           groups: [filteredGroups[0]],
           value: allValues,
           onChanged: (updatedValue) {
@@ -479,6 +480,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
                 (g) => Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: CustomFieldEditor(
+                    indicator: widget.indicator,
                     groups: [g],
                     value: allValues,
                     onChanged: (updatedValue) {
@@ -1398,6 +1400,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
         }
 
         return CustomFieldEditor(
+          indicator: widget.indicator,
           groups: groups,
           value: widget.value is Map
               ? Map<String, dynamic>.from(widget.value as Map)

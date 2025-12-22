@@ -1114,8 +1114,11 @@ class _IndicatorFieldState extends State<IndicatorField> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: fieldOrGroup
-            .map((e) =>
-                buildCustomField(e, value, onChanged, parentLabel: parentLabel))
+            .map((e) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: buildCustomField(e, value, onChanged,
+                      parentLabel: parentLabel),
+                ))
             .toList(),
       );
     }
@@ -1144,9 +1147,10 @@ class _IndicatorFieldState extends State<IndicatorField> {
 
         // Điều kiện cho root group: “Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)”
         // và cho episode groups: “Có điều trị hay không?”
-        if (fieldLabel == "Tên thuốc" ||
-            fieldLabel == "Liều thuốc (ghi thời gian nếu nhớ)" ||
-            fieldLabel == "Tình trạng tổn thương khi đang uống thuốc") {
+        if ((fieldLabel == "Tên thuốc" ||
+                fieldLabel == "Liều thuốc (ghi thời gian nếu nhớ)" ||
+                fieldLabel == "Tình trạng tổn thương khi đang uống thuốc") &&
+            (widget.indicator.id == 175 || widget.indicator.id == 64)) {
           String treatmentKey;
           if (groupLabel.isEmpty) {
             // Root group
@@ -1203,125 +1207,128 @@ class _IndicatorFieldState extends State<IndicatorField> {
         final fieldValue = allValues[fieldKey];
 
         children.add(
-          buildCustomField(
-            f,
-            fieldValue,
-            (updatedValue) {
-              final newMap = Map<String, dynamic>.from(allValues);
-              final imageKey = "${fieldKey}_image";
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildCustomField(
+              f,
+              fieldValue,
+              (updatedValue) {
+                final newMap = Map<String, dynamic>.from(allValues);
+                final imageKey = "${fieldKey}_image";
 
-              // Nhận patch ảnh từ SELECT có ảnh
-              if (updatedValue is Map &&
-                  updatedValue.containsKey(_kImagePatchKey)) {
-                final link = updatedValue[_kImagePatchKey];
-                if (_isValueNotEmpty(link)) {
-                  newMap[imageKey] = link;
+                // Nhận patch ảnh từ SELECT có ảnh
+                if (updatedValue is Map &&
+                    updatedValue.containsKey(_kImagePatchKey)) {
+                  final link = updatedValue[_kImagePatchKey];
+                  if (_isValueNotEmpty(link)) {
+                    newMap[imageKey] = link;
+                  } else {
+                    newMap.remove(imageKey);
+                  }
                 } else {
-                  newMap.remove(imageKey);
-                }
-              } else {
-                // Ghi phẳng giá trị field (String/List/Map/URL)
-                if (_isValueNotEmpty(updatedValue)) {
-                  newMap[fieldKey] = updatedValue;
-                  // NEW: nếu field hiện tại là range (date range) -> tự tính "Số tuần bị đợt này"
-                  if (f.type == FieldType.range) {
-                    // tìm field "Số tuần bị đợt này" trong cùng group
-                    final weekField = group.fields.firstWhere(
-                      (x) => (x.label ?? '').contains("Số tuần bị đợt này"),
-                      orElse: () => CustomField(
-                          label: null,
-                          description: null,
-                          type: FieldType.unknown),
-                    );
+                  // Ghi phẳng giá trị field (String/List/Map/URL)
+                  if (_isValueNotEmpty(updatedValue)) {
+                    newMap[fieldKey] = updatedValue;
+                    // NEW: nếu field hiện tại là range (date range) -> tự tính "Số tuần bị đợt này"
+                    if (f.type == FieldType.range) {
+                      // tìm field "Số tuần bị đợt này" trong cùng group
+                      final weekField = group.fields.firstWhere(
+                        (x) => (x.label ?? '').contains("Số tuần bị đợt này"),
+                        orElse: () => CustomField(
+                            label: null,
+                            description: null,
+                            type: FieldType.unknown),
+                      );
 
-                    final weekLabel = weekField.label?.trim();
-                    if (weekLabel != null && weekLabel.isNotEmpty) {
-                      final weekKey = groupLabel.isNotEmpty
-                          ? '$groupLabel.$weekLabel'
-                          : weekLabel;
+                      final weekLabel = weekField.label?.trim();
+                      if (weekLabel != null && weekLabel.isNotEmpty) {
+                        final weekKey = groupLabel.isNotEmpty
+                            ? '$groupLabel.$weekLabel'
+                            : weekLabel;
 
-                      final r = _parseDateRangeValue(newMap[fieldKey]);
-                      final weeks = _weeksFromDateRange(r);
+                        final r = _parseDateRangeValue(newMap[fieldKey]);
+                        final weeks = _weeksFromDateRange(r);
 
-                      if (weeks != null) {
-                        newMap[weekKey] = weeks; // auto set number
-                      } else {
-                        newMap.remove(weekKey);
+                        if (weeks != null) {
+                          newMap[weekKey] = weeks; // auto set number
+                        } else {
+                          newMap.remove(weekKey);
+                        }
+                      }
+                    }
+                  } else {
+                    newMap.remove(
+                        fieldKey); // NEW: nếu field hiện tại là range (date range) -> tự tính "Số tuần bị đợt này"
+                    if (f.type == FieldType.range) {
+                      // tìm field "Số tuần bị đợt này" trong cùng group
+                      final weekField = group.fields.firstWhere(
+                        (x) => (x.label ?? '').contains("Số tuần bị đợt này"),
+                        orElse: () => CustomField(
+                            label: null,
+                            description: null,
+                            type: FieldType.unknown),
+                      );
+
+                      final weekLabel = weekField.label?.trim();
+                      if (weekLabel != null && weekLabel.isNotEmpty) {
+                        final weekKey = groupLabel.isNotEmpty
+                            ? '$groupLabel.$weekLabel'
+                            : weekLabel;
+
+                        final r = _parseDateRangeValue(newMap[fieldKey]);
+                        final weeks = _weeksFromDateRange(r);
+
+                        if (weeks != null) {
+                          newMap[weekKey] = weeks; // auto set number
+                        } else {
+                          newMap.remove(weekKey);
+                        }
                       }
                     }
                   }
-                } else {
-                  newMap.remove(
-                      fieldKey); // NEW: nếu field hiện tại là range (date range) -> tự tính "Số tuần bị đợt này"
-                  if (f.type == FieldType.range) {
-                    // tìm field "Số tuần bị đợt này" trong cùng group
-                    final weekField = group.fields.firstWhere(
-                      (x) => (x.label ?? '').contains("Số tuần bị đợt này"),
-                      orElse: () => CustomField(
-                          label: null,
-                          description: null,
-                          type: FieldType.unknown),
-                    );
+                }
 
-                    final weekLabel = weekField.label?.trim();
-                    if (weekLabel != null && weekLabel.isNotEmpty) {
-                      final weekKey = groupLabel.isNotEmpty
-                          ? '$groupLabel.$weekLabel'
-                          : weekLabel;
-
-                      final r = _parseDateRangeValue(newMap[fieldKey]);
-                      final weeks = _weeksFromDateRange(r);
-
-                      if (weeks != null) {
-                        newMap[weekKey] = weeks; // auto set number
-                      } else {
-                        newMap.remove(weekKey);
-                      }
-                    }
+                // Cleanup khi đổi điều trị
+                if (fieldLabel ==
+                        "Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)" ||
+                    fieldLabel == "Có điều trị hay không?") {
+                  final isYes = updatedValue == "Có" ||
+                      (updatedValue is Map && updatedValue[fieldLabel] == 'Có');
+                  if (!isYes) {
+                    final drugNameKey = groupLabel.isNotEmpty
+                        ? '$groupLabel.Tên thuốc'
+                        : 'Tên thuốc';
+                    final drugDoseKey = groupLabel.isNotEmpty
+                        ? '$groupLabel.Liều thuốc (ghi thời gian nếu nhớ)'
+                        : 'Liều thuốc (ghi thời gian nếu nhớ)';
+                    final statusKey = groupLabel.isNotEmpty
+                        ? '$groupLabel.Tình trạng tổn thương khi đang uống thuốc'
+                        : 'Tình trạng tổn thương khi đang uống thuốc';
+                    final symptomKey = groupLabel.isNotEmpty
+                        ? '$groupLabel.Triệu chứng Giảm xuống/ Nặng lên là gì?'
+                        : 'Triệu chứng Giảm xuống/ Nặng lên là gì?';
+                    newMap.remove(drugNameKey);
+                    newMap.remove(drugDoseKey);
+                    newMap.remove(statusKey);
+                    newMap.remove(symptomKey);
                   }
                 }
-              }
 
-              // Cleanup khi đổi điều trị
-              if (fieldLabel ==
-                      "Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)" ||
-                  fieldLabel == "Có điều trị hay không?") {
-                final isYes = updatedValue == "Có" ||
-                    (updatedValue is Map && updatedValue[fieldLabel] == 'Có');
-                if (!isYes) {
-                  final drugNameKey = groupLabel.isNotEmpty
-                      ? '$groupLabel.Tên thuốc'
-                      : 'Tên thuốc';
-                  final drugDoseKey = groupLabel.isNotEmpty
-                      ? '$groupLabel.Liều thuốc (ghi thời gian nếu nhớ)'
-                      : 'Liều thuốc (ghi thời gian nếu nhớ)';
-                  final statusKey = groupLabel.isNotEmpty
-                      ? '$groupLabel.Tình trạng tổn thương khi đang uống thuốc'
-                      : 'Tình trạng tổn thương khi đang uống thuốc';
-                  final symptomKey = groupLabel.isNotEmpty
-                      ? '$groupLabel.Triệu chứng Giảm xuống/ Nặng lên là gì?'
-                      : 'Triệu chứng Giảm xuống/ Nặng lên là gì?';
-                  newMap.remove(drugNameKey);
-                  newMap.remove(drugDoseKey);
-                  newMap.remove(statusKey);
-                  newMap.remove(symptomKey);
+                if (fieldLabel == "Tình trạng tổn thương khi đang uống thuốc") {
+                  final keep = updatedValue == "Giảm xuống" ||
+                      updatedValue == "Nặng lên";
+                  if (!keep) {
+                    final symptomKey = groupLabel.isNotEmpty
+                        ? '$groupLabel.Triệu chứng Giảm xuống/ Nặng lên là gì?'
+                        : 'Triệu chứng Giảm xuống/ Nặng lên là gì?';
+                    newMap.remove(symptomKey);
+                  }
                 }
-              }
 
-              if (fieldLabel == "Tình trạng tổn thương khi đang uống thuốc") {
-                final keep =
-                    updatedValue == "Giảm xuống" || updatedValue == "Nặng lên";
-                if (!keep) {
-                  final symptomKey = groupLabel.isNotEmpty
-                      ? '$groupLabel.Triệu chứng Giảm xuống/ Nặng lên là gì?'
-                      : 'Triệu chứng Giảm xuống/ Nặng lên là gì?';
-                  newMap.remove(symptomKey);
-                }
-              }
-
-              onChanged(newMap);
-            },
-            parentLabel: groupLabel,
+                onChanged(newMap);
+              },
+              parentLabel: groupLabel,
+            ),
           ),
         );
       }
