@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 12),
                     const Text(
-                      'Hệ thống quản lý mề đay',
+                      'Hệ thống quản lý Mày đay',
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 18,

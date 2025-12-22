@@ -92,11 +92,11 @@ class MedicalRecordModel {
   String get typeDisplayName {
     switch (type) {
       case MedicalRecordType.acute:
-        return 'Mề đay cấp tính';
+        return 'Mày đay cấp tính';
       case MedicalRecordType.chronicFirst:
-        return 'Mề đay mạn tính lần 1';
+        return 'Mày đay mạn tính lần 1';
       case MedicalRecordType.chronicReexam:
-        return 'Mề đay mạn tính tái khám';
+        return 'Mày đay mạn tính tái khám';
     }
   }
 

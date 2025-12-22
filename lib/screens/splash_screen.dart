@@ -104,7 +104,7 @@ class _SplashScreenState extends State<SplashScreen> {
               child: const Column(
                 children: [
                   Text(
-                    'Quản lý Mề đay',
+                    'Quản lý Mày đay',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,

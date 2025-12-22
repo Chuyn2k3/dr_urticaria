@@ -169,6 +169,9 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
       case 89:
       case 90:
         return _buildSpecial89or90(context);
+      case 217:
+        return _buildSpecial217(context);
+
       default:
         return null;
     }
@@ -1188,6 +1191,102 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
             } else {
               m.remove('7.2 Khi không dùng thuốc');
             }
+            widget.onChanged(m);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSpecial217(BuildContext context) {
+    final label = widget.labelOverride ?? widget.indicator.name;
+    final unit = (widget.unitOverride ?? widget.unit ?? widget.indicator.unit)
+        ?.toString();
+    final displayLabel = _displayLabel(label, unit);
+
+    final allValues = _asMap(widget.value);
+
+    final controllerTienSuDiUng = TextEditingController(
+      text: allValues['Chi tiết tiền sử dị ứng']?.toString() ?? '',
+    );
+    final controllerThuoc = TextEditingController(
+      text: allValues['Chi tiết thuốc']?.toString() ?? '',
+    );
+    final controllerYeuToKhac = TextEditingController(
+      text: allValues['Yếu tố khác']?.toString() ?? '',
+    );
+
+    Widget buildRadioWithDetail({
+      required String label,
+      required String detailKey,
+      required TextEditingController controller,
+    }) {
+      final selected = allValues[label]?.toString();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CustomRadioGroup(
+            label: label,
+            value: selected,
+            options: const ['Có', 'Không', 'Không biết'],
+            onChanged: (v) {
+              final m = Map<String, dynamic>.from(allValues);
+              m[label] = v;
+              if (v != 'Có') {
+                m.remove(detailKey);
+              }
+              widget.onChanged(m);
+            },
+            isRequired: false,
+            enabled: true,
+          ),
+          if (selected == 'Có')
+            InputTextField(
+              label: detailKey,
+              textController: controller,
+              onChanged: (v) {
+                final m = Map<String, dynamic>.from(allValues);
+                m[detailKey] = v;
+                widget.onChanged(m);
+              },
+            ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(displayLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        buildRadioWithDetail(
+          label: 'Tiền sử dị ứng',
+          detailKey: 'Chi tiết tiền sử dị ứng',
+          controller: controllerTienSuDiUng,
+        ),
+        buildRadioWithDetail(
+          label: 'Thuốc',
+          detailKey: 'Chi tiết thuốc',
+          controller: controllerThuoc,
+        ),
+        CustomRadioGroup(
+          label: 'Mày đay',
+          value: allValues['Mày đay']?.toString(),
+          options: const ['Có', 'Không', 'Không biết'],
+          onChanged: (v) {
+            final m = Map<String, dynamic>.from(allValues);
+            m['Mày đay'] = v;
+            widget.onChanged(m);
+          },
+          isRequired: false,
+          enabled: true,
+        ),
+        InputTextField(
+          label: 'Yếu tố khác',
+          textController: controllerYeuToKhac,
+          onChanged: (v) {
+            final m = Map<String, dynamic>.from(allValues);
+            m['Yếu tố khác'] = v;
             widget.onChanged(m);
           },
         ),

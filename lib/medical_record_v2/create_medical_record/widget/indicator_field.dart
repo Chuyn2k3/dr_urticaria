@@ -2718,6 +2718,99 @@ class _IndicatorFieldState extends State<IndicatorField> {
             ],
           );
         }
+        if (widget.indicator.id == 217) {
+          final allValues = (widget.value as Map<String, dynamic>?) ?? {};
+
+          // Hàm tiện ích cập nhật map và gọi onChanged
+          void updateValues(String key, dynamic newValue) {
+            final m = allValues;
+            if (newValue == null ||
+                (newValue is String && newValue.trim().isEmpty)) {
+              m.remove(key);
+            } else {
+              m[key] = newValue;
+            }
+            widget.onChanged(m);
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Tiêu đề chính (indicator name)
+              Text(
+                widget.indicator.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+
+              // 1. Tiền sử dị ứng
+              CustomRadioGroup(
+                label: 'Tiền sử dị ứng',
+                value: allValues['Tiền sử dị ứng'] as String?,
+                options: const ['Có', 'Không', 'Không biết'],
+                onChanged: (newValue) {
+                  updateValues('Tiền sử dị ứng', newValue);
+
+                  // Nếu không chọn 'Có' thì xóa chi tiết
+                  if (newValue != 'Có') {
+                    updateValues('Chi tiết tiền sử dị ứng', null);
+                  }
+                },
+              ),
+              if ((allValues['Tiền sử dị ứng'] as String?) == 'Có')
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: InputTextField(
+                    label: 'Chi tiết tiền sử dị ứng',
+                    onChanged: (v) =>
+                        updateValues('Chi tiết tiền sử dị ứng', v),
+                  ),
+                ),
+
+              const SizedBox(height: 16),
+
+              // 2. Thuốc
+              CustomRadioGroup(
+                label: 'Thuốc',
+                value: allValues['Thuốc'] as String?,
+                options: const ['Có', 'Không', 'Không biết'],
+                onChanged: (newValue) {
+                  // print(newValue);
+                  updateValues('Thuốc', newValue);
+                  if (newValue != 'Có') {
+                    updateValues('Chi tiết thuốc', null);
+                  }
+                },
+              ),
+              if ((allValues['Thuốc'] as String?) == 'Có')
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: InputTextField(
+                    label: 'Chi tiết thuốc',
+                    onChanged: (v) => updateValues('Chi tiết thuốc', v),
+                  ),
+                ),
+
+              const SizedBox(height: 16),
+
+              // 3. Mày đay
+              CustomRadioGroup(
+                label: 'Mày đay',
+                value: allValues['Mày đay'] as String?,
+                options: const ['Có', 'Không', 'Không biết'],
+                onChanged: (newValue) => updateValues('Mày đay', newValue),
+              ),
+
+              const SizedBox(height: 16),
+
+              // 4. Yếu tố khác
+              InputTextField(
+                label: 'Yếu tố khác',
+                onChanged: (v) => updateValues('Yếu tố khác', v),
+              ),
+            ],
+          );
+        }
         // Mặc định cho các custom khác (như 179 với multi + image)
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
