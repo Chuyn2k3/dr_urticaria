@@ -1,18 +1,18 @@
-// import 'package:dr_urticaria/medical_record_v2/widgets/image_upload_field.dart';
-// import 'package:flutter/cupertino.dart';
 // import 'package:flutter/material.dart';
 // import 'package:intl/intl.dart';
 //
 // import '../../constant/color.dart';
+// import '../../models/vital_indicator_model.dart';
 // import '../../utils/enum/field_type_enum.dart';
 // import '../../widget/text_field/input_text_field.dart';
 // import 'custom_checkbox_group.dart';
-// import 'custom_multiple_choice_with_images.dart';
 // import 'custom_radio_group.dart';
+// import 'image_upload_field.dart';
 //
 // class CustomFieldEditor extends StatefulWidget {
+//   final VitalIndicator indicator;
 //   final List<CustomFieldGroup>? groups;
-//   final Map<String, dynamic> value;
+//   final Map<String, dynamic> value; // flat map (key can be "Group.Field")
 //   final ValueChanged<Map<String, dynamic>> onChanged;
 //
 //   const CustomFieldEditor({
@@ -20,6 +20,7 @@
 //     this.groups,
 //     required this.value,
 //     required this.onChanged,
+//     required this.indicator,
 //   });
 //
 //   @override
@@ -52,6 +53,15 @@
 //   }
 //
 //   bool _isDigit(int c) => c >= 48 && c <= 57;
+//
+//   bool _isValueNotEmpty(dynamic val) {
+//     if (val == null) return false;
+//     if (val is String) return val.trim().isNotEmpty;
+//     if (val is num) return true;
+//     if (val is List) return val.isNotEmpty;
+//     if (val is Map) return val.isNotEmpty;
+//     return true;
+//   }
 //
 //   Map<String, dynamic> _flattenFormValue(
 //     Map<String, dynamic> nested, {
@@ -110,30 +120,45 @@
 //     final expandedValue = _expandFormValue(widget.value);
 //
 //     for (final group in widget.groups ?? []) {
+//       final gl = group.label?.trim() ?? '';
 //       for (var i = 0; i < group.fields.length; i++) {
 //         final field = group.fields[i];
-//         final fieldKey = field.label ?? group.label ?? 'field_$i';
-//         final fieldValue = _getValueByKey(
-//               expandedValue,
-//               _fullKey(
-//                   group.label?.trim() ?? '', field.label?.trim() ?? fieldKey),
-//             ) ??
+//
+//         // ✅ FIX precedence: ?? phải ôm cả biểu thức ternary
+//         final fl = (field.label ?? (gl.isNotEmpty ? gl : 'field_$i')).trim();
+//
+//         final fullKey = _fullKey(gl, fl);
+//
+//         final fieldValue = _getValueByKey(expandedValue, fullKey) ??
 //             (field.type == FieldType.custom ? {} : null);
 //
-//         if (field.type == FieldType.text || field.type == FieldType.number) {
-//           _controllers[fieldKey] ??= TextEditingController();
-//           final newText = fieldValue?.toString() ?? '';
-//           if (_controllers[fieldKey]!.text != newText) {
-//             _controllers[fieldKey]!.text = newText;
+//         if (field.type == FieldType.text ||
+//             field.type == FieldType.number ||
+//             field.type == FieldType.range) {
+//           _controllers[fullKey] ??= TextEditingController();
+//           final newText = _displayTextForController(field.type, fieldValue);
+//           if (_controllers[fullKey]!.text != newText) {
+//             _controllers[fullKey]!.text = newText;
 //           }
 //         }
 //       }
 //     }
 //   }
 //
+//   String _displayTextForController(FieldType type, dynamic value) {
+//     if (type == FieldType.range) {
+//       final r = _parseDateRangeValue(value);
+//       if (r == null) return '';
+//       return '${_fmtDate(r.start)}  →  ${_fmtDate(r.end)}';
+//     }
+//     return value?.toString() ?? '';
+//   }
+//
 //   @override
 //   void dispose() {
-//     _controllers.values.forEach((controller) => controller.dispose());
+//     for (final c in _controllers.values) {
+//       c.dispose();
+//     }
 //     super.dispose();
 //   }
 //
@@ -145,64 +170,138 @@
 //
 //     final expandedValue = _expandFormValue(widget.value);
 //
-//     return SingleChildScrollView(
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: widget.groups!.asMap().entries.map((entry) {
-//           final group = entry.value;
-//           return Card(
-//             elevation: 1,
-//             margin: const EdgeInsets.symmetric(vertical: 4),
-//             child: Padding(
-//               padding: const EdgeInsets.all(8.0),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   if (group.label != null)
-//                     Padding(
-//                       padding: const EdgeInsets.only(bottom: 8),
-//                       child: Text(
-//                         group.label!,
-//                         style: TextStyle(
-//                           fontWeight: FontWeight.bold,
-//                           fontSize: 16,
-//                           color: AppColors.bgBlueDark,
-//                         ),
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: widget.groups!.map((group) {
+//         final groupLabel = group.label?.trim() ?? '';
+//
+//         return Card(
+//           elevation: 1,
+//           margin: const EdgeInsets.symmetric(vertical: 4),
+//           child: Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 if (groupLabel.isNotEmpty)
+//                   Padding(
+//                     padding: const EdgeInsets.only(bottom: 8),
+//                     child: Text(
+//                       groupLabel,
+//                       style: TextStyle(
+//                         fontWeight: FontWeight.bold,
+//                         fontSize: 16,
+//                         color: AppColors.bgBlueDark,
 //                       ),
 //                     ),
-//                   ...group.fields.asMap().entries.map((fieldEntry) {
-//                     final field = fieldEntry.value;
-//                     final fieldKey =
-//                         field.label ?? group.label ?? 'field_${fieldEntry.key}';
-//                     final fullKey = _fullKey(
-//                       group.label?.trim() ?? '',
-//                       field.label?.trim() ?? fieldKey,
-//                     );
+//                   ),
+//                 ...group.fields.asMap().entries.map((fieldEntry) {
+//                   final field = fieldEntry.value;
+//                   final fieldLabel =
+//                       (field.label ?? 'field_${fieldEntry.key}').trim();
+//                   final fullKey = _fullKey(groupLabel, fieldLabel);
+//                   final resolvedValue = _getValueByKey(expandedValue, fullKey);
 //
-//                     final resolvedValue =
-//                         _getValueByKey(expandedValue, fullKey);
+//                   // ===== Hard-coded special show/hide rules (đã có ở IndicatorField) =====
+//                   if (!_shouldShowFieldBySpecialRules(
+//                     group: group,
+//                     groupLabel: groupLabel,
+//                     fieldLabel: fieldLabel,
+//                     expandedValue: expandedValue,
+//                   )) {
+//                     return const SizedBox.shrink();
+//                   }
 //
-//                     return Padding(
-//                       padding: const EdgeInsets.symmetric(vertical: 4.0),
-//                       child: _buildFieldEditor(
-//                         context,
-//                         field,
-//                         resolvedValue,
-//                         group.label?.trim() ?? '',
-//                         field.label?.trim() ?? fieldKey,
-//                         fullKey,
-//                       ),
-//                     );
-//                   }).toList(),
-//                 ],
-//               ),
+//                   return Padding(
+//                     padding: const EdgeInsets.symmetric(vertical: 4.0),
+//                     child: _buildFieldEditor(
+//                       context: context,
+//                       field: field,
+//                       resolvedValue: resolvedValue,
+//                       group: group,
+//                       groupLabel: groupLabel,
+//                       fieldLabel: fieldLabel,
+//                       fullKey: fullKey,
+//                     ),
+//                   );
+//                 }),
+//               ],
 //             ),
-//           );
-//         }).toList(),
-//       ),
+//           ),
+//         );
+//       }).toList(),
 //     );
 //   }
 //
+//   // ====== Special show/hide rules copied (generic trigger by label) ======
+//   bool _shouldShowFieldBySpecialRules({
+//     required CustomFieldGroup group,
+//     required String groupLabel,
+//     required String fieldLabel,
+//     required Map<String, dynamic> expandedValue,
+//   }) {
+//     // treatment-dependent fields
+//     if ((fieldLabel == "Tên thuốc" ||
+//             fieldLabel == "Liều thuốc (ghi thời gian nếu nhớ)" ||
+//             fieldLabel == "Tình trạng tổn thương khi đang uống thuốc") &&
+//         (widget.indicator.id == 175 || widget.indicator.id == 64)) {
+//       String treatmentKey;
+//       if (groupLabel.isEmpty) {
+//         treatmentKey =
+//             'Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)';
+//       } else {
+//         treatmentKey = groupLabel.isNotEmpty
+//             ? '$groupLabel.Có điều trị hay không?'
+//             : 'Có điều trị hay không?';
+//       }
+//
+//       final tv = _getValueByKey(expandedValue, treatmentKey) ??
+//           widget.value[treatmentKey];
+//       final isYes = (tv is Map && tv[treatmentKey] == 'Có') ||
+//           (tv is String && tv.trim() == 'Có');
+//       return isYes;
+//     }
+//
+//     // symptom-dependent field
+//     if (fieldLabel == "Triệu chứng Giảm xuống/ Nặng lên là gì?") {
+//       final statusKey = groupLabel.isNotEmpty
+//           ? '$groupLabel.Tình trạng tổn thương khi đang uống thuốc'
+//           : 'Tình trạng tổn thương khi đang uống thuốc';
+//       final sv =
+//           _getValueByKey(expandedValue, statusKey) ?? widget.value[statusKey];
+//       final ok = (sv is Map &&
+//               (sv['Tình trạng tổn thương khi đang uống thuốc'] ==
+//                       'Giảm xuống' ||
+//                   sv['Tình trạng tổn thương khi đang uống thuốc'] ==
+//                       'Nặng lên')) ||
+//           (sv is String &&
+//               (sv.trim() == 'Giảm xuống' || sv.trim() == 'Nặng lên'));
+//       return ok;
+//     }
+//
+//     // only show "Số đợt..." when "Trước đây..." == Có
+//     if (fieldLabel.contains("Số đợt bị tương tự như đợt này")) {
+//       final prevKey = group.fields.map((x) => x.label?.trim() ?? '').firstWhere(
+//             (l) =>
+//                 l.contains(
+//                     "Trước đây bạn đã từng bị đợt nào tương tự như vậy chưa?") ||
+//                 l.contains("Trước đây bạn đã từng bị đợt nào tương tự"),
+//             orElse: () => '',
+//           );
+//
+//       if (prevKey.isEmpty) return false;
+//
+//       final pv =
+//           _getValueByKey(expandedValue, prevKey) ?? widget.value[prevKey];
+//       final isYes = (pv is String && pv.trim() == 'Có') ||
+//           (pv is Map && pv[prevKey]?.toString().trim() == 'Có');
+//       return isYes;
+//     }
+//
+//     return true;
+//   }
+//
+//   // ====== Date range helpers (FieldType.range = date range) ======
 //   String _fmtDate(DateTime d) {
 //     final dd = d.day.toString().padLeft(2, '0');
 //     final mm = d.month.toString().padLeft(2, '0');
@@ -212,7 +311,6 @@
 //   DateTimeRange? _parseDateRangeValue(dynamic value) {
 //     if (value == null) return null;
 //
-//     // shape recommended: {"start": "...iso...", "end": "...iso..."}
 //     if (value is Map) {
 //       final s = value['start']?.toString();
 //       final e = value['end']?.toString();
@@ -221,7 +319,6 @@
 //       if (sd != null && ed != null) return DateTimeRange(start: sd, end: ed);
 //     }
 //
-//     // fallback: List [startIso, endIso]
 //     if (value is List && value.length >= 2) {
 //       final sd = DateTime.tryParse(value[0].toString());
 //       final ed = DateTime.tryParse(value[1].toString());
@@ -231,22 +328,31 @@
 //     return null;
 //   }
 //
-//   Widget _buildFieldEditor(
-//     BuildContext context,
-//     CustomField field,
-//     dynamic resolvedValue,
-//     String groupLabel,
-//     String fieldLabel,
-//     String fullKey,
-//   ) {
-//     // Điều kiện phụ thuộc (nếu có)
+//   int? _weeksFromDateRange(DateTimeRange? r) {
+//     if (r == null) return null;
+//     final days = r.end.difference(r.start).inDays;
+//     if (days < 0) return null;
+//     return (days / 7).ceil();
+//   }
+//
+//   // ====== Core editor ======
+//   Widget _buildFieldEditor({
+//     required BuildContext context,
+//     required CustomField field,
+//     required dynamic resolvedValue,
+//     required CustomFieldGroup group,
+//     required String groupLabel,
+//     required String fieldLabel,
+//     required String fullKey,
+//   }) {
+//     // dependsOn
 //     if (field.dependsOn != null && field.dependsOnValues != null) {
-//       final depKey = field.dependsOn!;
+//       final depKey = field.dependsOn!.trim();
 //       final expanded = _expandFormValue(widget.value);
 //       final depFullKey = groupLabel.isNotEmpty ? '$groupLabel.$depKey' : depKey;
+//
 //       dynamic parentValue =
 //           _getValueByKey(expanded, depFullKey) ?? widget.value[depKey];
-//
 //       if (parentValue is Map<String, dynamic> && parentValue.length == 1) {
 //         parentValue = parentValue.values.first;
 //       }
@@ -269,21 +375,22 @@
 //           textController: _controllers[fullKey],
 //           onChanged: (newValue) {
 //             final updated = Map<String, dynamic>.from(widget.value);
-//             if (newValue.isNotEmpty) {
+//
+//             if (newValue.trim().isNotEmpty) {
 //               updated[fullKey] = field.type == FieldType.number
-//                   ? num.tryParse(newValue) ?? newValue
+//                   ? (num.tryParse(newValue) ?? newValue)
 //                   : newValue;
 //             } else {
 //               updated.remove(fullKey);
 //             }
+//
 //             widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
 //           },
 //         );
 //
 //       case FieldType.select:
-//         // Hỗ trợ 2 kiểu:
-//         // - select có ảnh (chuẩn): "key": "Option", "key_image": "URL"
-//         // - image-only (1 option cố định + bắt buộc ảnh): "key": "URL"
+//         // - select có ảnh: "key": "Option", "key_image": "URL"
+//         // - image-only: "key": "URL"
 //         final needsImage = (field.requiredFields ?? [])
 //             .any((rf) => rf.type == FieldType.image);
 //         final options = field.options ?? [];
@@ -306,7 +413,7 @@
 //             onChanged: (link) {
 //               final updated = Map<String, dynamic>.from(widget.value);
 //               if (link != null && link.isNotEmpty) {
-//                 updated[fullKey] = link; // image-only: "key": "URL"
+//                 updated[fullKey] = link;
 //               } else {
 //                 updated.remove(fullKey);
 //               }
@@ -315,7 +422,6 @@
 //           );
 //         }
 //
-//         // select + ảnh (chuẩn)
 //         final expanded = _expandFormValue(widget.value);
 //         final imageUrl =
 //             _getValueByKey(expanded, '${fullKey}_image')?.toString();
@@ -326,11 +432,11 @@
 //             CustomRadioGroup(
 //               label: field.label ?? '',
 //               value: resolvedValue is String ? resolvedValue : null,
-//               options: field.options ?? [],
+//               options: options,
 //               onChanged: (newValue) {
 //                 final updated = Map<String, dynamic>.from(widget.value);
-//                 if (newValue != null && newValue.toString().isNotEmpty) {
-//                   updated[fullKey] = newValue; // "key": "Option"
+//                 if (newValue != null && newValue.toString().trim().isNotEmpty) {
+//                   updated[fullKey] = newValue;
 //                 } else {
 //                   updated.remove(fullKey);
 //                   updated.remove('${fullKey}_image');
@@ -352,7 +458,7 @@
 //                   onChanged: (url) {
 //                     final updated = Map<String, dynamic>.from(widget.value);
 //                     if (url != null && url.isNotEmpty) {
-//                       updated['${fullKey}_image'] = url; // "key_image": "URL"
+//                       updated['${fullKey}_image'] = url;
 //                     } else {
 //                       updated.remove('${fullKey}_image');
 //                     }
@@ -369,14 +475,12 @@
 //             .any((rf) => rf.type == FieldType.image);
 //
 //         if (needsImage) {
-//           // Map<option, url|null>
 //           Map<String, String?> selectedWithImages = {};
 //           List<String> selectedValues = [];
 //
 //           if (resolvedValue is Map<String, dynamic>) {
-//             selectedWithImages = resolvedValue.map(
-//               (k, v) => MapEntry(k, v?.toString()),
-//             );
+//             selectedWithImages =
+//                 resolvedValue.map((k, v) => MapEntry(k, v?.toString()));
 //             selectedValues = selectedWithImages.keys.toList();
 //           }
 //
@@ -396,7 +500,7 @@
 //                         data[opt] = selectedWithImages[opt];
 //                       }
 //                       if (data.isNotEmpty) {
-//                         updated[fullKey] = data; // "key": {opt: url|null}
+//                         updated[fullKey] = data;
 //                       } else {
 //                         updated.remove(fullKey);
 //                       }
@@ -424,8 +528,9 @@
 //                               _getValueByKey(_expandFormValue(updated), fullKey)
 //                                       as Map<String, dynamic>? ??
 //                                   {};
-//                           final next = Map<String, String?>.from(current
-//                               .map((k, v) => MapEntry(k, v?.toString())));
+//                           final next = Map<String, String?>.from(
+//                             current.map((k, v) => MapEntry(k, v?.toString())),
+//                           );
 //                           next[option] =
 //                               (imageUrl != null && imageUrl.isNotEmpty)
 //                                   ? imageUrl
@@ -441,33 +546,32 @@
 //               );
 //             },
 //           );
-//         } else {
-//           // List<String>
-//           return CustomCheckboxGroup(
-//             label: field.label ?? '',
-//             selectedValues: resolvedValue is List<String>
-//                 ? resolvedValue
-//                 : (resolvedValue is List
-//                     ? List<String>.from(resolvedValue.map((e) => e.toString()))
-//                     : <String>[]),
-//             options: field.options ?? [],
-//             onChanged: (newValues) {
-//               final updated = Map<String, dynamic>.from(widget.value);
-//               if (newValues.isNotEmpty) {
-//                 updated[fullKey] = newValues; // "key": ["opt1","opt2"]
-//               } else {
-//                 updated.remove(fullKey);
-//               }
-//               widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
-//             },
-//             isRequired: false,
-//             enabled: true,
-//           );
 //         }
+//
+//         return CustomCheckboxGroup(
+//           label: field.label ?? '',
+//           selectedValues: resolvedValue is List<String>
+//               ? resolvedValue
+//               : (resolvedValue is List
+//                   ? List<String>.from(resolvedValue.map((e) => e.toString()))
+//                   : <String>[]),
+//           options: field.options ?? [],
+//           onChanged: (newValues) {
+//             final updated = Map<String, dynamic>.from(widget.value);
+//             if (newValues.isNotEmpty) {
+//               updated[fullKey] = newValues;
+//             } else {
+//               updated.remove(fullKey);
+//             }
+//             widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
+//           },
+//           isRequired: false,
+//           enabled: true,
+//         );
+//
 //       case FieldType.fullDate:
 //         return InkWell(
 //           onTap: () async {
-//             // xác định initialDate
 //             DateTime initial = DateTime.now();
 //             if (resolvedValue is String && resolvedValue.isNotEmpty) {
 //               final parsed = DateTime.tryParse(resolvedValue);
@@ -485,15 +589,10 @@
 //
 //             if (picked != null) {
 //               final updated = Map<String, dynamic>.from(widget.value);
-//
-//               // Chuẩn hoá về 00:00:00 và lưu ISO string để gửi API
 //               final normalized =
 //                   DateTime(picked.year, picked.month, picked.day);
 //               updated[fullKey] = normalized.toIso8601String();
-//
-//               widget.onChanged(
-//                 _flattenFormValue(_expandFormValue(updated)),
-//               );
+//               widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
 //             }
 //           },
 //           child: InputDecorator(
@@ -504,9 +603,7 @@
 //               border:
 //                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
 //             ),
-//             child: Text(
-//               _formatDisplayDate(resolvedValue),
-//             ),
+//             child: Text(_formatDisplayDate(resolvedValue)),
 //           ),
 //         );
 //
@@ -543,14 +640,13 @@
 //             ),
 //           ),
 //         );
+//
 //       case FieldType.range:
 //         final current = _parseDateRangeValue(resolvedValue);
-//
 //         final display = (current == null)
 //             ? ''
 //             : '${_fmtDate(current.start)}  →  ${_fmtDate(current.end)}';
 //
-//         // controller theo fullKey (tránh dùng fieldKey)
 //         _controllers[fullKey] ??= TextEditingController(text: display);
 //         if (_controllers[fullKey]!.text != display) {
 //           _controllers[fullKey]!.text = display;
@@ -568,9 +664,8 @@
 //             final updated = Map<String, dynamic>.from(widget.value);
 //
 //             if (picked == null) {
-//               // nếu muốn giữ nguyên khi bấm cancel: return;
-//               // nếu muốn clear khi cancel giống code bạn tham khảo:
 //               updated.remove(fullKey);
+//               _cleanupWeeksIfAny(updated, groupLabel: groupLabel, group: group);
 //               widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
 //               return;
 //             }
@@ -579,6 +674,10 @@
 //               "start": picked.start.toIso8601String(),
 //               "end": picked.end.toIso8601String(),
 //             };
+//
+//             // auto-set "Số tuần bị đợt này" (nếu có trong cùng group)
+//             _autoSetWeeksIfAny(updated,
+//                 groupLabel: groupLabel, group: group, rangeKey: fullKey);
 //
 //             widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
 //           },
@@ -595,8 +694,11 @@
 //
 //       case FieldType.custom:
 //         return CustomFieldEditor(
+//           indicator: widget.indicator,
 //           groups: field.groups,
-//           value: resolvedValue is Map<String, dynamic> ? resolvedValue : {},
+//           value: resolvedValue is Map<String, dynamic>
+//               ? resolvedValue
+//               : <String, dynamic>{},
 //           onChanged: (newValue) {
 //             final updated = Map<String, dynamic>.from(widget.value);
 //             if (newValue.isNotEmpty) {
@@ -609,8 +711,53 @@
 //         );
 //
 //       default:
-//         return Text('⚠️ Kiểu dữ liệu không hỗ trợ1: ${field.type}');
+//         return Text('⚠️ Kiểu dữ liệu không hỗ trợ: ${field.type}');
 //     }
+//   }
+//
+//   void _autoSetWeeksIfAny(
+//     Map<String, dynamic> flat, {
+//     required String groupLabel,
+//     required CustomFieldGroup group,
+//     required String rangeKey,
+//   }) {
+//     final weekField = group.fields.firstWhere(
+//       (x) => (x.label ?? '').contains("Số tuần bị đợt này"),
+//       orElse: () =>
+//           CustomField(label: null, description: null, type: FieldType.unknown),
+//     );
+//
+//     final weekLabel = weekField.label?.trim();
+//     if (weekLabel == null || weekLabel.isEmpty) return;
+//
+//     final weekKey =
+//         groupLabel.isNotEmpty ? '$groupLabel.$weekLabel' : weekLabel;
+//     final r = _parseDateRangeValue(flat[rangeKey]);
+//     final weeks = _weeksFromDateRange(r);
+//
+//     if (weeks != null) {
+//       flat[weekKey] = weeks;
+//     } else {
+//       flat.remove(weekKey);
+//     }
+//   }
+//
+//   void _cleanupWeeksIfAny(
+//     Map<String, dynamic> flat, {
+//     required String groupLabel,
+//     required CustomFieldGroup group,
+//   }) {
+//     final weekField = group.fields.firstWhere(
+//       (x) => (x.label ?? '').contains("Số tuần bị đợt này"),
+//       orElse: () =>
+//           CustomField(label: null, description: null, type: FieldType.unknown),
+//     );
+//     final weekLabel = weekField.label?.trim();
+//     if (weekLabel == null || weekLabel.isEmpty) return;
+//
+//     final weekKey =
+//         groupLabel.isNotEmpty ? '$groupLabel.$weekLabel' : weekLabel;
+//     flat.remove(weekKey);
 //   }
 //
 //   String _fullKey(String groupLabel, String fieldLabel) {
@@ -642,10 +789,8 @@
 //     return DateFormat('dd/MM/yyyy').format(dt);
 //   }
 // }
-// custom_field_editor.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../constant/color.dart';
 import '../../models/vital_indicator_model.dart';
 import '../../utils/enum/field_type_enum.dart';
@@ -659,7 +804,6 @@ class CustomFieldEditor extends StatefulWidget {
   final List<CustomFieldGroup>? groups;
   final Map<String, dynamic> value; // flat map (key can be "Group.Field")
   final ValueChanged<Map<String, dynamic>> onChanged;
-
   const CustomFieldEditor({
     super.key,
     this.groups,
@@ -667,14 +811,12 @@ class CustomFieldEditor extends StatefulWidget {
     required this.onChanged,
     required this.indicator,
   });
-
   @override
   State<CustomFieldEditor> createState() => _CustomFieldEditorState();
 }
 
 class _CustomFieldEditorState extends State<CustomFieldEditor> {
   final Map<String, TextEditingController> _controllers = {};
-
   // Split '.' an toàn: không cắt giữa 2 chữ số (vd "6.3 Bàn tay")
   List<String> _splitKeyParts(String key) {
     final parts = <String>[];
@@ -717,6 +859,11 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       final newKey = prefix.isEmpty ? key : '$prefix.$key';
       if (value is Map<String, dynamic>) {
         flat.addAll(_flattenFormValue(value, prefix: newKey));
+      } else if (value is List && value.every((e) => e is String)) {
+        // Nếu là list URL ảnh, flatten as is (nhưng giữ nguyên list)
+        if (value.isNotEmpty) {
+          flat[newKey] = value;
+        }
       } else {
         if (value != null && value.toString().trim().isNotEmpty) {
           flat[newKey] = value;
@@ -728,7 +875,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
 
   Map<String, dynamic> _expandFormValue(Map<String, dynamic> flat) {
     final Map<String, dynamic> nested = {};
-
     void putPath(String path, dynamic value) {
       final parts = _splitKeyParts(path);
       Map<String, dynamic> current = nested;
@@ -755,7 +901,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         }
       }
     });
-
     return nested;
   }
 
@@ -763,20 +908,15 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
   void didUpdateWidget(covariant CustomFieldEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
     final expandedValue = _expandFormValue(widget.value);
-
     for (final group in widget.groups ?? []) {
       final gl = group.label?.trim() ?? '';
       for (var i = 0; i < group.fields.length; i++) {
         final field = group.fields[i];
-
         // ✅ FIX precedence: ?? phải ôm cả biểu thức ternary
         final fl = (field.label ?? (gl.isNotEmpty ? gl : 'field_$i')).trim();
-
         final fullKey = _fullKey(gl, fl);
-
         final fieldValue = _getValueByKey(expandedValue, fullKey) ??
             (field.type == FieldType.custom ? {} : null);
-
         if (field.type == FieldType.text ||
             field.type == FieldType.number ||
             field.type == FieldType.range) {
@@ -794,7 +934,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
     if (type == FieldType.range) {
       final r = _parseDateRangeValue(value);
       if (r == null) return '';
-      return '${_fmtDate(r.start)}  →  ${_fmtDate(r.end)}';
+      return '${_fmtDate(r.start)} → ${_fmtDate(r.end)}';
     }
     return value?.toString() ?? '';
   }
@@ -812,14 +952,11 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
     if (widget.groups == null || widget.groups!.isEmpty) {
       return const Text('Không có trường dữ liệu');
     }
-
     final expandedValue = _expandFormValue(widget.value);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: widget.groups!.map((group) {
         final groupLabel = group.label?.trim() ?? '';
-
         return Card(
           elevation: 1,
           margin: const EdgeInsets.symmetric(vertical: 4),
@@ -846,7 +983,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                       (field.label ?? 'field_${fieldEntry.key}').trim();
                   final fullKey = _fullKey(groupLabel, fieldLabel);
                   final resolvedValue = _getValueByKey(expandedValue, fullKey);
-
                   // ===== Hard-coded special show/hide rules (đã có ở IndicatorField) =====
                   if (!_shouldShowFieldBySpecialRules(
                     group: group,
@@ -856,7 +992,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                   )) {
                     return const SizedBox.shrink();
                   }
-
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: _buildFieldEditor(
@@ -899,14 +1034,12 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             ? '$groupLabel.Có điều trị hay không?'
             : 'Có điều trị hay không?';
       }
-
       final tv = _getValueByKey(expandedValue, treatmentKey) ??
           widget.value[treatmentKey];
       final isYes = (tv is Map && tv[treatmentKey] == 'Có') ||
           (tv is String && tv.trim() == 'Có');
       return isYes;
     }
-
     // symptom-dependent field
     if (fieldLabel == "Triệu chứng Giảm xuống/ Nặng lên là gì?") {
       final statusKey = groupLabel.isNotEmpty
@@ -923,7 +1056,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               (sv.trim() == 'Giảm xuống' || sv.trim() == 'Nặng lên'));
       return ok;
     }
-
     // only show "Số đợt..." when "Trước đây..." == Có
     if (fieldLabel.contains("Số đợt bị tương tự như đợt này")) {
       final prevKey = group.fields.map((x) => x.label?.trim() ?? '').firstWhere(
@@ -933,16 +1065,13 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                 l.contains("Trước đây bạn đã từng bị đợt nào tương tự"),
             orElse: () => '',
           );
-
       if (prevKey.isEmpty) return false;
-
       final pv =
           _getValueByKey(expandedValue, prevKey) ?? widget.value[prevKey];
       final isYes = (pv is String && pv.trim() == 'Có') ||
           (pv is Map && pv[prevKey]?.toString().trim() == 'Có');
       return isYes;
     }
-
     return true;
   }
 
@@ -955,7 +1084,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
 
   DateTimeRange? _parseDateRangeValue(dynamic value) {
     if (value == null) return null;
-
     if (value is Map) {
       final s = value['start']?.toString();
       final e = value['end']?.toString();
@@ -963,13 +1091,11 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       final ed = e == null ? null : DateTime.tryParse(e);
       if (sd != null && ed != null) return DateTimeRange(start: sd, end: ed);
     }
-
     if (value is List && value.length >= 2) {
       final sd = DateTime.tryParse(value[0].toString());
       final ed = DateTime.tryParse(value[1].toString());
       if (sd != null && ed != null) return DateTimeRange(start: sd, end: ed);
     }
-
     return null;
   }
 
@@ -995,7 +1121,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       final depKey = field.dependsOn!.trim();
       final expanded = _expandFormValue(widget.value);
       final depFullKey = groupLabel.isNotEmpty ? '$groupLabel.$depKey' : depKey;
-
       dynamic parentValue =
           _getValueByKey(expanded, depFullKey) ?? widget.value[depKey];
       if (parentValue is Map<String, dynamic> && parentValue.length == 1) {
@@ -1006,7 +1131,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         return const SizedBox.shrink();
       }
     }
-
     switch (field.type) {
       case FieldType.text:
       case FieldType.number:
@@ -1020,7 +1144,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
           textController: _controllers[fullKey],
           onChanged: (newValue) {
             final updated = Map<String, dynamic>.from(widget.value);
-
             if (newValue.trim().isNotEmpty) {
               updated[fullKey] = field.type == FieldType.number
                   ? (num.tryParse(newValue) ?? newValue)
@@ -1028,37 +1151,38 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             } else {
               updated.remove(fullKey);
             }
-
             widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
           },
         );
-
       case FieldType.select:
-        // - select có ảnh: "key": "Option", "key_image": "URL"
-        // - image-only: "key": "URL"
+        // - select có ảnh: "key": "Option", "key_image": ["URL1", "URL2", ...]
+        // - image-only: "key": ["URL1", "URL2", ...]
         final needsImage = (field.requiredFields ?? [])
             .any((rf) => rf.type == FieldType.image);
         final options = field.options ?? [];
         final bool imageOnly = needsImage && options.length <= 1;
-
         if (imageOnly) {
-          String? url;
-          if (resolvedValue is String && resolvedValue.trim().isNotEmpty) {
-            url = resolvedValue;
+          List<String> urls = [];
+          if (resolvedValue is List) {
+            urls = List<String>.from(resolvedValue.where((e) => e is String));
           } else if (resolvedValue is Map) {
             final k = field.label ?? '';
-            url = (resolvedValue['${k}_image'] as String?) ??
-                (resolvedValue['image'] as String?);
+            final imageValue =
+                resolvedValue['${k}_image'] ?? resolvedValue['image'];
+            if (imageValue is List) {
+              urls = List<String>.from(imageValue);
+            } else if (imageValue is String) {
+              urls = [imageValue];
+            }
           }
-
           return ImageUploadField(
             label: field.label ?? 'Ảnh',
             templateId: 16,
-            initialImageUrl: url,
-            onChanged: (link) {
+            initialImageUrls: urls,
+            onChanged: (newImages) {
               final updated = Map<String, dynamic>.from(widget.value);
-              if (link != null && link.isNotEmpty) {
-                updated[fullKey] = link;
+              if (newImages != null && newImages.isNotEmpty) {
+                updated[fullKey] = newImages;
               } else {
                 updated.remove(fullKey);
               }
@@ -1066,11 +1190,11 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             },
           );
         }
-
         final expanded = _expandFormValue(widget.value);
-        final imageUrl =
-            _getValueByKey(expanded, '${fullKey}_image')?.toString();
-
+        dynamic imageValue = _getValueByKey(expanded, '${fullKey}_image');
+        final List<String> imageUrls = imageValue is List
+            ? List<String>.from(imageValue.map((e) => e.toString()))
+            : [];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1099,11 +1223,11 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                 child: ImageUploadField(
                   label: "Ảnh cho $resolvedValue",
                   templateId: 16,
-                  initialImageUrl: imageUrl,
-                  onChanged: (url) {
+                  initialImageUrls: imageUrls,
+                  onChanged: (newImages) {
                     final updated = Map<String, dynamic>.from(widget.value);
-                    if (url != null && url.isNotEmpty) {
-                      updated['${fullKey}_image'] = url;
+                    if (newImages != null && newImages.isNotEmpty) {
+                      updated['${fullKey}_image'] = newImages;
                     } else {
                       updated.remove('${fullKey}_image');
                     }
@@ -1114,21 +1238,20 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               ),
           ],
         );
-
       case FieldType.multiSelection:
         final needsImage = (field.requiredFields ?? [])
             .any((rf) => rf.type == FieldType.image);
-
         if (needsImage) {
-          Map<String, String?> selectedWithImages = {};
+          Map<String, List<String>> selectedWithImages = {};
           List<String> selectedValues = [];
-
           if (resolvedValue is Map<String, dynamic>) {
-            selectedWithImages =
-                resolvedValue.map((k, v) => MapEntry(k, v?.toString()));
+            selectedWithImages = resolvedValue.map((k, v) => MapEntry(
+                k,
+                v is List
+                    ? List<String>.from(v)
+                    : (v != null ? [v.toString()] : [])));
             selectedValues = selectedWithImages.keys.toList();
           }
-
           return StatefulBuilder(
             builder: (context, setState) {
               return Column(
@@ -1140,9 +1263,9 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                     options: field.options ?? [],
                     onChanged: (newValues) {
                       final updated = Map<String, dynamic>.from(widget.value);
-                      final data = <String, String?>{};
+                      final data = <String, List<String>>{};
                       for (final opt in newValues) {
-                        data[opt] = selectedWithImages[opt];
+                        data[opt] = selectedWithImages[opt] ?? [];
                       }
                       if (data.isNotEmpty) {
                         updated[fullKey] = data;
@@ -1165,21 +1288,18 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                       child: ImageUploadField(
                         label: "Ảnh cho $option",
                         templateId: 16,
-                        initialImageUrl: selectedWithImages[option],
-                        onChanged: (imageUrl) {
+                        initialImageUrls: selectedWithImages[option],
+                        onChanged: (newImages) {
                           final updated =
                               Map<String, dynamic>.from(widget.value);
                           final current =
                               _getValueByKey(_expandFormValue(updated), fullKey)
                                       as Map<String, dynamic>? ??
                                   {};
-                          final next = Map<String, String?>.from(
-                            current.map((k, v) => MapEntry(k, v?.toString())),
-                          );
-                          next[option] =
-                              (imageUrl != null && imageUrl.isNotEmpty)
-                                  ? imageUrl
-                                  : null;
+                          final next = Map<String, List<String>>.from(
+                              current.map((k, v) => MapEntry(
+                                  k, v is List ? List<String>.from(v) : [])));
+                          next[option] = newImages ?? [];
                           updated[fullKey] = next;
                           widget.onChanged(
                               _flattenFormValue(_expandFormValue(updated)));
@@ -1192,7 +1312,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             },
           );
         }
-
         return CustomCheckboxGroup(
           label: field.label ?? '',
           selectedValues: resolvedValue is List<String>
@@ -1213,7 +1332,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
           isRequired: false,
           enabled: true,
         );
-
       case FieldType.fullDate:
         return InkWell(
           onTap: () async {
@@ -1224,14 +1342,12 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             } else if (resolvedValue is DateTime) {
               initial = resolvedValue;
             }
-
             final picked = await showDatePicker(
               context: context,
               initialDate: initial,
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
             );
-
             if (picked != null) {
               final updated = Map<String, dynamic>.from(widget.value);
               final normalized =
@@ -1251,7 +1367,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             child: Text(_formatDisplayDate(resolvedValue)),
           ),
         );
-
       case FieldType.fullYearRange:
         return InkWell(
           onTap: () async {
@@ -1285,18 +1400,15 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             ),
           ),
         );
-
       case FieldType.range:
         final current = _parseDateRangeValue(resolvedValue);
         final display = (current == null)
             ? ''
-            : '${_fmtDate(current.start)}  →  ${_fmtDate(current.end)}';
-
+            : '${_fmtDate(current.start)} → ${_fmtDate(current.end)}';
         _controllers[fullKey] ??= TextEditingController(text: display);
         if (_controllers[fullKey]!.text != display) {
           _controllers[fullKey]!.text = display;
         }
-
         return InkWell(
           onTap: () async {
             final picked = await showDateRangePicker(
@@ -1305,25 +1417,20 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               lastDate: DateTime(2100),
               initialDateRange: current,
             );
-
             final updated = Map<String, dynamic>.from(widget.value);
-
             if (picked == null) {
               updated.remove(fullKey);
               _cleanupWeeksIfAny(updated, groupLabel: groupLabel, group: group);
               widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
               return;
             }
-
             updated[fullKey] = {
               "start": picked.start.toIso8601String(),
               "end": picked.end.toIso8601String(),
             };
-
             // auto-set "Số tuần bị đợt này" (nếu có trong cùng group)
             _autoSetWeeksIfAny(updated,
                 groupLabel: groupLabel, group: group, rangeKey: fullKey);
-
             widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
           },
           child: IgnorePointer(
@@ -1336,7 +1443,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             ),
           ),
         );
-
       case FieldType.custom:
         return CustomFieldEditor(
           indicator: widget.indicator,
@@ -1354,7 +1460,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             widget.onChanged(_flattenFormValue(_expandFormValue(updated)));
           },
         );
-
       default:
         return Text('⚠️ Kiểu dữ liệu không hỗ trợ: ${field.type}');
     }
@@ -1371,15 +1476,12 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       orElse: () =>
           CustomField(label: null, description: null, type: FieldType.unknown),
     );
-
     final weekLabel = weekField.label?.trim();
     if (weekLabel == null || weekLabel.isEmpty) return;
-
     final weekKey =
         groupLabel.isNotEmpty ? '$groupLabel.$weekLabel' : weekLabel;
     final r = _parseDateRangeValue(flat[rangeKey]);
     final weeks = _weeksFromDateRange(r);
-
     if (weeks != null) {
       flat[weekKey] = weeks;
     } else {
@@ -1399,7 +1501,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
     );
     final weekLabel = weekField.label?.trim();
     if (weekLabel == null || weekLabel.isEmpty) return;
-
     final weekKey =
         groupLabel.isNotEmpty ? '$groupLabel.$weekLabel' : weekLabel;
     flat.remove(weekKey);
