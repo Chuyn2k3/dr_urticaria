@@ -52,6 +52,8 @@ class CustomField {
   final List<CustomField>? requiredFields; // Có điều kiện
   final String? dependsOn;
   final List<String>? dependsOnValues;
+  final String? minValue;
+  final String? maxValue;
 
   CustomField({
     this.label,
@@ -62,11 +64,33 @@ class CustomField {
     this.requiredFields,
     this.dependsOn,
     this.dependsOnValues,
+    this.minValue,
+    this.maxValue,
   });
+
+  /// Parse int an toàn từ nhiều kiểu dữ liệu (int/double/String/null).
+  static String? _toString(dynamic v) {
+    if (v == null) return "";
+
+    if (v is String) return v;
+    return null;
+  }
+
+  /// Lấy giá trị theo nhiều key khả dĩ (tránh phụ thuộc format backend).
+  static String? _readIntAnyKey(Map<String, dynamic> json, List<String> keys) {
+    for (final k in keys) {
+      if (json.containsKey(k)) {
+        final parsed = _toString(json[k]);
+        if (parsed != null) return parsed;
+      }
+    }
+    return null;
+  }
 
   factory CustomField.fromJson(Map<String, dynamic> json) {
     final groupJson =
         json['valueOptions']?['group'] ?? json['group'] ?? json['fields'];
+
     List<CustomFieldGroup>? parsedGroups;
     if (groupJson != null) {
       if (groupJson is List) {
@@ -100,12 +124,29 @@ class CustomField {
     FieldType type = parseFieldType(json['type']);
     if (type == FieldType.unknown &&
         (parsedGroups != null || json['fields'] is List)) {
-      type = FieldType
-          .custom; // Nếu có nhóm hoặc trường lồng nhau, gán loại custom
+      type = FieldType.custom; // Nếu có nhóm/trường lồng nhau -> custom
     }
 
     final fieldLabel =
         json['label'] ?? json['name'] ?? 'Field_${json['type'] ?? 'unknown'}';
+
+    // BỔ SUNG: parse min/max từ các key phổ biến
+    final minValue = _readIntAnyKey(json, [
+      'minValue',
+      'min_value',
+      'min',
+      'minAllowed',
+      'minimum',
+    ]);
+
+    final maxValue = _readIntAnyKey(json, [
+      'maxValue',
+      'max_value',
+      'max',
+      'maxAllowed',
+      'maximum',
+    ]);
+
     return CustomField(
       label: fieldLabel,
       description: json['description'],
@@ -115,6 +156,15 @@ class CustomField {
           .toList(),
       groups: parsedGroups,
       requiredFields: parsedRequired,
+
+      // Nếu backend có depends logic thì parse luôn để đồng bộ schema
+      dependsOn: json['dependsOn']?.toString(),
+      dependsOnValues:
+          (json['dependsOnValues'] as List?)?.map((e) => e.toString()).toList(),
+
+      // GÁN GIÁ TRỊ
+      minValue: minValue,
+      maxValue: maxValue,
     );
   }
 }

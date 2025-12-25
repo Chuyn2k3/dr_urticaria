@@ -5,7 +5,7 @@ part 'medical_record_request.g.dart';
 @JsonSerializable(explicitToJson: true)
 class MedicalRecordRequest {
   final int templateId;
-  final int patientId; // NEW
+  final int? patientId; // NEW
 
   // các trường tùy chọn, nếu API có dùng
   @JsonKey(includeIfNull: false)
@@ -27,7 +27,7 @@ class MedicalRecordRequest {
 
   MedicalRecordRequest({
     required this.templateId,
-    required this.patientId,
+    this.patientId,
     required this.vitalValues,
     this.doctorId,
     this.appointmentId,

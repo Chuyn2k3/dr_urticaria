@@ -10,7 +10,7 @@ MedicalRecordRequest _$MedicalRecordRequestFromJson(
         Map<String, dynamic> json) =>
     MedicalRecordRequest(
       templateId: (json['templateId'] as num).toInt(),
-      patientId: (json['patientId'] as num).toInt(),
+      patientId: (json['patientId'] as num?)?.toInt(),
       vitalValues: (json['vitalValues'] as List<dynamic>)
           .map((e) => VitalValueRequest.fromJson(e as Map<String, dynamic>))
           .toList(),

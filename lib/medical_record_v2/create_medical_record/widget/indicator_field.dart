@@ -1732,6 +1732,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
   final Map<String, TextEditingController> _customCtrls = {};
   // Patch key để child SELECT (custom) gửi ảnh: parent ghi "<key>_image"
   static const String _kImagePatchKey = '__field_image__patch';
+  final FocusNode _dummyFocusNode = FocusNode(debugLabel: 'dummy_focus');
   @override
   void initState() {
     super.initState();
@@ -1740,6 +1741,13 @@ class _IndicatorFieldState extends State<IndicatorField> {
     } else if (widget.indicator.valueType == 'number') {
       _numCtrl.text = widget.value?.toString() ?? '';
     }
+  }
+
+  void _releaseKeyboardFocus() {
+    // 1) Unfocus ngay lập tức
+    FocusManager.instance.primaryFocus?.unfocus();
+    // 2) Request dummy focus để Flutter không restore focus về TextField cũ
+    FocusScope.of(context).requestFocus(_dummyFocusNode);
   }
 
   @override
@@ -1756,6 +1764,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
 
   @override
   void dispose() {
+    _dummyFocusNode.dispose();
     _textCtrl.dispose();
     _numCtrl.dispose();
     for (final c in _customCtrls.values) {
@@ -2030,6 +2039,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
             : null;
         return InkWell(
           onTap: () async {
+            _releaseKeyboardFocus();
             final picked = await showDatePicker(
               // locale: const Locale('vi'),
               context: context,
@@ -2037,6 +2047,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
               firstDate: DateTime(1970),
               lastDate: DateTime(2100),
             );
+            _releaseKeyboardFocus();
             if (picked != null) {
               widget.onChanged(picked.toIso8601String());
             }
@@ -2062,6 +2073,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
             : null;
         return InkWell(
           onTap: () async {
+            _releaseKeyboardFocus();
             final picked = await showDatePicker(
               // locale: const Locale('vi'),
               context: context,
@@ -2069,6 +2081,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
               firstDate: DateTime(1970),
               lastDate: DateTime(2100),
             );
+            _releaseKeyboardFocus();
             if (picked != null) {
               widget.onChanged(picked.toIso8601String());
             }
@@ -2533,7 +2546,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
           final allValues = (widget.value as Map<String, dynamic>?) ?? {};
           // Hàm tiện ích cập nhật map
           void updateValues(String label, dynamic newValue) {
-            final m = Map<String, dynamic>.from(allValues);
+            final m = allValues;
             m[label] = newValue;
             widget.onChanged(m);
           }
@@ -2568,16 +2581,16 @@ class _IndicatorFieldState extends State<IndicatorField> {
                 },
                 enabled: true,
               ),
-              if ((allValues[
-                          'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa']
-                      as String?) ==
-                  'Có')
-                InputTextField(
-                  label: 'Ghi rõ tên',
-                  onChanged: (v) => updateValues(
-                      'ghi_chu_Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa',
-                      v),
-                ),
+              // if ((allValues[
+              //             'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa']
+              //         as String?) ==
+              //     'Có')
+              //   InputTextField(
+              //     label: 'Ghi rõ tên',
+              //     onChanged: (v) => updateValues(
+              //         'ghi_chu_Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa',
+              //         v),
+              //   ),
               // 2. Tiền sử bệnh lý tuyến giáp
               CustomRadioGroup(
                 label: 'Tiền sử bệnh lý tuyến giáp',
@@ -2678,11 +2691,11 @@ class _IndicatorFieldState extends State<IndicatorField> {
                 },
                 enabled: true,
               ),
-              if ((allValues['Tiền sử phản vệ'] as String?) == 'Có')
-                InputTextField(
-                  label: 'Ghi rõ tên phản vệ',
-                  onChanged: (v) => updateValues('ghi_chu_Tiền sử phản vệ', v),
-                ),
+              // if ((allValues['Tiền sử phản vệ'] as String?) == 'Có')
+              //   InputTextField(
+              //     label: 'Ghi rõ tên phản vệ',
+              //     onChanged: (v) => updateValues('ghi_chu_Tiền sử phản vệ', v),
+              //   ),
             ],
           );
         }
@@ -3048,6 +3061,9 @@ class _IndicatorFieldState extends State<IndicatorField> {
       final fullKey = parentLabel.isNotEmpty
           ? '$parentLabel.${field.label ?? ''}'.trim()
           : (field.label ?? '').trim();
+      final minValue = field.minValue ?? '';
+      final maxValue = field.maxValue ?? '';
+      final rangeValue = _getRangeText(minValue, maxValue);
       switch (field.type) {
         case FieldType.text:
           {
@@ -3055,7 +3071,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
             final c = _ctrlFor(fullKey, text);
             widgets.add(
               InputTextField(
-                label: field.label ?? '',
+                label: (field.label ?? "") + rangeValue,
                 textController: c,
                 onChanged: (v) => onChanged(v.isNotEmpty ? v : null),
               ),
@@ -3068,7 +3084,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
             final c = _ctrlFor(fullKey, text);
             widgets.add(
               InputTextField(
-                label: field.label ?? '',
+                label: (field.label ?? "") + rangeValue,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 textController: c,
@@ -3224,6 +3240,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
           widgets.add(
             InkWell(
               onTap: () async {
+                _releaseKeyboardFocus();
                 final picked = await showDatePicker(
                   // locale: const Locale('vi'),
                   context: context,
@@ -3231,6 +3248,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
                   firstDate: DateTime(1970),
                   lastDate: DateTime(2100),
                 );
+                _releaseKeyboardFocus();
                 if (picked != null) {
                   onChanged(picked.toIso8601String());
                 }
@@ -3260,6 +3278,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
             widgets.add(
               InkWell(
                 onTap: () async {
+                  _releaseKeyboardFocus();
                   final picked = await showDatePicker(
                     //locale: const Locale('vi'),
                     context: context, // FIX: không dùng getContext
@@ -3267,6 +3286,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
                     firstDate: DateTime(1970),
                     lastDate: DateTime(2100),
                   );
+                  _releaseKeyboardFocus();
                   if (picked != null) {
                     onChanged(picked.toIso8601String());
                   }

@@ -28,7 +28,7 @@ class StaffTemplatePickerScreen extends StatelessWidget {
               title: Text(t.name),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
-                // 1. Chọn bệnh nhân
+                //1. Chọn bệnh nhân
                 final selectedPatient = await Navigator.push<PatientModel>(
                   context,
                   MaterialPageRoute(
