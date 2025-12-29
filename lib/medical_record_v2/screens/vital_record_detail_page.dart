@@ -42,7 +42,7 @@ class _VitalRecordDetailViewState extends State<_VitalRecordDetailView>
     with TickerProviderStateMixin {
   static const Set<int> _diagnosisIds = {25, 35, 52};
   static const Set<int> _labIds = {23, 33, 43};
-  static const Set<int> _treatmentIds = {26, 53};
+  static const Set<int> _treatmentIds = {26, 36, 53};
   static const Set<int> _followUpIds = {49, 37, 54};
 
   late final TabController _tabController;

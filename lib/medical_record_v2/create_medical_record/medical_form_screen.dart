@@ -371,6 +371,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:dr_urticaria/constant/color.dart';
 import 'package:dr_urticaria/utils/snack_bar.dart';
+import '../../models/patient/patient_model.dart';
 import '../../widget/custom_progress_indicator.dart';
 import 'cubit/medical_form_cubit.dart';
 import 'cubit/medical_form_state.dart';
@@ -378,20 +379,24 @@ import 'model/vital_group.dart';
 
 class MedicalFormScreen extends StatelessWidget {
   final int templateId;
-  final int patientId;
+  final PatientModel patient;
   const MedicalFormScreen({
     super.key,
     required this.templateId,
-    required this.patientId,
+    required this.patient,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => MedicalFormCubit()..loadMedicalForm(templateId),
+      create: (_) => MedicalFormCubit()
+        ..loadMedicalForm(
+          templateId,
+          patient: patient,
+        ),
       child: _MedicalFormView(
         templateId: templateId,
-        patientId: patientId,
+        patient: patient,
       ),
     );
   }
@@ -399,10 +404,10 @@ class MedicalFormScreen extends StatelessWidget {
 
 class _MedicalFormView extends StatefulWidget {
   final int templateId;
-  final int patientId;
+  final PatientModel patient;
   const _MedicalFormView({
     required this.templateId,
-    required this.patientId,
+    required this.patient,
   });
 
   @override
@@ -793,7 +798,7 @@ class _MedicalFormViewState extends State<_MedicalFormView> {
                                       .read<MedicalFormCubit>()
                                       .submitMedicalRecord(
                                         templateId: widget.templateId,
-                                        patientId: widget.patientId,
+                                        patientId: widget.patient.id,
                                       );
                                 } else {
                                   nextStep(visibleGroups.length);

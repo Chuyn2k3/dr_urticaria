@@ -48,7 +48,7 @@ class StaffTemplatePickerScreen extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (_) => MedicalFormScreen(
                       templateId: t.id,
-                      patientId: selectedPatient.id,
+                      patient: selectedPatient,
                     ),
                   ),
                 );

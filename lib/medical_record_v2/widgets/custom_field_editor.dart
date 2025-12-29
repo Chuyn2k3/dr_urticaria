@@ -248,7 +248,7 @@
 //       String treatmentKey;
 //       if (groupLabel.isEmpty) {
 //         treatmentKey =
-//             'Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)';
+//             'Đợt bệnh này bạn đã điều trị hay chưa?';
 //       } else {
 //         treatmentKey = groupLabel.isNotEmpty
 //             ? '$groupLabel.Có điều trị hay không?'
@@ -817,6 +817,7 @@ class CustomFieldEditor extends StatefulWidget {
 
 class _CustomFieldEditorState extends State<CustomFieldEditor> {
   final Map<String, TextEditingController> _controllers = {};
+  final FocusNode _dummyFocusNode = FocusNode(debugLabel: 'dummy_focus');
   // Split '.' an toàn: không cắt giữa 2 chữ số (vd "6.3 Bàn tay")
   List<String> _splitKeyParts(String key) {
     final parts = <String>[];
@@ -939,8 +940,16 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
     return value?.toString() ?? '';
   }
 
+  void _releaseKeyboardFocus() {
+    // 1) Unfocus ngay lập tức
+    FocusManager.instance.primaryFocus?.unfocus();
+    // 2) Request dummy focus để Flutter không restore focus về TextField cũ
+    FocusScope.of(context).requestFocus(_dummyFocusNode);
+  }
+
   @override
   void dispose() {
+    _dummyFocusNode.dispose();
     for (final c in _controllers.values) {
       c.dispose();
     }
@@ -1027,8 +1036,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         (widget.indicator.id == 175 || widget.indicator.id == 64)) {
       String treatmentKey;
       if (groupLabel.isEmpty) {
-        treatmentKey =
-            'Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)';
+        treatmentKey = 'Đợt bệnh này bạn đã điều trị hay chưa?';
       } else {
         treatmentKey = groupLabel.isNotEmpty
             ? '$groupLabel.Có điều trị hay không?'
@@ -1335,6 +1343,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       case FieldType.fullDate:
         return InkWell(
           onTap: () async {
+            _releaseKeyboardFocus();
             DateTime initial = DateTime.now();
             if (resolvedValue is String && resolvedValue.isNotEmpty) {
               final parsed = DateTime.tryParse(resolvedValue);
@@ -1348,6 +1357,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
             );
+            _releaseKeyboardFocus();
             if (picked != null) {
               final updated = Map<String, dynamic>.from(widget.value);
               final normalized =
@@ -1370,6 +1380,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       case FieldType.fullYearRange:
         return InkWell(
           onTap: () async {
+            _releaseKeyboardFocus();
             final picked = await showDatePicker(
               context: context,
               initialDate: DateTime.tryParse(resolvedValue?.toString() ?? '') ??
@@ -1377,6 +1388,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
             );
+            _releaseKeyboardFocus();
             if (picked != null) {
               final updated = Map<String, dynamic>.from(widget.value);
               updated[fullKey] = DateFormat('yyyy-MM-dd').format(picked);
@@ -1411,6 +1423,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         }
         return InkWell(
           onTap: () async {
+            _releaseKeyboardFocus();
             final picked = await showDateRangePicker(
               context: context,
               firstDate: DateTime(1970),
@@ -1418,6 +1431,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               initialDateRange: current,
             );
             final updated = Map<String, dynamic>.from(widget.value);
+            _releaseKeyboardFocus();
             if (picked == null) {
               updated.remove(fullKey);
               _cleanupWeeksIfAny(updated, groupLabel: groupLabel, group: group);

@@ -45,11 +45,21 @@ class VitalFieldEditor extends StatefulWidget {
 
 class _VitalFieldEditorState extends State<VitalFieldEditor> {
   late TextEditingController _controller;
-
+  final FocusNode _dummyFocusNode = FocusNode(debugLabel: 'dummy_focus');
+  late TextEditingController _ctrl185_1;
+  late TextEditingController _ctrl185_2;
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.value?.toString() ?? '');
+    final allValues = _asMap(widget.value);
+    _ctrl185_1 = TextEditingController(
+      text: (allValues['Nhập khoảng thời gian (dùng thuốc)'] ?? '').toString(),
+    );
+    _ctrl185_2 = TextEditingController(
+      text: (allValues['Nhập khoảng thời gian (không dùng thuốc)'] ?? '')
+          .toString(),
+    );
   }
 
   @override
@@ -58,12 +68,29 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
     if (widget.value?.toString() != oldWidget.value?.toString()) {
       _controller.text = widget.value?.toString() ?? '';
     }
+    final newMap = _asMap(widget.value);
+    final t1 = (newMap['Nhập khoảng thời gian (dùng thuốc)'] ?? '').toString();
+    final t2 =
+        (newMap['Nhập khoảng thời gian (không dùng thuốc)'] ?? '').toString();
+
+    if (_ctrl185_1.text != t1) _ctrl185_1.text = t1;
+    if (_ctrl185_2.text != t2) _ctrl185_2.text = t2;
   }
 
   @override
   void dispose() {
+    _dummyFocusNode.dispose();
     _controller.dispose();
+    _ctrl185_1.dispose();
+    _ctrl185_2.dispose();
     super.dispose();
+  }
+
+  void _releaseKeyboardFocus() {
+    // 1) Unfocus ngay lập tức
+    FocusManager.instance.primaryFocus?.unfocus();
+    // 2) Request dummy focus để Flutter không restore focus về TextField cũ
+    FocusScope.of(context).requestFocus(_dummyFocusNode);
   }
 
   // ===================== Shared helpers =====================
@@ -767,11 +794,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
         CustomCheckboxGroup(
           label: '',
           selectedValues: selected,
-          options: const [
-            "Stress",
-            "Thức ăn",
-            "Chống viêm, giảm đau (Paracetalmon,...)"
-          ],
+          options: const ["Căng thẳng", "Thức ăn", "Thuốc"],
           onChanged: (newValues) {
             final m = Map<String, dynamic>.from(allValues);
 
@@ -786,8 +809,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
             if (!normalized.contains('Thức ăn')) {
               m.remove('Chi tiết thức ăn làm nặng bệnh');
             }
-            if (!normalized
-                .contains('Chống viêm, giảm đau (Paracetalmon,...)')) {
+            if (!normalized.contains('Thuốc')) {
               m.remove('Chi tiết thuốc làm nặng bệnh');
             }
 
@@ -809,7 +831,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
               widget.onChanged(m);
             },
           ),
-        if (selected.contains('Chống viêm, giảm đau (Paracetalmon,...)'))
+        if (selected.contains('Thuốc'))
           InputTextField(
             label: 'Chi tiết thuốc làm nặng bệnh',
             textController: _controller,
@@ -909,33 +931,135 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
   }
 
   // 185/71: 2 radio + input khi chọn "Khác (theo giờ)" + cleanup
+  // Widget _buildSpecial185or71(BuildContext context) {
+  //   final label = widget.labelOverride ?? widget.indicator.name;
+  //   final unit = (widget.unitOverride ?? widget.unit ?? widget.indicator.unit)
+  //       ?.toString();
+  //   final displayLabel = _displayLabel(label, unit);
+  //
+  //   // ✅ không cast cứng nữa
+  //   final allValues = _asMap(widget.value);
+  //
+  //   final sel1 = allValues['11.1 Khi dùng thuốc']?.toString();
+  //   final sel2 = allValues['11.2 Khi không dùng thuốc']?.toString();
+  //
+  //   final input1 =
+  //       (allValues['Nhập khoảng thời gian (dùng thuốc)'] ?? '').toString();
+  //   final input2 = (allValues['Nhập khoảng thời gian (không dùng thuốc)'] ?? '')
+  //       .toString();
+  //   if (sel1 == 'Khác (theo giờ)') {
+  //     _controller.text = input1;
+  //   }
+  //   if (sel2 == 'Khác (theo giờ)') {
+  //     _controller.text = input2;
+  //   }
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       // Text(displayLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
+  //       // const SizedBox(height: 8),
+  //       CustomRadioGroup(
+  //         label: '11.1 Khi dùng thuốc',
+  //         value: (sel1 != null && sel1.trim().isNotEmpty) ? sel1 : null,
+  //         options: const [
+  //           '< 1h',
+  //           '1-6h',
+  //           '6h-12h',
+  //           '12-24h',
+  //           'Không biết',
+  //           'Khác (theo giờ)',
+  //         ],
+  //         onChanged: (v) {
+  //           final m = Map<String, dynamic>.from(allValues);
+  //           final vv = v?.toString() ?? '';
+  //
+  //           if (vv.trim().isNotEmpty) {
+  //             m['11.1 Khi dùng thuốc'] = vv;
+  //           } else {
+  //             m.remove('11.1 Khi dùng thuốc');
+  //           }
+  //
+  //           if (vv != 'Khác (theo giờ)') {
+  //             m.remove('Nhập khoảng thời gian (dùng thuốc)');
+  //           }
+  //
+  //           widget.onChanged(m);
+  //         },
+  //       ),
+  //       if (sel1 == 'Khác (theo giờ)')
+  //         InputTextField(
+  //           label: 'Nhập khoảng thời gian',
+  //           textController: _controller,
+  //           onChanged: (v) {
+  //             final m = Map<String, dynamic>.from(allValues);
+  //             final vv = v.toString();
+  //
+  //             if (vv.trim().isNotEmpty) {
+  //               m['Nhập khoảng thời gian (dùng thuốc)'] = vv;
+  //             } else {
+  //               m.remove('Nhập khoảng thời gian (dùng thuốc)');
+  //             }
+  //
+  //             widget.onChanged(m);
+  //           },
+  //         ),
+  //       CustomRadioGroup(
+  //         label: '11.2 Khi không dùng thuốc',
+  //         value: (sel2 != null && sel2.trim().isNotEmpty) ? sel2 : null,
+  //         options: const [
+  //           '< 1h',
+  //           '1-6h',
+  //           '6h-12h',
+  //           '12-24h',
+  //           'Không biết',
+  //           'Khác (theo giờ)',
+  //         ],
+  //         onChanged: (v) {
+  //           final m = Map<String, dynamic>.from(allValues);
+  //           final vv = v?.toString() ?? '';
+  //
+  //           if (vv.trim().isNotEmpty) {
+  //             m['11.2 Khi không dùng thuốc'] = vv;
+  //           } else {
+  //             m.remove('11.2 Khi không dùng thuốc');
+  //           }
+  //
+  //           if (vv != 'Khác (theo giờ)') {
+  //             m.remove('Nhập khoảng thời gian (không dùng thuốc)');
+  //           }
+  //
+  //           widget.onChanged(m);
+  //         },
+  //       ),
+  //       if (sel2 == 'Khác (theo giờ)')
+  //         InputTextField(
+  //           label: 'Nhập khoảng thời gian',
+  //           textController: _controller,
+  //           onChanged: (v) {
+  //             final m = Map<String, dynamic>.from(allValues);
+  //             final vv = v.toString();
+  //
+  //             if (vv.trim().isNotEmpty) {
+  //               m['Nhập khoảng thời gian (không dùng thuốc)'] = vv;
+  //             } else {
+  //               m.remove('Nhập khoảng thời gian (không dùng thuốc)');
+  //             }
+  //
+  //             widget.onChanged(m);
+  //           },
+  //         ),
+  //     ],
+  //   );
+  // }
   Widget _buildSpecial185or71(BuildContext context) {
-    final label = widget.labelOverride ?? widget.indicator.name;
-    final unit = (widget.unitOverride ?? widget.unit ?? widget.indicator.unit)
-        ?.toString();
-    final displayLabel = _displayLabel(label, unit);
-
-    // ✅ không cast cứng nữa
     final allValues = _asMap(widget.value);
 
     final sel1 = allValues['11.1 Khi dùng thuốc']?.toString();
     final sel2 = allValues['11.2 Khi không dùng thuốc']?.toString();
 
-    final input1 =
-        (allValues['Nhập khoảng thời gian (dùng thuốc)'] ?? '').toString();
-    final input2 = (allValues['Nhập khoảng thời gian (không dùng thuốc)'] ?? '')
-        .toString();
-    if (sel1 == 'Khác (theo giờ)') {
-      _controller.text = input1;
-    }
-    if (sel2 == 'Khác (theo giờ)') {
-      _controller.text = input2;
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Text(displayLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
-        // const SizedBox(height: 8),
         CustomRadioGroup(
           label: '11.1 Khi dùng thuốc',
           value: (sel1 != null && sel1.trim().isNotEmpty) ? sel1 : null,
@@ -949,16 +1073,18 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
           ],
           onChanged: (v) {
             final m = Map<String, dynamic>.from(allValues);
-            final vv = v?.toString() ?? '';
+            final vv = v?.toString().trim() ?? '';
 
-            if (vv.trim().isNotEmpty) {
+            if (vv.isNotEmpty) {
               m['11.1 Khi dùng thuốc'] = vv;
             } else {
               m.remove('11.1 Khi dùng thuốc');
             }
 
+            // nếu không phải "Khác" thì xoá input + reset controller riêng
             if (vv != 'Khác (theo giờ)') {
               m.remove('Nhập khoảng thời gian (dùng thuốc)');
+              if (_ctrl185_1.text.isNotEmpty) _ctrl185_1.clear();
             }
 
             widget.onChanged(m);
@@ -967,17 +1093,15 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
         if (sel1 == 'Khác (theo giờ)')
           InputTextField(
             label: 'Nhập khoảng thời gian',
-            textController: _controller,
+            textController: _ctrl185_1, // controller riêng
             onChanged: (v) {
               final m = Map<String, dynamic>.from(allValues);
-              final vv = v.toString();
-
-              if (vv.trim().isNotEmpty) {
-                m['Nhập khoảng thời gian (dùng thuốc)'] = vv;
+              final text = v.trim();
+              if (text.isNotEmpty) {
+                m['Nhập khoảng thời gian (dùng thuốc)'] = text;
               } else {
                 m.remove('Nhập khoảng thời gian (dùng thuốc)');
               }
-
               widget.onChanged(m);
             },
           ),
@@ -994,9 +1118,9 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
           ],
           onChanged: (v) {
             final m = Map<String, dynamic>.from(allValues);
-            final vv = v?.toString() ?? '';
+            final vv = v?.toString().trim() ?? '';
 
-            if (vv.trim().isNotEmpty) {
+            if (vv.isNotEmpty) {
               m['11.2 Khi không dùng thuốc'] = vv;
             } else {
               m.remove('11.2 Khi không dùng thuốc');
@@ -1004,6 +1128,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
 
             if (vv != 'Khác (theo giờ)') {
               m.remove('Nhập khoảng thời gian (không dùng thuốc)');
+              if (_ctrl185_2.text.isNotEmpty) _ctrl185_2.clear();
             }
 
             widget.onChanged(m);
@@ -1012,17 +1137,15 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
         if (sel2 == 'Khác (theo giờ)')
           InputTextField(
             label: 'Nhập khoảng thời gian',
-            textController: _controller,
+            textController: _ctrl185_2, // controller riêng
             onChanged: (v) {
               final m = Map<String, dynamic>.from(allValues);
-              final vv = v.toString();
-
-              if (vv.trim().isNotEmpty) {
-                m['Nhập khoảng thời gian (không dùng thuốc)'] = vv;
+              final text = v.trim();
+              if (text.isNotEmpty) {
+                m['Nhập khoảng thời gian (không dùng thuốc)'] = text;
               } else {
                 m.remove('Nhập khoảng thời gian (không dùng thuốc)');
               }
-
               widget.onChanged(m);
             },
           ),
@@ -1393,6 +1516,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
             : '';
         return InkWell(
           onTap: () async {
+            _releaseKeyboardFocus();
             final picked = await showDatePicker(
               locale: const Locale('vi'),
               context: context,
@@ -1400,6 +1524,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
               firstDate: DateTime(1970),
               lastDate: DateTime(2100),
             );
+            _releaseKeyboardFocus();
             if (picked != null) {
               widget.onChanged(picked.toIso8601String());
             }
@@ -1417,6 +1542,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
       case FieldType.fullYearRange:
         return InkWell(
           onTap: () async {
+            _releaseKeyboardFocus();
             final picked = await showDatePicker(
               locale: const Locale('vi'),
               context: context,
@@ -1425,6 +1551,7 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
             );
+            _releaseKeyboardFocus();
             if (picked != null) {
               widget.onChanged(DateFormat('yyyy-MM-dd').format(picked));
             }

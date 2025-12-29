@@ -641,7 +641,7 @@
 //             ],
 //           );
 //         }
-//         // Xử lý cho id 196: Yếu tố làm nặng bệnh - hiển thị chi tiết nếu chọn "Thức ăn" hoặc "Chống viêm, giảm đau (Paracetalmon,...)"
+//         // Xử lý cho id 196: Yếu tố làm nặng bệnh - hiển thị chi tiết nếu chọn "Thức ăn" hoặc "Thuốc"
 //         if (widget.indicator.id == 196 || widget.indicator.id == 66) {
 //           final allValues = (widget.value as Map<String, dynamic>?) ?? {};
 //           final selected =
@@ -660,7 +660,7 @@
 //                 options: [
 //                   "Stress",
 //                   "Thức ăn",
-//                   "Chống viêm, giảm đau (Paracetalmon,...)"
+//                   "Thuốc"
 //                 ],
 //                 onChanged: (newValues) {
 //                   final m = Map<String, dynamic>.from(allValues);
@@ -670,7 +670,7 @@
 //                     m.remove('Chi tiết thức ăn');
 //                   }
 //                   if (!newValues
-//                       .contains('Chống viêm, giảm đau (Paracetalmon,...)')) {
+//                       .contains('Thuốc')) {
 //                     m.remove('Chi tiết thuốc');
 //                   }
 //                   widget.onChanged(m);
@@ -686,7 +686,7 @@
 //                     widget.onChanged(m);
 //                   },
 //                 ),
-//               if (selected.contains('Chống viêm, giảm đau (Paracetalmon,...)'))
+//               if (selected.contains('Thuốc'))
 //                 InputTextField(
 //                   label: 'Chi tiết thuốc',
 //                   onChanged: (v) {
@@ -1145,7 +1145,7 @@
 //
 //         bool shouldShowField = true;
 //
-//         // Điều kiện cho root group: “Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)”
+//         // Điều kiện cho root group: “Đợt bệnh này bạn đã điều trị hay chưa?”
 //         // và cho episode groups: “Có điều trị hay không?”
 //         if ((fieldLabel == "Tên thuốc" ||
 //                 fieldLabel == "Liều thuốc (ghi thời gian nếu nhớ)" ||
@@ -1155,8 +1155,8 @@
 //           if (groupLabel.isEmpty) {
 //             // Root group
 //             treatmentKey = groupLabel.isNotEmpty
-//                 ? '$groupLabel.Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)'
-//                 : 'Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)';
+//                 ? '$groupLabel.Đợt bệnh này bạn đã điều trị hay chưa?'
+//                 : 'Đợt bệnh này bạn đã điều trị hay chưa?';
 //           } else {
 //             // Episode groups
 //             treatmentKey = groupLabel.isNotEmpty
@@ -1290,7 +1290,7 @@
 //
 //                 // Cleanup khi đổi điều trị
 //                 if (fieldLabel ==
-//                         "Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)" ||
+//                         "Đợt bệnh này bạn đã điều trị hay chưa?" ||
 //                     fieldLabel == "Có điều trị hay không?") {
 //                   final isYes = updatedValue == "Có" ||
 //                       (updatedValue is Map && updatedValue[fieldLabel] == 'Có');
@@ -2305,7 +2305,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
             ],
           );
         }
-        // Xử lý cho id 196: Yếu tố làm nặng bệnh - hiển thị chi tiết nếu chọn "Thức ăn" hoặc "Chống viêm, giảm đau (Paracetalmon,...)"
+        // Xử lý cho id 196: Yếu tố làm nặng bệnh - hiển thị chi tiết nếu chọn "Thức ăn" hoặc "Thuốc"
         if (widget.indicator.id == 196 || widget.indicator.id == 66) {
           final allValues = (widget.value as Map<String, dynamic>?) ?? {};
           final selected =
@@ -2320,11 +2320,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
               CustomCheckboxGroup(
                 label: '',
                 selectedValues: selected,
-                options: [
-                  "Stress",
-                  "Thức ăn",
-                  "Chống viêm, giảm đau (Paracetalmon,...)"
-                ],
+                options: ["Căng thẳng", "Thức ăn", "Thuốc"],
                 onChanged: (newValues) {
                   final m = Map<String, dynamic>.from(allValues);
                   m[widget.indicator.id.toString()] = newValues;
@@ -2332,8 +2328,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
                   if (!newValues.contains('Thức ăn')) {
                     m.remove('Chi tiết thức ăn');
                   }
-                  if (!newValues
-                      .contains('Chống viêm, giảm đau (Paracetalmon,...)')) {
+                  if (!newValues.contains('Thuốc')) {
                     m.remove('Chi tiết thuốc');
                   }
                   widget.onChanged(m);
@@ -2349,7 +2344,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
                     widget.onChanged(m);
                   },
                 ),
-              if (selected.contains('Chống viêm, giảm đau (Paracetalmon,...)'))
+              if (selected.contains('Thuốc'))
                 InputTextField(
                   label: 'Chi tiết thuốc',
                   onChanged: (v) {
@@ -2879,7 +2874,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
         final fieldKey =
             groupLabel.isNotEmpty ? '$groupLabel.$fieldLabel' : fieldLabel;
         bool shouldShowField = true;
-        // Điều kiện cho root group: “Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)”
+        // Điều kiện cho root group: “Đợt bệnh này bạn đã điều trị hay chưa?”
         // và cho episode groups: “Có điều trị hay không?”
         if ((fieldLabel == "Tên thuốc" ||
                 fieldLabel == "Liều thuốc (ghi thời gian nếu nhớ)" ||
@@ -2889,8 +2884,8 @@ class _IndicatorFieldState extends State<IndicatorField> {
           if (groupLabel.isEmpty) {
             // Root group
             treatmentKey = groupLabel.isNotEmpty
-                ? '$groupLabel.Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)'
-                : 'Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)';
+                ? '$groupLabel.Đợt bệnh này bạn đã điều trị hay chưa?'
+                : 'Đợt bệnh này bạn đã điều trị hay chưa?';
           } else {
             // Episode groups
             treatmentKey = groupLabel.isNotEmpty
@@ -3010,8 +3005,7 @@ class _IndicatorFieldState extends State<IndicatorField> {
                   }
                 }
                 // Cleanup khi đổi điều trị
-                if (fieldLabel ==
-                        "Đợt bệnh này bạn đã điều trị hay chưa? (1 đợt bệnh liên tục có nghĩa là bị ít nhất 2 ngày/tuần)" ||
+                if (fieldLabel == "Đợt bệnh này bạn đã điều trị hay chưa?" ||
                     fieldLabel == "Có điều trị hay không?") {
                   final isYes = updatedValue == "Có" ||
                       (updatedValue is Map && updatedValue[fieldLabel] == 'Có');
