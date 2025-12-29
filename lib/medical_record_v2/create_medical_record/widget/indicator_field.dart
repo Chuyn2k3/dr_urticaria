@@ -2537,163 +2537,343 @@ class _IndicatorFieldState extends State<IndicatorField> {
             ],
           );
         }
-        if (widget.indicator.id == 89 || widget.indicator.id == 90) {
+        // if (widget.indicator.id == 89 || widget.indicator.id == 90) {
+        //   final allValues = (widget.value as Map<String, dynamic>?) ?? {};
+        //   // Hàm tiện ích cập nhật map
+        //   void updateValues(String label, dynamic newValue) {
+        //     final m = allValues;
+        //     m[label] = newValue;
+        //     widget.onChanged(m);
+        //   }
+
+        //   return Column(
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       Text(
+        //         'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'}',
+        //         style: const TextStyle(fontWeight: FontWeight.bold),
+        //       ),
+        //       const SizedBox(height: 8),
+        //       // 1. Tiền sử mắc bệnh lý cơ địa
+        //       if (widget.indicator.id == 90)
+        //         CustomRadioGroup(
+        //           label: 'Tiền sử gia đình có người mắc mày đay mạn tính',
+        //           value: (allValues[
+        //                       'Tiền sử gia đình có người mắc mày đay mạn tính']
+        //                   as String?) ??
+        //               '',
+        //           options: ['Có', 'Không', 'Không biết'],
+        //           onChanged: (newValue) {
+        //             updateValues(
+        //                 'Tiền sử gia đình có người mắc mày đay mạn tính',
+        //                 newValue);
+        //             // Nếu không còn 'Có' thì xóa ghi chú
+        //             if (newValue != 'Có') {
+        //               allValues.remove(
+        //                   'ghi_chu_Tiền sử gia đình có người mắc mày đay mạn tính');
+        //               widget.onChanged(allValues);
+        //             }
+        //           },
+        //           enabled: true,
+        //         ),
+        //       CustomRadioGroup(
+        //         label:
+        //             'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa',
+        //         value: (allValues[
+        //                     'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa']
+        //                 as String?) ??
+        //             '',
+        //         options: ['Có', 'Không', 'Không biết'],
+        //         onChanged: (newValue) {
+        //           updateValues(
+        //               'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa',
+        //               newValue);
+        //           // Nếu không còn 'Có' thì xóa ghi chú
+        //           if (newValue != 'Có') {
+        //             allValues.remove(
+        //                 'ghi_chu_Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa');
+        //             widget.onChanged(allValues);
+        //           }
+        //         },
+        //         enabled: true,
+        //       ),
+        //       // if ((allValues[
+        //       //             'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa']
+        //       //         as String?) ==
+        //       //     'Có')
+        //       //   InputTextField(
+        //       //     label: 'Ghi rõ tên',
+        //       //     onChanged: (v) => updateValues(
+        //       //         'ghi_chu_Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa',
+        //       //         v),
+        //       //   ),
+        //       // 2. Tiền sử bệnh lý tuyến giáp
+        //       if (widget.indicator.id == 89)
+        //         CustomRadioGroup(
+        //           label: 'Tiền sử bệnh lý tuyến giáp',
+        //           value: (allValues['Tiền sử bệnh lý tuyến giáp'] as String?) ??
+        //               '',
+        //           options: ['Có', 'Không', 'Không biết'],
+        //           onChanged: (newValue) {
+        //             updateValues('Tiền sử bệnh lý tuyến giáp', newValue);
+        //             if (newValue != 'Có') {
+        //               allValues.remove('ghi_chu_Tiền sử bệnh lý tuyến giáp');
+        //               widget.onChanged(allValues);
+        //             }
+        //           },
+        //           enabled: true,
+        //         ),
+        //       if ((allValues['Tiền sử bệnh lý tuyến giáp'] as String?) == 'Có')
+        //         InputTextField(
+        //           label: 'Ghi rõ tên tuyến giáp',
+        //           onChanged: (v) =>
+        //               updateValues('ghi_chu_Tiền sử bệnh lý tuyến giáp', v),
+        //         ),
+        //       // 3. Tiền sử bệnh tự miễn
+        //       CustomRadioGroup(
+        //         label: 'Tiền sử bệnh tự miễn',
+        //         value: (allValues['Tiền sử bệnh tự miễn'] as String?) ?? '',
+        //         options: ['Có', 'Không', 'Không biết'],
+        //         onChanged: (newValue) {
+        //           updateValues('Tiền sử bệnh tự miễn', newValue);
+        //           if (newValue != 'Có') {
+        //             allValues.remove('ghi_chu_Tiền sử bệnh tự miễn');
+        //             widget.onChanged(allValues);
+        //           }
+        //         },
+        //         enabled: true,
+        //       ),
+        //       if ((allValues['Tiền sử bệnh tự miễn'] as String?) == 'Có')
+        //         InputTextField(
+        //           label: 'Ghi rõ tên bệnh tự miễn',
+        //           onChanged: (v) =>
+        //               updateValues('ghi_chu_Tiền sử bệnh tự miễn', v),
+        //         ),
+        //       // 4. Tiền sử bệnh lý khác
+        //       if (widget.indicator.id == 89)
+        //         CustomRadioGroup(
+        //           label: 'Tiền sử bệnh lý khác',
+        //           value: (allValues['Tiền sử bệnh lý khác'] as String?) ?? '',
+        //           options: ['Có', 'Không', 'Không biết'],
+        //           onChanged: (newValue) {
+        //             updateValues('Tiền sử bệnh lý khác', newValue);
+        //             if (newValue != 'Có') {
+        //               allValues.remove('ghi_chu_Tiền sử bệnh lý khác');
+        //               widget.onChanged(allValues);
+        //             }
+        //           },
+        //           enabled: true,
+        //         ),
+        //       if ((allValues['Tiền sử bệnh lý khác'] as String?) == 'Có')
+        //         InputTextField(
+        //           label: 'Ghi rõ tên bệnh lý khác',
+        //           onChanged: (v) =>
+        //               updateValues('ghi_chu_Tiền sử bệnh lý khác', v),
+        //         ),
+        //       // 5. Tiền sử dị ứng
+        //       if (widget.indicator.id == 89)
+        //         CustomRadioGroup(
+        //           label: 'Tiền sử dị ứng thuốc, thức ăn khác',
+        //           value: (allValues['Tiền sử dị ứng thuốc, thức ăn khác']
+        //                   as String?) ??
+        //               '',
+        //           options: ['Có', 'Không', 'Không biết'],
+        //           onChanged: (newValue) {
+        //             updateValues(
+        //                 'Tiền sử dị ứng thuốc, thức ăn khác', newValue);
+        //             if (newValue != 'Có') {
+        //               allValues
+        //                   .remove('ghi_chu_Tiền sử dị ứng thuốc, thức ăn khác');
+        //               widget.onChanged(allValues);
+        //             }
+        //           },
+        //           enabled: true,
+        //         ),
+        //       if ((allValues['Tiền sử dị ứng thuốc, thức ăn khác']
+        //               as String?) ==
+        //           'Có')
+        //         InputTextField(
+        //           label: 'Ghi rõ tên dị ứng',
+        //           onChanged: (v) => updateValues(
+        //               'ghi_chu_Tiền sử dị ứng thuốc, thức ăn khác', v),
+        //         ),
+        //       // 6. Tiền sử phản vệ
+        //       if (widget.indicator.id == 89)
+        //         CustomRadioGroup(
+        //           label: 'Tiền sử phản vệ',
+        //           value: (allValues['Tiền sử phản vệ'] as String?) ?? '',
+        //           options: ['Có', 'Không', 'Không biết'],
+        //           onChanged: (newValue) {
+        //             updateValues('Tiền sử phản vệ', newValue);
+        //             if (newValue != 'Có') {
+        //               allValues.remove('ghi_chu_Tiền sử phản vệ');
+        //               widget.onChanged(allValues);
+        //             }
+        //           },
+        //           enabled: true,
+        //         ),
+        //       // if ((allValues['Tiền sử phản vệ'] as String?) == 'Có')
+        //       //   InputTextField(
+        //       //     label: 'Ghi rõ tên phản vệ',
+        //       //     onChanged: (v) => updateValues('ghi_chu_Tiền sử phản vệ', v),
+        //       //   ),
+        //     ],
+        //   );
+        // }
+        if (widget.indicator.id == 89) {
           final allValues = (widget.value as Map<String, dynamic>?) ?? {};
-          // Hàm tiện ích cập nhật map
-          void updateValues(String label, dynamic newValue) {
-            final m = allValues;
-            m[label] = newValue;
+
+          void update(String key, dynamic value) {
+            final m = Map<String, dynamic>.from(allValues);
+            if (value == null || (value is String && value.trim().isEmpty)) {
+              m.remove(key);
+            } else {
+              m[key] = value;
+            }
             widget.onChanged(m);
           }
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              const Text('Tiền sử bản thân',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              // 1. Tiền sử mắc bệnh lý cơ địa
+
+              // 1. Bệnh lý cơ địa
               CustomRadioGroup(
-                label:
-                    'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa',
-                value: (allValues[
-                            'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa']
-                        as String?) ??
-                    '',
-                options: ['Có', 'Không', 'Không biết'],
-                onChanged: (newValue) {
-                  updateValues(
-                      'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa',
-                      newValue);
-                  // Nếu không còn 'Có' thì xóa ghi chú
-                  if (newValue != 'Có') {
-                    allValues.remove(
-                        'ghi_chu_Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa');
-                    widget.onChanged(allValues);
-                  }
-                },
-                enabled: true,
+                label: 'Tiền sử bản thân mắc bệnh lý cơ địa',
+                value: allValues['Tiền sử bản thân mắc bệnh lý cơ địa'],
+                options: const ['Có', 'Không', 'Không biết'],
+                onChanged: (v) =>
+                    update('Tiền sử bản thân mắc bệnh lý cơ địa', v),
               ),
-              // if ((allValues[
-              //             'Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa']
-              //         as String?) ==
-              //     'Có')
-              //   InputTextField(
-              //     label: 'Ghi rõ tên',
-              //     onChanged: (v) => updateValues(
-              //         'ghi_chu_Tiền sử ${widget.indicator.id == 89 ? 'bản thân' : 'gia đình'} mắc bệnh lý cơ địa',
-              //         v),
-              //   ),
-              // 2. Tiền sử bệnh lý tuyến giáp
+
+              // 2. Tuyến giáp
               CustomRadioGroup(
-                label: 'Tiền sử bệnh lý tuyến giáp',
-                value:
-                    (allValues['Tiền sử bệnh lý tuyến giáp'] as String?) ?? '',
-                options: ['Có', 'Không', 'Không biết'],
-                onChanged: (newValue) {
-                  updateValues('Tiền sử bệnh lý tuyến giáp', newValue);
-                  if (newValue != 'Có') {
-                    allValues.remove('ghi_chu_Tiền sử bệnh lý tuyến giáp');
-                    widget.onChanged(allValues);
-                  }
+                label: 'Tiền sử bản thân bệnh lý tuyến giáp',
+                value: allValues['Tiền sử bản thân bệnh lý tuyến giáp'],
+                options: const ['Có', 'Không', 'Không biết'],
+                onChanged: (v) {
+                  update('Tiền sử bản thân bệnh lý tuyến giáp', v);
+                  if (v != 'Có') update('Chi tiết bệnh tuyến giáp', null);
                 },
-                enabled: true,
               ),
-              if ((allValues['Tiền sử bệnh lý tuyến giáp'] as String?) == 'Có')
+              if (allValues['Tiền sử bản thân bệnh lý tuyến giáp'] == 'Có')
                 InputTextField(
-                  label: 'Ghi rõ tên tuyến giáp',
-                  onChanged: (v) =>
-                      updateValues('ghi_chu_Tiền sử bệnh lý tuyến giáp', v),
+                  label: 'Chi tiết bệnh tuyến giáp',
+                  onChanged: (v) => update('Chi tiết bệnh tuyến giáp', v),
                 ),
-              // 3. Tiền sử bệnh tự miễn
+
+              // 3. Bệnh tự miễn
               CustomRadioGroup(
-                label: 'Tiền sử bệnh tự miễn',
-                value: (allValues['Tiền sử bệnh tự miễn'] as String?) ?? '',
-                options: ['Có', 'Không', 'Không biết'],
-                onChanged: (newValue) {
-                  updateValues('Tiền sử bệnh tự miễn', newValue);
-                  if (newValue != 'Có') {
-                    allValues.remove('ghi_chu_Tiền sử bệnh tự miễn');
-                    widget.onChanged(allValues);
-                  }
+                label: 'Tiền sử bản thân bệnh tự miễn',
+                value: allValues['Tiền sử bản thân bệnh tự miễn'],
+                options: const ['Có', 'Không', 'Không biết'],
+                onChanged: (v) {
+                  update('Tiền sử bản thân bệnh tự miễn', v);
+                  if (v != 'Có') update('Chi tiết bệnh tự miễn', null);
                 },
-                enabled: true,
               ),
-              if ((allValues['Tiền sử bệnh tự miễn'] as String?) == 'Có')
+              if (allValues['Tiền sử bản thân bệnh tự miễn'] == 'Có')
                 InputTextField(
-                  label: 'Ghi rõ tên bệnh tự miễn',
-                  onChanged: (v) =>
-                      updateValues('ghi_chu_Tiền sử bệnh tự miễn', v),
+                  label: 'Chi tiết bệnh tự miễn',
+                  onChanged: (v) => update('Chi tiết bệnh tự miễn', v),
                 ),
-              // 4. Tiền sử bệnh lý khác
+
+              // 4. Bệnh lý khác
               CustomRadioGroup(
-                label: 'Tiền sử bệnh lý khác',
-                value: (allValues['Tiền sử bệnh lý khác'] as String?) ?? '',
-                options: ['Có', 'Không', 'Không biết'],
-                onChanged: (newValue) {
-                  updateValues('Tiền sử bệnh lý khác', newValue);
-                  if (newValue != 'Có') {
-                    allValues.remove('ghi_chu_Tiền sử bệnh lý khác');
-                    widget.onChanged(allValues);
-                  }
+                label: 'Tiền sử bản thân bệnh lý khác',
+                value: allValues['Tiền sử bản thân bệnh lý khác'],
+                options: const ['Có', 'Không', 'Không biết'],
+                onChanged: (v) {
+                  update('Tiền sử bản thân bệnh lý khác', v);
+                  if (v != 'Có') update('Chi tiết bệnh lý khác', null);
                 },
-                enabled: true,
               ),
-              if ((allValues['Tiền sử bệnh lý khác'] as String?) == 'Có')
+              if (allValues['Tiền sử bản thân bệnh lý khác'] == 'Có')
                 InputTextField(
-                  label: 'Ghi rõ tên bệnh lý khác',
-                  onChanged: (v) =>
-                      updateValues('ghi_chu_Tiền sử bệnh lý khác', v),
+                  label: 'Chi tiết bệnh lý khác',
+                  onChanged: (v) => update('Chi tiết bệnh lý khác', v),
                 ),
-              // 5. Tiền sử dị ứng
+
+              // 5. Dị ứng
               CustomRadioGroup(
-                label: 'Tiền sử dị ứng thuốc, thức ăn khác',
-                value: (allValues['Tiền sử dị ứng thuốc, thức ăn khác']
-                        as String?) ??
-                    '',
-                options: ['Có', 'Không', 'Không biết'],
-                onChanged: (newValue) {
-                  updateValues('Tiền sử dị ứng thuốc, thức ăn khác', newValue);
-                  if (newValue != 'Có') {
-                    allValues
-                        .remove('ghi_chu_Tiền sử dị ứng thuốc, thức ăn khác');
-                    widget.onChanged(allValues);
-                  }
+                label: 'Tiền sử bản thân dị ứng thuốc, thức ăn khác',
+                value: allValues['Tiền sử bản thân dị ứng thuốc, thức ăn khác'],
+                options: const ['Có', 'Không', 'Không biết'],
+                onChanged: (v) {
+                  update('Tiền sử bản thân dị ứng thuốc, thức ăn khác', v);
+                  if (v != 'Có') update('Chi tiết dị ứng', null);
                 },
-                enabled: true,
               ),
-              if ((allValues['Tiền sử dị ứng thuốc, thức ăn khác']
-                      as String?) ==
+              if (allValues['Tiền sử bản thân dị ứng thuốc, thức ăn khác'] ==
                   'Có')
                 InputTextField(
-                  label: 'Ghi rõ tên dị ứng',
-                  onChanged: (v) => updateValues(
-                      'ghi_chu_Tiền sử dị ứng thuốc, thức ăn khác', v),
+                  label: 'Chi tiết dị ứng',
+                  onChanged: (v) => update('Chi tiết dị ứng', v),
                 ),
-              // 6. Tiền sử phản vệ
+
+              // 6. Phản vệ (KHÔNG có ô chi tiết)
               CustomRadioGroup(
-                label: 'Tiền sử phản vệ',
-                value: (allValues['Tiền sử phản vệ'] as String?) ?? '',
-                options: ['Có', 'Không', 'Không biết'],
-                onChanged: (newValue) {
-                  updateValues('Tiền sử phản vệ', newValue);
-                  if (newValue != 'Có') {
-                    allValues.remove('ghi_chu_Tiền sử phản vệ');
-                    widget.onChanged(allValues);
-                  }
-                },
-                enabled: true,
+                label: 'Tiền sử bản thân phản vệ',
+                value: allValues['Tiền sử bản thân phản vệ'],
+                options: const ['Có', 'Không', 'Không biết'],
+                onChanged: (v) => update('Tiền sử bản thân phản vệ', v),
               ),
-              // if ((allValues['Tiền sử phản vệ'] as String?) == 'Có')
-              //   InputTextField(
-              //     label: 'Ghi rõ tên phản vệ',
-              //     onChanged: (v) => updateValues('ghi_chu_Tiền sử phản vệ', v),
-              //   ),
             ],
           );
         }
+        if (widget.indicator.id == 90) {
+          final allValues = (widget.value as Map<String, dynamic>?) ?? {};
+
+          void update(String key, dynamic value) {
+            final m = Map<String, dynamic>.from(allValues);
+            if (value == null || (value is String && value.trim().isEmpty)) {
+              m.remove(key);
+            } else {
+              m[key] = value;
+            }
+            widget.onChanged(m);
+          }
+
+          Widget familyBlock(String questionKey) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomRadioGroup(
+                  label: questionKey,
+                  value: allValues[questionKey],
+                  options: const ['Có', 'Không', 'Không biết'],
+                  onChanged: (v) {
+                    update(questionKey, v);
+                    if (v != 'Có')
+                      update('Ghi rõ ai, tên bệnh ($questionKey)', null);
+                  },
+                ),
+                if (allValues[questionKey] == 'Có')
+                  InputTextField(
+                    label: 'Ghi rõ ai, tên bệnh',
+                    onChanged: (v) =>
+                        update('Ghi rõ ai, tên bệnh ($questionKey)', v),
+                  ),
+              ],
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Tiền sử gia đình',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              familyBlock('Tiền sử gia đình có người mắc mày đay mạn tính'),
+              familyBlock('Tiền sử gia đình có người mắc bệnh lý cơ địa'),
+              familyBlock('Tiền sử gia đình mắc bệnh tự miễn khác'),
+            ],
+          );
+        }
+
         // Xử lý cho id 180: Kích thước - nhóm selection
         if (widget.indicator.id == 180 || widget.indicator.id == 67) {
           final allValues = (widget.value as Map<String, dynamic>?) ?? {};
