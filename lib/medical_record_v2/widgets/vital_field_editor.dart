@@ -377,6 +377,95 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
       ],
     );
   }
+  // Widget _buildSpecial190or65(BuildContext context) {
+  //   final label = widget.labelOverride ?? widget.indicator.name;
+  //   final unit = (widget.unitOverride ?? widget.unit ?? widget.indicator.unit)
+  //       ?.toString();
+  //   final displayLabel = _displayLabel(label, unit);
+
+  //   final options = widget.indicator.valueOptions is List
+  //       ? List<String>.from(
+  //           widget.indicator.valueOptions.map((e) => e.toString()))
+  //       : <String>[];
+
+  //   final allValues = _asMap(widget.value);
+
+  //   // Main checkbox key (thay cho radioKey)
+  //   final mainKey = "${widget.indicator.name}_main";
+
+  //   // Main selected: List<String>
+  //   final mainSelected = (allValues[mainKey] is List)
+  //       ? List<String>.from(
+  //           (allValues[mainKey] as List).map((e) => e.toString()))
+  //       : <String>[];
+
+  //   // Sub selected (yếu tố kích thích)
+  //   final selected = (allValues[widget.indicator.id.toString()] is List)
+  //       ? List<String>.from(
+  //           (allValues[widget.indicator.id.toString()] as List)
+  //               .map((e) => e.toString()),
+  //         )
+  //       : <String>[];
+
+  //   final hasRandom = mainSelected.contains("Một cách ngẫu nhiên");
+  //   final hasStimulus = mainSelected.contains("Khi có các yếu tố kích thích");
+
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       CustomCheckboxGroup(
+  //         label: displayLabel,
+  //         selectedValues: mainSelected,
+  //         options: const [
+  //           "Một cách ngẫu nhiên",
+  //           "Khi có các yếu tố kích thích",
+  //         ],
+  //         onChanged: (newMainValues) {
+  //           final m = Map<String, dynamic>.from(allValues);
+
+  //           final cleaned = newMainValues.map((e) => e.toString()).toList();
+
+  //           if (cleaned.isNotEmpty) {
+  //             m[mainKey] = cleaned;
+  //           } else {
+  //             m.remove(mainKey);
+  //           }
+
+  //           // Nếu tick "Một cách ngẫu nhiên" => xoá checkbox phụ
+  //           if (cleaned.contains("Một cách ngẫu nhiên")) {
+  //             m.remove(widget.indicator.id.toString());
+  //           }
+
+  //           widget.onChanged(m);
+  //         },
+  //         enabled: true,
+  //       ),
+
+  //       // Chỉ hiện phần phụ khi chọn "Khi có các yếu tố kích thích"
+  //       // và không chọn "Một cách ngẫu nhiên"
+  //       if (hasStimulus && !hasRandom)
+  //         CustomCheckboxGroup(
+  //           label: "Chọn các yếu tố kích thích",
+  //           selectedValues: selected,
+  //           options: options.length > 2 ? options.skip(2).toList() : options,
+  //           onChanged: (newValues) {
+  //             final m = Map<String, dynamic>.from(allValues);
+
+  //             final cleaned = newValues.map((e) => e.toString()).toList();
+
+  //             if (cleaned.isNotEmpty) {
+  //               m[widget.indicator.id.toString()] = cleaned;
+  //             } else {
+  //               m.remove(widget.indicator.id.toString());
+  //             }
+
+  //             widget.onChanged(m);
+  //           },
+  //           enabled: true,
+  //         ),
+  //     ],
+  //   );
+  // }
 
   // 175/64: episode groups theo "Số đợt..." + cleanup group ẩn
   Widget _buildSpecial175or64(BuildContext context) {
@@ -1292,7 +1381,13 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
         CustomRadioGroup(
           label: '7.1 Khi dùng thuốc',
           value: allValues['7.1 Khi dùng thuốc']?.toString(),
-          options: const ['< 3 mm', '3-10 mm', '10-50 mm', '> 50 mm'],
+          options: const [
+            '< 3 mm',
+            '3-10 mm',
+            '10-50 mm',
+            '> 50 mm',
+            "Không xuất hiện"
+          ],
           onChanged: (v) {
             final m = Map<String, dynamic>.from(allValues);
             if (v != null && v.toString().trim().isNotEmpty) {
@@ -1306,7 +1401,13 @@ class _VitalFieldEditorState extends State<VitalFieldEditor> {
         CustomRadioGroup(
           label: '7.2 Khi không dùng thuốc',
           value: allValues['7.2 Khi không dùng thuốc']?.toString(),
-          options: const ['< 3 mm', '3-10 mm', '10-50 mm', '> 50 mm'],
+          options: const [
+            '< 3 mm',
+            '3-10 mm',
+            '10-50 mm',
+            '> 50 mm',
+            "Không xuất hiện"
+          ],
           onChanged: (v) {
             final m = Map<String, dynamic>.from(allValues);
             if (v != null && v.toString().trim().isNotEmpty) {

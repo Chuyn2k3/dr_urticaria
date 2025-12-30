@@ -2024,6 +2024,76 @@ class _IndicatorFieldState extends State<IndicatorField> {
             ],
           );
         }
+        // if (widget.indicator.id == 190 || widget.indicator.id == 65) {
+        //   final allValues = (widget.value as Map<String, dynamic>?) ?? {};
+        //   final mainKey =
+        //       "${widget.indicator.name}_main"; // thay radioKey -> mainKey
+
+        //   // Main selection giờ là List<String>
+        //   final mainSelected =
+        //       (allValues[mainKey] as List<dynamic>?)?.cast<String>() ?? [];
+
+        //   final stimSelected =
+        //       (allValues[widget.indicator.id.toString()] as List<dynamic>?)
+        //               ?.cast<String>() ??
+        //           [];
+
+        //   final hasRandom = mainSelected.contains("Một cách ngẫu nhiên");
+        //   final hasStimulus =
+        //       mainSelected.contains("Khi có các yếu tố kích thích");
+
+        //   return Column(
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       CustomCheckboxGroup(
+        //         label: indicatorLabel,
+        //         selectedValues: mainSelected,
+        //         options: const [
+        //           "Một cách ngẫu nhiên",
+        //           "Khi có các yếu tố kích thích",
+        //         ],
+        //         onChanged: (newMainValues) {
+        //           final m = Map<String, dynamic>.from(allValues);
+
+        //           if (newMainValues.isNotEmpty) {
+        //             m[mainKey] = newMainValues;
+        //           } else {
+        //             m.remove(mainKey);
+        //           }
+
+        //           // Nếu tick "Một cách ngẫu nhiên" thì xoá nhóm yếu tố kích thích phụ
+        //           if (newMainValues.contains("Một cách ngẫu nhiên")) {
+        //             m.remove(widget.indicator.id.toString());
+        //           }
+
+        //           widget.onChanged(m);
+        //         },
+        //         enabled: true,
+        //       ),
+        //       if (hasStimulus && !hasRandom)
+        //         CustomCheckboxGroup(
+        //           label: "Chọn các yếu tố kích thích",
+        //           selectedValues: stimSelected,
+        //           options: options
+        //               .skip(2)
+        //               .toList(), // Bỏ 2 option đầu cho checkbox phụ
+        //           onChanged: (newStimValues) {
+        //             final m = Map<String, dynamic>.from(allValues);
+
+        //             if (newStimValues.isNotEmpty) {
+        //               m[widget.indicator.id.toString()] = newStimValues;
+        //             } else {
+        //               m.remove(widget.indicator.id.toString());
+        //             }
+
+        //             widget.onChanged(m);
+        //           },
+        //           enabled: true,
+        //         ),
+        //     ],
+        //   );
+        // }
+
         // Mặc định indicator-level (không ảnh)
         final selected = (widget.value as List<String>?) ?? [];
         return CustomCheckboxGroup(
@@ -2886,7 +2956,13 @@ class _IndicatorFieldState extends State<IndicatorField> {
               CustomRadioGroup(
                 label: '7.1 Khi dùng thuốc',
                 value: allValues['7.1 Khi dùng thuốc'],
-                options: ['< 3 mm', '3-10 mm', '10-50 mm', '> 50 mm'],
+                options: [
+                  '< 3 mm',
+                  '3-10 mm',
+                  '10-50 mm',
+                  '> 50 mm',
+                  "Không xuất hiện"
+                ],
                 onChanged: (v) {
                   final m = Map<String, dynamic>.from(allValues);
                   m['7.1 Khi dùng thuốc'] = v;
@@ -2896,7 +2972,13 @@ class _IndicatorFieldState extends State<IndicatorField> {
               CustomRadioGroup(
                 label: '7.2 Khi không dùng thuốc',
                 value: allValues['7.2 Khi không dùng thuốc'],
-                options: ['< 3 mm', '3-10 mm', '10-50 mm', '> 50 mm'],
+                options: [
+                  '< 3 mm',
+                  '3-10 mm',
+                  '10-50 mm',
+                  '> 50 mm',
+                  "Không xuất hiện"
+                ],
                 onChanged: (v) {
                   final m = Map<String, dynamic>.from(allValues);
                   m['7.2 Khi không dùng thuốc'] = v;
